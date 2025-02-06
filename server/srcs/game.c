@@ -1,5 +1,11 @@
 #include "../includes/server.h"
 
+void assign_player_position(player_t *player, map_t *map) {
+    player->x = rand() % map->width;
+    player->y = rand() % map->height;
+    player->direction = rand() % 4;  // Orientation aléatoire (0 à 3)
+}
+
 void game_loop() {
     struct timeval start, end;
     double elapsed;

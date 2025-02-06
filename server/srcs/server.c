@@ -1,8 +1,10 @@
 #include "../includes/server.h"
 
 game_time_t game_time = {0, 100, false};  // Temps initialisé avec `t = 100`
-int *global_client_sockets;
-int global_max_clients;
+int         *global_client_sockets;
+int         global_max_clients;
+player_t    *players = NULL;
+int         player_count = 0;
 
 // Initialise un serveur TCP et le met en écoute sur un port donné.
 // Cette fonction crée un socket, configure son adresse, lie ce socket à une
@@ -46,7 +48,7 @@ int init_server(int port) {
 // Cette fonction attend une connexion entrante sur le socket serveur, accepte la connexion
 // et enregistre le socket du client dans un tableau de gestion des connexions.
 
-void accept_new_client(int server_socket, int *client_sockets, int max_clients) {
+void accept_new_client(int server_socket, int *client_sockets, int max_clients, map_t *map) {
     struct sockaddr_in client_addr;
     socklen_t addr_size = sizeof(client_addr);
     // Attente d'une connexion entrante avec `accept`.
@@ -61,14 +63,14 @@ void accept_new_client(int server_socket, int *client_sockets, int max_clients) 
     char buffer[BUFFER_SIZE] = {0};
     read(client_socket, buffer, sizeof(buffer) - 1);
 
-    // if (strcmp(buffer, "GRAPHIC\n") == 0)
-    // {
+    if (strcmp(buffer, "GRAPHIC\n") == 0)
+    {
         log_printf("Client graphique connecté ! Démarrage du jeu...\n");
         game_time.game_started = true;
         send_message_to_all_clients("La partie commence !\n", client_sockets, max_clients);
-    // }
-    // else
-    // {
+    }
+    else
+    {
     // Affichage d'un message confirmant la connexion d'un nouveau client.
     log_printf("Nouvelle connexion acceptée (socket %d)\n", client_socket);
 
@@ -78,6 +80,23 @@ void accept_new_client(int server_socket, int *client_sockets, int max_clients) 
         if (client_sockets[i] == 0) {
             client_sockets[i] = client_socket;
             log_printf("Client ajouté à l'index %d\n", i);
+            
+            
+            players = realloc(players, (player_count + 1) * sizeof(player_t));
+            players[player_count].id = player_count;
+            assign_player_position(&players[player_count], map);
+            player_count++;
+
+            log_printf("Joueur #%d placé en (%d, %d)\n",
+                players[player_count - 1].id,
+                players[player_count - 1].x,
+                players[player_count - 1].y
+            );
+
+            // Envoyer la position au client
+            char response[64];
+            snprintf(response, sizeof(response), "%d\n%d %d", max_clients - player_count, players[player_count - 1].x, players[player_count - 1].y);
+            write(client_socket, response, strlen(response));
             return;
         }
     }
@@ -85,7 +104,7 @@ void accept_new_client(int server_socket, int *client_sockets, int max_clients) 
     //  Si aucun emplacement n'est disponible, la connexion est refusée et le socket est fermé.
     log_printf("Connexion refusée : trop de clients\n");
     close(client_socket);
-    //}
+    }
 }
 
 // Gère les messages des clients connectés et traite les déconnexions.
@@ -184,7 +203,7 @@ void start_server(server_config_t config) {
 
         // Si une connexion est détectée sur le socket serveur, elle est acceptée avec `accept_new_client`.
         if (FD_ISSET(server_socket, &read_fds)) {
-            accept_new_client(server_socket, client_sockets, max_clients);
+            accept_new_client(server_socket, client_sockets, max_clients, map);
         }
 
         // Les messages des clients sont ensuite traités avec `handle_client_messages`.

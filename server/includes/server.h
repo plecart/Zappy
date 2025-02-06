@@ -43,7 +43,17 @@ typedef struct  game_time_s {
     bool        game_started;
 }               game_time_t;
 
+typedef struct  player_s {
+    int         id;
+    int         x;
+    int         y;
+    int         direction;
+    int         team_id;
+}               player_t;
+
 extern          game_time_t game_time;
+extern          player_t *players;
+extern          int player_count;
 
 void            print_server_usage(char *prog_name);
 server_config_t parse_server_arguments(int argc, char *argv[]);
@@ -51,7 +61,7 @@ void            print_server_config(server_config_t config);
 
 void            start_server(server_config_t config);
 int             init_server(int port);
-void            accept_new_client(int server_socket, int *client_sockets, int max_clients);
+void            accept_new_client(int server_socket, int *client_sockets, int max_clients, map_t *map);
 void            handle_client_messages(int *client_sockets, int max_clients, fd_set *read_fds);
 void            send_message_to_all_clients(const char *message, int *client_sockets, int max_clients);
 
@@ -60,6 +70,7 @@ void            populate_map(map_t *map);
 void            print_map(map_t *map);
 void            free_map(map_t *map);
 
+void            assign_player_position(player_t *player, map_t *map);
 void            game_loop();
 
 #endif 
