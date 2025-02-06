@@ -38,6 +38,23 @@ int connect_to_server(client_config_t config) {
     return sock;
 }
 
+void wait_for_game_start(int sock) {
+    char buffer[BUFFER_SIZE] = {0};
+
+    while (1) {
+        int bytes_read = read(sock, buffer, sizeof(buffer) - 1);
+        if (bytes_read > 0) {
+            buffer[bytes_read] = '\0';
+            log_printf("Message reçu du serveur : %s", buffer);
+
+            if (strcmp(buffer, "La partie commence !\n") == 0) {
+                log_printf("Le jeu commence !\n");
+                break;
+            }
+        }
+    }
+}
+
 
 void send_message(int sock, const char *message) {
     if (write(sock, message, strlen(message)) < 0) {
@@ -79,6 +96,8 @@ void start_client(client_config_t config) {
 
     // Réception et affichage de la réponse du serveur avec `receive_server_response()`.
     receive_server_response(sock);
+
+    wait_for_game_start(sock);
 
     // TEST
     while (1) {
