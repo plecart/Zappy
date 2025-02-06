@@ -9,6 +9,10 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/select.h>
+#include <stdbool.h>
+#include <pthread.h>
+#include <sys/time.h>
+
 
 #define BUFFER_SIZE 1024
 

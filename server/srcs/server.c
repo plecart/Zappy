@@ -1,5 +1,9 @@
 #include "../includes/server.h"
 
+game_time_t game_time = {0, 100, false};  // Temps initialisé avec `t = 100`
+int *global_client_sockets;
+int global_max_clients;
+
 // Initialise un serveur TCP et le met en écoute sur un port donné.
 // Cette fonction crée un socket, configure son adresse, lie ce socket à une
 // adresse spécifique, et le met en écoute afin d'accepter des connexions clients.
@@ -8,6 +12,8 @@ int init_server(int port) {
     int server_socket;
     struct sockaddr_in server_addr;
 
+    log_printf("Démarrage du serveur sur le port %d...\n", port);
+    
     // Création d'un socket IPv4 en mode TCP.
     if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         log_printf("Erreur lors de la création du socket");
@@ -52,6 +58,17 @@ void accept_new_client(int server_socket, int *client_sockets, int max_clients) 
         return;
     }
 
+    char buffer[BUFFER_SIZE] = {0};
+    read(client_socket, buffer, sizeof(buffer) - 1);
+
+    // if (strcmp(buffer, "GRAPHIC\n") == 0)
+    // {
+        log_printf("Client graphique connecté ! Démarrage du jeu...\n");
+        game_time.game_started = true;
+        send_message_to_all_clients("La partie commence !\n", client_sockets, max_clients);
+    // }
+    // else
+    // {
     // Affichage d'un message confirmant la connexion d'un nouveau client.
     log_printf("Nouvelle connexion acceptée (socket %d)\n", client_socket);
 
@@ -68,6 +85,7 @@ void accept_new_client(int server_socket, int *client_sockets, int max_clients) 
     //  Si aucun emplacement n'est disponible, la connexion est refusée et le socket est fermé.
     log_printf("Connexion refusée : trop de clients\n");
     close(client_socket);
+    //}
 }
 
 // Gère les messages des clients connectés et traite les déconnexions.
@@ -103,6 +121,14 @@ void handle_client_messages(int *client_sockets, int max_clients, fd_set *read_f
     }
 }
 
+void send_message_to_all_clients(const char *message, int *client_sockets, int max_clients) {
+    for (int i = 0; i < max_clients; i++) {
+        if (client_sockets[i] != 0) {
+            write(client_sockets[i], message, strlen(message));
+        }
+    }
+}
+
 // Démarre et gère le serveur en acceptant et en traitant les connexions clients.
 // Cette fonction initialise un serveur, gère les connexions entrantes et traite les
 // messages des clients en utilisant `select` pour surveiller l'activité sur les sockets.
@@ -118,15 +144,22 @@ void start_server(server_config_t config) {
     
     // Affichage initial de la carte
     // log_printf("Carte générée :\n");
-    print_map(map);
+    // print_map(map);
 
     // Calcul du nombre maximal de clients (`max_clients`) et allocation dynamique d'un tableau
     // pour stocker les descripteurs des clients connectés.
     int max_clients = (config.clients_per_team * config.team_count) + 1;
     int *client_sockets = calloc(max_clients, sizeof(int));
 
+    global_client_sockets = client_sockets;
+    global_max_clients = max_clients;
+    game_time.time_unit = config.time_unit;
+
     fd_set read_fds;
     int max_fd, activity;
+
+    pthread_t time_thread;
+    pthread_create(&time_thread, NULL, (void *)game_loop, NULL);
 
     // Boucle infinie de gestion des connexions et des messages
     while (1) {

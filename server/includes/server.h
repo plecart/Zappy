@@ -37,6 +37,14 @@ typedef struct  map_s
     cell_t      **cells;
 }               map_t;
 
+typedef struct  game_time_s {
+    int         elapsed_time;
+    int         time_unit;
+    bool        game_started;
+}               game_time_t;
+
+extern          game_time_t game_time;
+
 void            print_server_usage(char *prog_name);
 server_config_t parse_server_arguments(int argc, char *argv[]);
 void            print_server_config(server_config_t config);
@@ -45,10 +53,13 @@ void            start_server(server_config_t config);
 int             init_server(int port);
 void            accept_new_client(int server_socket, int *client_sockets, int max_clients);
 void            handle_client_messages(int *client_sockets, int max_clients, fd_set *read_fds);
+void            send_message_to_all_clients(const char *message, int *client_sockets, int max_clients);
 
 map_t           *create_map(int width, int height);
 void            populate_map(map_t *map);
 void            print_map(map_t *map);
 void            free_map(map_t *map);
+
+void            game_loop();
 
 #endif 
