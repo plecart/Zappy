@@ -43,12 +43,24 @@ typedef struct  game_time_s {
     bool        game_started;
 }               game_time_t;
 
+typedef enum
+{
+    NORTH = 0,
+    EAST = 1,
+    SOUTH = 2,
+    WEST = 3
+}               direction_t;
+
 typedef struct  player_s {
     int         id;
     int         x;
     int         y;
-    int         direction;
-    int         team_id;
+    direction_t direction;
+    int         socket;
+    char        *team_name;
+    double      action_time_remaining;  // Temps restant avant d'exécuter une nouvelle action
+    int         command_count;  // Nombre de commandes en attente
+    char        command_queue[10][BUFFER_SIZE];  // File d'attente des commandes (max 10)
 }               player_t;
 
 extern          game_time_t game_time;
@@ -71,6 +83,14 @@ void            print_map(map_t *map);
 void            free_map(map_t *map);
 
 void            assign_player_position(player_t *player, map_t *map);
-void            game_loop();
+void            *game_loop(void *arg);
+void            enqueue_command(player_t *player, const char *command);
+void            process_player_command(player_t *player, map_t *map, double delta_time);
+double          execute_player_action(player_t *player, const char *command, map_t *map);
+
+void            printf_identity(player_t *player);
+void            move_forward(player_t *player, map_t *map);
+void            turn_right(player_t *player);
+void            turn_left(player_t *player);
 
 #endif 

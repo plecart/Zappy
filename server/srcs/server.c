@@ -84,6 +84,8 @@ void accept_new_client(int server_socket, int *client_sockets, int max_clients, 
             
             players = realloc(players, (player_count + 1) * sizeof(player_t));
             players[player_count].id = player_count;
+            players[player_count].socket = client_socket;
+            players[player_count].team_name = "TEAM NAME";
             assign_player_position(&players[player_count], map);
             player_count++;
 
@@ -134,7 +136,7 @@ void handle_client_messages(int *client_sockets, int max_clients, fd_set *read_f
             } else {
                 buffer[bytes_read] = '\0';
                 log_printf("Message reçu (socket %d): %s\n", sd, buffer);
-                write(sd, "OK", 3);
+                enqueue_command(&players[i], buffer);
             }
         }
     }
@@ -178,7 +180,7 @@ void start_server(server_config_t config) {
     int max_fd, activity;
 
     pthread_t time_thread;
-    pthread_create(&time_thread, NULL, (void *)game_loop, NULL);
+    pthread_create(&time_thread, NULL, game_loop, (void *)map);
 
     // Boucle infinie de gestion des connexions et des messages
     while (1) {

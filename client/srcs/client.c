@@ -101,9 +101,10 @@ void start_client(client_config_t config) {
 
     // TEST
     while (1) {
-        send_message(sock, "TEST_MESSAGE");
+        send_message(sock, "droite\n");
         receive_server_response(sock);
-        sleep(2);
+        send_message(sock, "avance\n");
+        receive_server_response(sock);
     }
 
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.
