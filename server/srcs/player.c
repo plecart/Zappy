@@ -80,12 +80,30 @@ void free_players(player_t *players[], int max_clients) {
     }
 }
 
+void add_action_to_player(player_t *player, const char *action) {
+    if (player->action_count >= MAX_ACTIONS) {
+        log_printf(PRINT_ERROR, "Joueur %d : file d'attente pleine, actione ignorée\n", player->socket);
+        return;
+    }
+    player->actions[player->action_count] = strdup(action);
+    player->action_count++;
+}
+
+
 void print_players(player_t *players[], int max_players) {
     printf("- - - - - Liste des joueurs - - - - -\n");
     for (int i = 0; i < max_players; i++) {
         if (players[i] != NULL) {
             printf("Index: %d | Socket: %d | Team: %s | Position: [%d, %d]\n",
                        i, players[i]->socket, players[i]->team_name, players[i]->x, players[i]->y);
+            if (players[i]->action_count > 0) {
+                printf("Action: ");
+                for (int j = 0; j < players[i]->action_count; j++) {
+                    if (players[i]->actions[j] != NULL)
+                        printf("[%s]", players[i]->actions[j]);
+                }
+                printf("\n");
+            }
         } else {
             printf("Index: %d | Empty slot\n", i);
         }

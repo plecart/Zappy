@@ -49,8 +49,12 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
                 players[i] = NULL;
             } else {
                 buffer[bytes_read] = '\0';
-                log_printf(PRINT_RECEIVE, "Message reçu (socket %d): %s", players[i]->socket, buffer);
-                send_message(players[i]->socket, "OK\n");
+
+                char *command = strtok(buffer, "\n");
+                while (command != NULL) {
+                    add_action_to_player(players[i], command);
+                    command = strtok(NULL, "\n");
+                }
             }
         }
     }
@@ -68,13 +72,19 @@ void start_server(server_config_t config) {
     fd_set read_fds;
     int max_fd, activity;
     map_t *map = create_map(config.width, config.height);
+    struct timeval timeout;
 
-  populate_map(map);
+    populate_map(map);
+
     while (1) {
+        time_t start = time(NULL); // Timestamp pour la gestion du temps
+
+        // Réinitialisation du set de lecture
         FD_ZERO(&read_fds);
         FD_SET(server_socket, &read_fds);
         max_fd = server_socket;
 
+        // Ajout des sockets des joueurs actifs
         for (int i = 0; i < max_clients; i++) {
             if (players[i] && players[i]->socket > 0) {
                 FD_SET(players[i]->socket, &read_fds);
@@ -82,22 +92,47 @@ void start_server(server_config_t config) {
             }
         }
 
-        activity = select(max_fd + 1, &read_fds, NULL, NULL, NULL);
+        // Configuration du timeout : vérification toutes les 10ms
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 10000;
+
+        activity = select(max_fd + 1, &read_fds, NULL, NULL, &timeout);
         if (activity < 0) {
             log_printf(PRINT_ERROR, "Erreur lors de select\n");
             exit(EXIT_FAILURE);
         }
 
+        // Vérification des nouvelles connexions
         if (FD_ISSET(server_socket, &read_fds)) {
             accept_new_client(server_socket, players, max_clients, &config);
         }
 
+        // Gestion des messages reçus des clients
         handle_client_messages(players, max_clients, &read_fds);
-        
-        sleep(5);
+
+        // Exécution des actiones des joueurs en attente
+        for (int i = 0; i < max_clients; i++) {
+            if (players[i]) {
+                execute_player_action(players[i]);
+            }
+        }
+
+
+
+        // Gestion du temps pour maintenir un cycle de 1 seconde
+        time_t end = time(NULL);
+        int elapsed_time = (int)(end - start);
+        if (elapsed_time < 1) {
+            struct timeval remaining_time = {0, (1 - elapsed_time) * 1000000};
+            select(0, NULL, NULL, NULL, &remaining_time);
+        }
+
         print_players(players, max_clients);
     }
+
+    // Nettoyage des ressources
     free_players(players, max_clients);
     free_map(map);
     close(server_socket);
 }
+

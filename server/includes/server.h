@@ -3,6 +3,8 @@
 
 #include "../../tools/includes/tools.h"
 
+#define MAX_ACTIONS 10
+
 typedef struct  server_config_s
 {
     int         port;
@@ -43,6 +45,9 @@ typedef struct player_s
     char        team_name[BUFFER_SIZE];
     int         x;
     int         y;
+    char        *actions[MAX_ACTIONS];
+    int         action_count;
+    int         current_execution_time;
 }               player_t;
 
 void            print_server_usage(char *prog_name);
@@ -62,5 +67,10 @@ void            free_map(map_t *map);
 
 void            free_players(player_t *players[], int max_clients);
 void            print_players(player_t *players[], int max_players);
+void            add_action_to_player(player_t *player, const char *action);
+
+void            execute_player_action(player_t *player);
+
+
 
 #endif 

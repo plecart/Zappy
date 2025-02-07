@@ -74,12 +74,24 @@ void start_client(client_config_t config) {
     //wait_for_game_start(sock);
 
     // TEST
+    sleep(6);
+    send_message(sock, "avance\n");
+    send_message(sock, "droite\n");
+    send_message(sock, "gauche\n");
+    send_message(sock, "prout\n");
+    while(1) {
+        sleep(1);
+    }
     while (1) {
-        send_message(sock, "droite\n");
-        receive_server_response(sock);
-        send_message(sock, "avance\n");
-        receive_server_response(sock);
-        sleep (2);
+        for (int i = 0; i < 12; i++) {
+            send_message(sock, "avance\n");
+            //receive_server_response(sock);
+        }
+        for (int i = 0; i < 12; i++) {
+            send_message(sock, "droite\n");
+            //receive_server_response(sock);
+        }
+       sleep(10);
     }
 
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.
