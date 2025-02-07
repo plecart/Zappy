@@ -1,7 +1,7 @@
 #include "../includes/server.h"
 
 void execute_player_action(player_t *player) {
-    if (player->current_execution_time > 0) {
+    if (player->current_execution_time >= 0) {
         player->current_execution_time--;
         return;
     }
@@ -12,7 +12,7 @@ void execute_player_action(player_t *player) {
 //TMP
     log_printf(PRINT_INFORMATION, "TMP -> Exécution de l'action '%s' pour le joueur %d\n", player->actions[0], player->socket);
     send_message(player->socket, "Ok\n");
-    player->current_execution_time = 0;
+    player->current_execution_time = 1;
 //
     
     free(player->actions[0]);
