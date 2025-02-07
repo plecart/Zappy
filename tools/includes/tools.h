@@ -16,6 +16,14 @@
 
 #define BUFFER_SIZE 1024
 
-void        log_printf(const char *format, ...);
+typedef enum    print_type {
+    PRINT_ERROR,
+    PRINT_INFORMATION,
+    PRINT_SEND,
+    PRINT_RECEIVE
+}               print_type;
+
+void            log_printf(print_type type, const char *format, ...);
+void            send_message(int sock, const char *message);
 
 #endif 

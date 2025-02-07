@@ -11,7 +11,7 @@ int connect_to_server(client_config_t config) {
 
     // Création d'un socket TCP avec `socket()`.
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        log_printf("Erreur lors de la création du socket");
+        log_printf(PRINT_ERROR, "Erreur lors de la création du socket\n");
         return -1;
     }
 
@@ -21,7 +21,7 @@ int connect_to_server(client_config_t config) {
 
     // Conversion de l'adresse IP avec `inet_pton()`, avec vérification de sa validité.
     if (inet_pton(AF_INET, config.hostname, &server_addr.sin_addr) <= 0) {
-        log_printf("Adresse du serveur invalide");
+        log_printf(PRINT_ERROR, "Adresse du serveur invalide\n");
         close(sock);
         return -1;
     }
@@ -29,39 +29,13 @@ int connect_to_server(client_config_t config) {
 
     // Tentative de connexion au serveur avec `connect()`
     if (connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        log_printf("Connexion au serveur échouée");
+        log_printf(PRINT_ERROR, "Connexion au serveur échouée\n");
         close(sock);
         return -1;
     }
 
-    log_printf("Connecté au serveur %s:%d\n", config.hostname, config.port);
+    log_printf(PRINT_INFORMATION, "Connecté au serveur %s:%d\n", config.hostname, config.port);
     return sock;
-}
-
-void wait_for_game_start(int sock) {
-    char buffer[BUFFER_SIZE] = {0};
-
-    while (1) {
-        int bytes_read = read(sock, buffer, sizeof(buffer) - 1);
-        if (bytes_read > 0) {
-            buffer[bytes_read] = '\0';
-            log_printf("Message reçu du serveur : %s", buffer);
-
-            if (strcmp(buffer, "La partie commence !\n") == 0) {
-                log_printf("Le jeu commence !\n");
-                break;
-            }
-        }
-    }
-}
-
-
-void send_message(int sock, const char *message) {
-    if (write(sock, message, strlen(message)) < 0) {
-        log_printf("Erreur lors de l'envoi du message");
-    } else {
-        log_printf("Message envoyé: %s\n", message);
-    }
 }
 
 // Reçoit et affiche la réponse du serveur via un socket.
@@ -76,9 +50,9 @@ void receive_server_response(int sock) {
 
     // Lecture de la réponse du serveur avec `read()`, jusqu'à `BUFFER_SIZE - 1` octets.
     if (read(sock, buffer, BUFFER_SIZE - 1) > 0) {
-        log_printf("Réponse du serveur: %s\n", buffer);
+        log_printf(PRINT_RECEIVE, "Réponse du serveur: %s", buffer);
     } else {
-        log_printf("Erreur lors de la réception de la réponse");
+        log_printf(PRINT_ERROR, "Erreur lors de la réception de la réponse\n");
     }
 }
 
@@ -92,12 +66,12 @@ void start_client(client_config_t config) {
     if (sock == -1) return;  
 
     // Envoi du nom de l'équipe avec `send_message()`.
-    send_message(sock, config.team_name);
+    send_message(sock, strcat(config.team_name,"\n"));
 
     // Réception et affichage de la réponse du serveur avec `receive_server_response()`.
     receive_server_response(sock);
 
-    wait_for_game_start(sock);
+    //wait_for_game_start(sock);
 
     // TEST
     while (1) {
@@ -105,9 +79,10 @@ void start_client(client_config_t config) {
         receive_server_response(sock);
         send_message(sock, "avance\n");
         receive_server_response(sock);
+        sleep (2);
     }
 
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.
     close(sock);
-    log_printf("Connexion fermée.\n");
+    log_printf(PRINT_INFORMATION, "Connexion fermée.\n");
 }

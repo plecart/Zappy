@@ -3,31 +3,26 @@
 map_t *create_map(int width, int height) {
     map_t *map = malloc(sizeof(map_t));
     if (!map) {
-        log_printf("Erreur d'allocation de la carte\n");
+        log_printf(PRINT_ERROR, "Erreur d'allocation de la carte\n");
         exit(EXIT_FAILURE);
     }
     map->width = width;
     map->height = height;
-
-
     map->cells = malloc(height * sizeof(cell_t *));
     if (!map->cells) {
-        log_printf("Erreur d'allocation des cases de la carte\n");
+        log_printf(PRINT_ERROR, "Erreur d'allocation des cases de la carte\n");
         exit(EXIT_FAILURE);
     }
-
     for (int y = 0; y < height; y++) {
         map->cells[y] = malloc(width * sizeof(cell_t));
         if (!map->cells[y]) {
-            log_printf("Erreur d'allocation d'une ligne de la carte\n");
+            log_printf(PRINT_ERROR, "Erreur d'allocation d'une ligne de la carte\n");
             exit(EXIT_FAILURE);
         }
-
         for (int x = 0; x < width; x++) {
             memset(&map->cells[y][x].resources, 0, sizeof(resources_t));
         }
     }
-
     return map;
 }
 
