@@ -37,19 +37,30 @@ typedef struct  map_s
     cell_t      **cells;
 }               map_t;
 
+typedef struct player_s
+{
+    int         socket;
+    char        team_name[BUFFER_SIZE];
+    int         x;
+    int         y;
+}               player_t;
+
 void            print_server_usage(char *prog_name);
 server_config_t parse_server_arguments(int argc, char *argv[]);
 void            print_server_config(server_config_t config);
 
 void            start_server(server_config_t config);
 int             init_server(int port);
-void            accept_new_client(int server_socket, int *client_sockets, int max_clients);
-void            handle_client_messages(int *client_sockets, int max_clients, fd_set *read_fds);
+void            accept_new_client(int server_socket, player_t *players[], int max_players, server_config_t *config);
+void handle_client_messages(player_t *players[], int max_players, fd_set *read_fds) ;
 void            send_message_to_all_clients(const char *message, int *client_sockets, int max_clients);
 
 map_t           *create_map(int width, int height);
 void            populate_map(map_t *map);
 void            print_map(map_t *map);
 void            free_map(map_t *map);
+
+void            free_players(player_t *players[], int max_clients);
+void            print_players(player_t *players[], int max_players);
 
 #endif 
