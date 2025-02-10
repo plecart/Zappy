@@ -39,10 +39,19 @@ typedef struct  map_s
     cell_t      **cells;
 }               map_t;
 
+typedef enum
+{
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST
+}               Direction;
+
 typedef struct player_s
 {
     int         socket;
     char        team_name[BUFFER_SIZE];
+    Direction   direction;
     int         x;
     int         y;
     char        *actions[MAX_ACTIONS];

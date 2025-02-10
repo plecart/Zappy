@@ -24,6 +24,12 @@ int count_players_in_team(player_t *players[], int max_players, const char *team
     return count;
 }
 
+char*  get_player_direction(player_t *player)
+{
+    const char *directions[] = {"NORTH", "EAST", "SOUTH", "WEST"};
+    return strdup(directions[player->direction]);
+}
+
 void assign_new_player(int client_socket, player_t *players[], int max_players, const char *team_name, server_config_t *config) {
     for (int i = 0; i < max_players; i++) {
         if (players[i] == NULL) {
@@ -33,8 +39,9 @@ void assign_new_player(int client_socket, player_t *players[], int max_players, 
             players[i]->team_name[sizeof(players[i]->team_name) - 1] = '\0';
             players[i]->x = rand() % config->width;
             players[i]->y = rand() % config->height;
+            players[i]->direction = rand() % 4;
             
-            log_printf(PRINT_INFORMATION, "Joueur assigné à l'équipe %s, position [%d, %d]\n", team_name, players[i]->x, players[i]->y);
+            log_printf(PRINT_INFORMATION, "Joueur assigné à l'équipe %s, position [%d, %d], direction %s\n", team_name, players[i]->x, players[i]->y, get_player_direction(players[i]));
             dprintf(client_socket, "%d %d\n", players[i]->x, players[i]->y);
             return;
         }
