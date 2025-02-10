@@ -57,6 +57,7 @@ typedef struct player_s
     char        *actions[MAX_ACTIONS];
     int         action_count;
     int         current_execution_time;
+    resources_t inventory;
 }               player_t;
 
 void            print_server_usage(char *prog_name);
@@ -84,6 +85,7 @@ void execute_player_action(player_t *player, map_t *map);
 int action_switch(player_t *player, char *action, map_t *map);
 void turn_player(player_t *player, bool left);
 void move_forward(player_t *player, map_t *map);
+void get_player_inventory(player_t *player, char *buffer, size_t size);
 
 
 

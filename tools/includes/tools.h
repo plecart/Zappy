@@ -14,7 +14,11 @@
 #include <sys/time.h>
 
 
+#define BUFFER_SIZE_TINY 64
+#define BUFFER_SIZE_SMALL 256 
+#define BUFFER_SIZE_MEDIUM 512
 #define BUFFER_SIZE 1024
+#define BUFFER_SIZE_LARGE 2048
 
 typedef enum    print_type {
     PRINT_ERROR,

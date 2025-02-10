@@ -77,8 +77,11 @@ void start_client(client_config_t config) {
     sleep(6);
     send_message(sock, "avance\n");
     send_message(sock, "droite\n");
+    send_message(sock, "inventaire\n");
     send_message(sock, "gauche\n");
     send_message(sock, "prout\n");
+    send_message(sock, "voir\n");
+    send_message(sock, "inventaire\n");
     while(1) {
         sleep(1);
     }

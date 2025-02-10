@@ -5,7 +5,11 @@
 #include <arpa/inet.h>
 #include <stdarg.h>
 
+#define BUFFER_SIZE_TINY 64
+#define BUFFER_SIZE_SMALL 256 
+#define BUFFER_SIZE_MEDIUM 512
 #define BUFFER_SIZE 1024
+#define BUFFER_SIZE_LARGE 2048
 
 void log_printf(const char *format, ...) {
     va_list args;
