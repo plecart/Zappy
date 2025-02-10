@@ -24,12 +24,6 @@ int count_players_in_team(player_t *players[], int max_players, const char *team
     return count;
 }
 
-char*  get_player_direction(player_t *player)
-{
-    const char *directions[] = {"NORTH", "EAST", "SOUTH", "WEST"};
-    return strdup(directions[player->direction]);
-}
-
 void   log_printf_identity(print_type type, player_t *player, const char *format, ...)
 {
     log_printf(type, "Le joueur \"%d\", de l'équipe \"%s\", ", player->socket, player->team_name);

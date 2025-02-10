@@ -129,6 +129,7 @@ void start_server(server_config_t config) {
         }
 
         //print_players(players, max_clients);
+        log_printf(PRINT_INFORMATION, "- - - Cycle de jeu terminé - - -\n");
     }
 
     // Nettoyage des ressources
