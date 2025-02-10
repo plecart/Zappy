@@ -76,9 +76,14 @@ void            free_map(map_t *map);
 
 void            free_players(player_t *players[], int max_clients);
 void            print_players(player_t *players[], int max_players);
+char*           get_player_direction(player_t *player);
+void   log_printf_identity(print_type type, player_t *player, const char *format, ...);
 void            add_action_to_player(player_t *player, const char *action);
 
-void            execute_player_action(player_t *player);
+void execute_player_action(player_t *player, map_t *map);
+int action_switch(player_t *player, char *action, map_t *map);
+void turn_player(player_t *player, bool left);
+void move_forward(player_t *player, map_t *map);
 
 
 

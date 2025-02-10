@@ -109,14 +109,15 @@ void start_server(server_config_t config) {
 
         // Gestion des messages reçus des clients
         handle_client_messages(players, max_clients, &read_fds);
-
+       
         // Exécution des actiones des joueurs en attente
         for (int i = 0; i < max_clients; i++) {
             if (players[i]) {
-                execute_player_action(players[i]);
+                execute_player_action(players[i], map);
             }
         }
 
+        
 
 
         // Gestion du temps pour maintenir un cycle de 1 seconde
@@ -127,7 +128,7 @@ void start_server(server_config_t config) {
             select(0, NULL, NULL, NULL, &remaining_time);
         }
 
-        print_players(players, max_clients);
+        //print_players(players, max_clients);
     }
 
     // Nettoyage des ressources

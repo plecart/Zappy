@@ -30,6 +30,15 @@ char*  get_player_direction(player_t *player)
     return strdup(directions[player->direction]);
 }
 
+void   log_printf_identity(print_type type, player_t *player, const char *format, ...)
+{
+    log_printf(type, "Le joueur \"%d\", de l'équipe \"%s\", ", player->socket, player->team_name);
+    va_list args;
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+}
+
 void assign_new_player(int client_socket, player_t *players[], int max_players, const char *team_name, server_config_t *config) {
     for (int i = 0; i < max_players; i++) {
         if (players[i] == NULL) {
@@ -40,8 +49,9 @@ void assign_new_player(int client_socket, player_t *players[], int max_players, 
             players[i]->x = rand() % config->width;
             players[i]->y = rand() % config->height;
             players[i]->direction = rand() % 4;
-            
-            log_printf(PRINT_INFORMATION, "Joueur assigné à l'équipe %s, position [%d, %d], direction %s\n", team_name, players[i]->x, players[i]->y, get_player_direction(players[i]));
+        
+            send_message(client_socket, "BIENVENUE\n");
+            log_printf_identity(PRINT_INFORMATION,players[i],  "est place en position [%d, %d], direction %s\n", players[i]->x, players[i]->y, get_player_direction(players[i]));
             dprintf(client_socket, "%d %d\n", players[i]->x, players[i]->y);
             return;
         }
