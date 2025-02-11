@@ -1,6 +1,6 @@
 #include "../includes/server.h"
 
-void execute_player_action(player_t *player, map_t *map)
+void execute_player_action(player_t *player, map_t *map, player_t *players[], int max_players)
 {
     if (player->current_execution_time > 1)
     {
@@ -9,7 +9,7 @@ void execute_player_action(player_t *player, map_t *map)
     }
     if (player->action_count == 0)
         return;
-    player->current_execution_time = action_switch(player, player->actions[0], map);
+    player->current_execution_time = action_switch(player, player->actions[0], map, players, max_players);
     free(player->actions[0]);
     for (int i = 1; i < player->action_count; i++)
     {
@@ -19,7 +19,7 @@ void execute_player_action(player_t *player, map_t *map)
     player->action_count--;
 }
 
-int action_switch(player_t *player, char *action, map_t *map)
+int action_switch(player_t *player, char *action, map_t *map, player_t *players[], int max_players)
 {
 
     log_printf_identity(PRINT_RECEIVE, player, "a envoye: %s\n", action);
@@ -30,7 +30,7 @@ int action_switch(player_t *player, char *action, map_t *map)
     if (strcmp(action, "gauche") == 0)
         return action_turn(player, true);
     if (strcmp(action, "voir") == 0)
-        return action_see(player, map);
+        return action_see(player, map, players, max_players);
     if (strcmp(action, "inventaire") == 0)
         return action_inventory(player);
     if (strncmp(action, "prend", 5) == 0)
@@ -58,10 +58,18 @@ int action_turn(player_t *player, bool left)
     return 7;
 }
 
-int action_see(player_t *player, map_t *map)
+int action_see(player_t *player, map_t *map, player_t *players[], int max_players)
 {
-    // TMP
-    log_printf_identity(PRINT_INFORMATION, player, "a demandé ce qu'il voiyait\n");
+    int visible_cell_count = get_visible_cell_count(player->level);
+    int coordinates[visible_cell_count][2];
+    get_visible_cells_coordinates(player, map, coordinates);
+    char buffer[96 * visible_cell_count];
+    get_elements_from_coordinates(map, coordinates, visible_cell_count, buffer, players, max_players);
+    int buffer_len = strlen(buffer);
+    char package[buffer_len];
+    snprintf(package, buffer_len + 4, "{%s}\n", buffer);
+    log_printf_identity(PRINT_INFORMATION, player, "a demandé ce qu'il voiyait depuis [%d, %d] en direction du %s\n", player->x, player->y, get_player_direction(player));
+    send_message(player->socket, package);
     return 7;
 }
 

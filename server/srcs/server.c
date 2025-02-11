@@ -39,8 +39,10 @@ int init_server(int port) {
 
 void handle_client_messages(player_t *players[], int max_players, fd_set *read_fds) {
     char buffer[BUFFER_SIZE];
+
     for (int i = 0; i < max_players; i++) {
         if (players[i] != NULL && FD_ISSET(players[i]->socket, read_fds)) {
+            
             int bytes_read = read(players[i]->socket, buffer, sizeof(buffer) - 1);
             if (bytes_read <= 0) {
                 log_printf(PRINT_INFORMATION, "Client déconnecté (socket %d)\n", players[i]->socket);
@@ -113,11 +115,9 @@ void start_server(server_config_t config) {
         // Exécution des actiones des joueurs en attente
         for (int i = 0; i < max_clients; i++) {
             if (players[i]) {
-                execute_player_action(players[i], map);
+                execute_player_action(players[i], map, players, max_clients);
             }
         }
-
-        
 
 
         // Gestion du temps pour maintenir un cycle de 1 seconde
@@ -129,7 +129,7 @@ void start_server(server_config_t config) {
         }
 
         //print_players(players, max_clients);
-        log_printf(PRINT_INFORMATION, "- - - Cycle de jeu terminé - - -\n");
+        //log_printf(PRINT_INFORMATION, "- - - Cycle de jeu terminé - - -\n");
     }
 
     // Nettoyage des ressources
