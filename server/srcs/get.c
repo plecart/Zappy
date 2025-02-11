@@ -96,6 +96,29 @@ void get_visible_cells_coordinates(player_t *player, map_t *map, int coordinates
     }
 }
 
+void get_front_coordinate(int coordinate[2], player_t player, map_t *map)
+{
+    switch (player.direction)
+    {
+    case NORTH:
+        coordinate[0] = player.x;
+        coordinate[1] = ((player.y - 1) % map->height + map->height) % map->height;
+        break;
+    case EAST:
+        coordinate[0] = ((player.x + 1) % map->width + map->width) % map->width;
+        coordinate[1] = player.y;
+        break;
+    case SOUTH:
+        coordinate[0] = player.x;
+        coordinate[1] = ((player.y + 1) % map->height + map->height) % map->height;
+        break;
+    case WEST:
+        coordinate[0] = ((player.x - 1) % map->width + map->width) % map->width;
+        coordinate[1] = player.y;
+        break;
+    }
+}
+
 void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_count, char *buffer, player_t *players[], int max_players)
 {
     int pos = 0;
@@ -112,7 +135,8 @@ void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_co
         int temp_pos = 0;
         int player_count = 0;
 
-        if (i != 0) {
+        if (i != 0)
+        {
             while (player_count < max_players && players[player_count] != NULL && players[player_count]->x != x && players[player_count]->y != y)
                 player_count++;
             if (player_count != max_players && players[player_count] != NULL)

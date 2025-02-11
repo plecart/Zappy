@@ -74,17 +74,10 @@ void start_client(client_config_t config) {
     //wait_for_game_start(sock);
 
     // TEST
-    sleep(2);
-    send_message(sock, "voir\n");
-    send_message(sock, "droite\n");
-    send_message(sock, "voir\n");
-    send_message(sock, "droite\n");
-    send_message(sock, "voir\n");
-    send_message(sock, "droite\n");
-    send_message(sock, "voir\n");
-    send_message(sock, "droite\n");
-    send_message(sock, "avance\n");
-    send_message(sock, "voir\n");
+    sleep(4);
+
+    send_message(sock, "expulse\n");
+
 
 
     // send_message(sock, "inventaire\n");

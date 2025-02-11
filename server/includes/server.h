@@ -84,6 +84,7 @@ void add_action_to_player(player_t *player, const char *action);
 
 void turn_player(player_t *player, bool left);
 void move_forward(player_t *player, map_t *map);
+bool kick_players(player_t *player, map_t *map, player_t *players[], int max_players);
 
 char *get_player_direction(player_t *player);
 void get_player_inventory(player_t *player, char *buffer, size_t size);
@@ -91,6 +92,7 @@ int get_resource_index(const char *resource_name);
 int get_visible_cell_count(int level);
 void get_visible_cells_coordinates(player_t *player, map_t *map, int coordinates[][2]);
 void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_count, char *buffer, player_t *players[], int max_players);
+void get_front_coordinate(int coordinate[2], player_t player, map_t *map);
 
 void execute_player_action(player_t *player, map_t *map, player_t *players[], int max_players);
 int action_switch(player_t *player, char *action, map_t *map, player_t *players[], int max_players);
@@ -100,5 +102,6 @@ int action_see(player_t *player, map_t *map, player_t *players[], int max_player
 int action_inventory(player_t *player);
 int action_take(player_t *player, map_t *map, const char *action);
 int action_put(player_t *player, map_t *map, const char *action);
+int action_kick(player_t *player, map_t *map, player_t *players[], int max_players);
 
 #endif

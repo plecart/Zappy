@@ -37,6 +37,8 @@ int action_switch(player_t *player, char *action, map_t *map, player_t *players[
         return action_take(player, map, action);
     if (strncmp(action, "pose", 4) == 0)
         return action_put(player, map, action);
+    if (strcmp(action, "expulse") == 0)
+        return action_kick(player, map, players, max_players);
     log_printf_identity(PRINT_ERROR, player, "a envoye une commande inconnue: %s\n", action);
     send_message(player->socket, "Unknown command\n");
     return 0;
@@ -129,5 +131,13 @@ int action_put(player_t *player, map_t *map, const char *action)
     ((int *)&player->inventory)[resource_index]--;
     ((int *)&map->cells[player->y][player->x].resources)[resource_index]++;
     log_printf_identity(PRINT_INFORMATION, player, "a deposer l'objet \"%s\", il y en a miantenant %d en [%d, %d], la ou il se trouve (il en possede %d dans son inventaire)\n", object, ((int *)&map->cells[player->y][player->x].resources)[resource_index], player->x, player->y, ((int *)&player->inventory)[resource_index]);
+    return 7;
+}
+
+int action_kick(player_t *player, map_t *map, player_t *players[], int max_players)
+{
+    log_printf_identity(PRINT_INFORMATION, player, "souhaite expulser les autres joueurs de sa case\n");
+    bool did_kicked = kick_players(player, map, players, max_players);
+    send_message(player->socket, did_kicked ? "ok\n" : "ko\n");
     return 7;
 }

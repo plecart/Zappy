@@ -39,8 +39,11 @@ player_t init_player(int client_socket, const char *team_name, server_config_t *
     player.socket = client_socket;
     strncpy(player.team_name, team_name, sizeof(player.team_name) - 1);
     player.team_name[sizeof(player.team_name) - 1] = '\0';
-    player.x = rand() % config->width;
-    player.y = rand() % config->height;
+    // player.x = rand() % config->width;
+    // player.y = rand() % config->height;
+    player.x = 2;
+    player.y = 2;
+    
     player.direction = rand() % 4;
     player.action_count = 0;
     player.current_execution_time = 0;
