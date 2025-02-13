@@ -62,6 +62,7 @@ typedef struct player_s
     bool need_level_up;
     bool incantation_trigger;
     int level;
+    int life_cycle;
 } player_t;
 
 void print_server_usage(char *prog_name);
@@ -79,8 +80,10 @@ void populate_map(map_t *map);
 void print_map(map_t *map);
 void free_map(map_t *map);
 
+void free_player(player_t *player);
 void free_players(player_t *players[], int max_clients);
 void print_players(player_t *players[], int max_players);
+bool player_eat(player_t *player);
 void log_printf_identity(print_type type, player_t *player, const char *format, ...);
 void add_action_to_player(player_t *player, const char *action);
 
@@ -111,5 +114,6 @@ int action_take(player_t *player, map_t *map, const char *action);
 int action_put(player_t *player, map_t *map, const char *action);
 int action_kick(player_t *player, map_t *map, player_t *players[], int max_players);
 int action_broadcast(player_t *player, map_t *map, player_t *players[], int max_players, const char *action);
+int action_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
 
 #endif

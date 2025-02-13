@@ -47,13 +47,15 @@ player_t init_player(int client_socket, const char *team_name, server_config_t *
     player.level = 1;
     player.need_level_up = false;
     player.incantation_trigger = false;
-    player.inventory.nourriture = 0;
+    player.life_cycle = 1;
+    player.inventory.nourriture = 10;
     player.inventory.linemate = 0;
     player.inventory.deraumere = 0;
     player.inventory.sibur = 0;
     player.inventory.mendiane = 0;
     player.inventory.phiras = 0;
     player.inventory.thystame = 0;
+
     return player;
 }
 
@@ -101,11 +103,19 @@ void accept_new_client(int server_socket, player_t *players[], int max_players, 
     assign_new_player(client_socket, players, max_players, team_name, config);
 }
 
+void free_player(player_t *player) {
+    close(player->socket);
+    for (int i = 0; i < player->action_count; i++) {
+        free(player->actions[i]);
+    }
+    free(player);
+    player = NULL;
+}
+
 void free_players(player_t *players[], int max_clients) {
      for (int i = 0; i < max_clients; i++) {
         if (players[i] != NULL) {
-            close(players[i]->socket);
-            free(players[i]);
+            free_player(players[i]);
         }
     }
 }
@@ -139,4 +149,19 @@ void print_players(player_t *players[], int max_players) {
         }
     }
     printf("- - - - - - - - - - - - - - - - - - -\n");
+}
+
+bool player_eat(player_t *player) {
+    player->life_cycle--;
+    if (player->life_cycle <= 0) {
+        if (player->inventory.nourriture > 0) {
+            player->inventory.nourriture--;
+            player->life_cycle = 126;
+            return true;
+        }
+        log_printf_identity(PRINT_INFORMATION, player, "est mort de faim\n");
+        send_message_player(*player, "mort\n");
+        return false;
+    }
+    return true;
 }
