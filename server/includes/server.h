@@ -59,6 +59,8 @@ typedef struct player_s
     int action_count;
     int current_execution_time;
     resources_t inventory;
+    bool need_level_up;
+    bool incantation_trigger;
     int level;
 } player_t;
 
@@ -85,6 +87,9 @@ void add_action_to_player(player_t *player, const char *action);
 void turn_player(player_t *player, bool left);
 void move_forward(player_t *player, map_t *map);
 bool kick_players(player_t *player, map_t *map, player_t *players[], int max_players);
+bool can_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
+void start_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
+void level_up_players(player_t *players[], int max_players);
 
 char *get_player_direction(player_t *player);
 void get_player_inventory(player_t *player, char *buffer, size_t size);

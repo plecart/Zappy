@@ -7,6 +7,11 @@ void execute_player_action(player_t *player, map_t *map, player_t *players[], in
         player->current_execution_time--;
         return;
     }
+    if (player->incantation_trigger == true)
+    {
+        player->incantation_trigger = false;
+        level_up_players(players, max_players);
+    }
     if (player->action_count == 0)
         return;
     player->current_execution_time = action_switch(player, player->actions[0], map, players, max_players);
@@ -41,6 +46,8 @@ int action_switch(player_t *player, char *action, map_t *map, player_t *players[
         return action_kick(player, map, players, max_players);
     if (strncmp(action, "broadcast", 9) == 0)
         return action_broadcast(player, map, players, max_players, action);
+    if (strcmp(action, "expulse") == 0)
+        return action_incantation(player, map, players, max_players);
     log_printf_identity(PRINT_ERROR, player, "a envoye une commande inconnue: %s\n", action);
     send_message_player(*player, "Unknown command\n");
     return 0;
@@ -138,7 +145,6 @@ int action_put(player_t *player, map_t *map, const char *action)
 
 int action_kick(player_t *player, map_t *map, player_t *players[], int max_players)
 {
-    log_printf_identity(PRINT_INFORMATION, player, "souhaite expulser les autres joueurs de sa case\n");
     bool did_kicked = kick_players(player, map, players, max_players);
     send_message_player(*player, did_kicked ? "ok\n" : "ko\n");
     return 7;
@@ -151,7 +157,6 @@ int action_broadcast(player_t *player, map_t *map, player_t *players[], int max_
     int cell_source = -1;
     int message_len = strlen(message);
 
-    log_printf_identity(PRINT_INFORMATION, player, "souhaite envoyer a tout le monde: %s\n", message);
     if (message == NULL)
     {
         log_printf_identity(PRINT_ERROR, player, "a envoyé une commande invalide: %s\n", action);
@@ -175,6 +180,19 @@ int action_broadcast(player_t *player, map_t *map, player_t *players[], int max_
         }
         player_count++;
     }
+    return 7;
+}
 
+int action_incantation(player_t *player, map_t *map, player_t *players[], int max_players)
+{
+    if (can_incantation(player, map, players, max_players))
+    {
+        start_incantation(player, map, players, max_players);
+        char buffer[BUFFER_SIZE_TINY];
+        sprintf(buffer, "elevation en cours niveau actuel : %d\n", player->level);
+        send_message_player(*player, buffer);
+        return 300;
+    }
+    send_message_player(*player, "ko\n");
     return 7;
 }

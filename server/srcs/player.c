@@ -45,6 +45,8 @@ player_t init_player(int client_socket, const char *team_name, server_config_t *
     player.action_count = 0;
     player.current_execution_time = 0;
     player.level = 1;
+    player.need_level_up = false;
+    player.incantation_trigger = false;
     player.inventory.nourriture = 0;
     player.inventory.linemate = 0;
     player.inventory.deraumere = 0;
