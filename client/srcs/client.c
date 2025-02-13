@@ -76,9 +76,7 @@ void start_client(client_config_t config) {
     // TEST
     sleep(4);
 
-    send_message(sock, "expulse\n");
-
-
+    send_message(sock, "broadcast OO\n");
 
     // send_message(sock, "inventaire\n");
     // send_message(sock, "pose nourriture\n");

@@ -26,7 +26,7 @@ int count_players_in_team(player_t *players[], int max_players, const char *team
 
 void   log_printf_identity(print_type type, player_t *player, const char *format, ...)
 {
-    log_printf(type, "Le joueur \"%d\", de l'équipe \"%s\", ", player->socket, player->team_name);
+    log_printf(type, "[%d][%s], ", player->socket, player->team_name);
     va_list args;
     va_start(args, format);
     vprintf(format, args);
@@ -39,11 +39,8 @@ player_t init_player(int client_socket, const char *team_name, server_config_t *
     player.socket = client_socket;
     strncpy(player.team_name, team_name, sizeof(player.team_name) - 1);
     player.team_name[sizeof(player.team_name) - 1] = '\0';
-    // player.x = rand() % config->width;
-    // player.y = rand() % config->height;
-    player.x = 2;
-    player.y = 2;
-    
+    player.x = rand() % config->width;
+    player.y = rand() % config->height;
     player.direction = rand() % 4;
     player.action_count = 0;
     player.current_execution_time = 0;
@@ -64,7 +61,7 @@ void assign_new_player(int client_socket, player_t *players[], int max_players, 
             players[i] = malloc(sizeof(player_t));
             *players[i] = init_player(client_socket, team_name, config);
 
-            send_message(client_socket, "BIENVENUE\n");
+            send_message_player(*players[i], "BIENVENUE\n");
             log_printf_identity(PRINT_INFORMATION,players[i],  "est place en position [%d, %d], direction %s\n", players[i]->x, players[i]->y, get_player_direction(players[i]));
             dprintf(client_socket, "%d %d\n", players[i]->x, players[i]->y);
             return;

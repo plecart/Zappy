@@ -70,7 +70,7 @@ void start_server(server_config_t config);
 int init_server(int port);
 void accept_new_client(int server_socket, player_t *players[], int max_players, server_config_t *config);
 void handle_client_messages(player_t *players[], int max_players, fd_set *read_fds);
-void send_message_to_all_clients(const char *message, int *client_sockets, int max_clients);
+void send_message_player(player_t player, const char *message);
 
 map_t *create_map(int width, int height);
 void populate_map(map_t *map);
@@ -93,6 +93,8 @@ int get_visible_cell_count(int level);
 void get_visible_cells_coordinates(player_t *player, map_t *map, int coordinates[][2]);
 void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_count, char *buffer, player_t *players[], int max_players);
 void get_front_coordinate(int coordinate[2], player_t player, map_t *map);
+int get_sound_direction(player_t *sender, player_t *receiver, map_t *map);
+
 
 void execute_player_action(player_t *player, map_t *map, player_t *players[], int max_players);
 int action_switch(player_t *player, char *action, map_t *map, player_t *players[], int max_players);
@@ -103,5 +105,6 @@ int action_inventory(player_t *player);
 int action_take(player_t *player, map_t *map, const char *action);
 int action_put(player_t *player, map_t *map, const char *action);
 int action_kick(player_t *player, map_t *map, player_t *players[], int max_players);
+int action_broadcast(player_t *player, map_t *map, player_t *players[], int max_players, const char *action);
 
 #endif

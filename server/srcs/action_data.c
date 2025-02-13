@@ -40,7 +40,7 @@ bool kick_players(player_t *player, map_t *map, player_t *players[], int max_pla
             log_printf_identity(PRINT_INFORMATION, player, "a expulsé le joueur %d de l'equipe %s sur la case [%d, %d]\n", players[i]->socket, players[i]->team_name, players[i]->x, players[i]->y);
             char buffer[24];
             sprintf(buffer, "deplacement %s\n", get_player_direction(players[i]));
-            send_message(players[i]->socket, buffer);
+            send_message_player(*players[i], buffer);
             kicked_one = true;
         }
     }

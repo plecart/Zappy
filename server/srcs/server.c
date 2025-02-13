@@ -62,6 +62,14 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
     }
 }
 
+void send_message_player(player_t player, const char *message) {
+    if (write(player.socket, message, strlen(message)) < 0) {
+        log_printf(PRINT_ERROR, "Erreur lors de l'envoi du message\n");
+    } else {
+        log_printf(PRINT_SEND, "[serveur], a [%d][%s]: %s", player.socket, player.team_name, message);
+    }
+}
+
 // Démarre et gère le serveur en acceptant et en traitant les connexions clients.
 // Cette fonction initialise un serveur, gère les connexions entrantes et traite les
 // messages des clients en utilisant `select` pour surveiller l'activité sur les sockets.
