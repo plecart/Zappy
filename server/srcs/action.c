@@ -1,6 +1,6 @@
 #include "../includes/server.h"
 
-void execute_player_action(player_t *player, map_t *map, player_t *players[], int max_players)
+void execute_player_action(player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs, int *egg_count)
 {
     if (player->current_execution_time > 1)
     {
@@ -14,7 +14,7 @@ void execute_player_action(player_t *player, map_t *map, player_t *players[], in
     }
     if (player->action_count == 0)
         return;
-    player->current_execution_time = action_switch(player, player->actions[0], map, players, max_players);
+    player->current_execution_time = action_switch(player, player->actions[0], map, players, max_players, eggs, egg_count);
     free(player->actions[0]);
     for (int i = 1; i < player->action_count; i++)
     {
@@ -24,7 +24,7 @@ void execute_player_action(player_t *player, map_t *map, player_t *players[], in
     player->action_count--;
 }
 
-int action_switch(player_t *player, char *action, map_t *map, player_t *players[], int max_players)
+int action_switch(player_t *player, char *action, map_t *map, player_t *players[], int max_players, egg_t *eggs, int *egg_count)
 {
 
     log_printf_identity(PRINT_RECEIVE, player, "a [serveur] -> %s\n", action);
@@ -48,6 +48,9 @@ int action_switch(player_t *player, char *action, map_t *map, player_t *players[
         return action_broadcast(player, map, players, max_players, action);
     if (strcmp(action, "expulse") == 0)
         return action_incantation(player, map, players, max_players);
+    if (strcmp(action, "fork") == 0)
+        return action_lay_egg(player, eggs, egg_count);
+
     log_printf_identity(PRINT_ERROR, player, "a envoye une commande inconnue: %s\n", action);
     send_message_player(*player, "Unknown command\n");
     return 0;
@@ -195,4 +198,12 @@ int action_incantation(player_t *player, map_t *map, player_t *players[], int ma
     }
     send_message_player(*player, "ko\n");
     return 7;
+}
+
+int action_lay_egg(player_t *player, egg_t *eggs, int *egg_count)
+{
+    add_egg(&eggs, egg_count, (egg_t){player->team_name, player->socket, player->x, player->y, 42, 600});
+    log_printf_identity(PRINT_INFORMATION, player, "commence a pondre un oeuf en [%d, %d]\n", player->x, player->y);
+    send_message_player(*player, "ok\n");
+    return 42;
 }

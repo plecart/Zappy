@@ -75,13 +75,24 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
 
 void send_message_player(player_t player, const char *message)
 {
-    if (write(player.socket, message, strlen(message)) < 0)
+    server_send_message(player.socket, message, player.team_name);
+}
+
+void send_message_egg(egg_t egg, const char *message)
+{
+    server_send_message(egg.mother_socket, message, egg.team_name);
+}
+
+
+void server_send_message(int socket, const char *message, char *team_name)
+{
+    if (write(socket, message, strlen(message)) < 0)
     {
         log_printf(PRINT_ERROR, "Erreur lors de l'envoi du message\n");
     }
     else
     {
-        log_printf(PRINT_SEND, "[serveur], a [%d][%s]: %s", player.socket, player.team_name, message);
+        log_printf(PRINT_SEND, "[serveur], a [%d][%s]: %s", socket, team_name, message);
     }
 }
 
@@ -99,7 +110,8 @@ void start_server(server_config_t config)
     int max_fd, activity;
     map_t *map = create_map(config.width, config.height);
     struct timeval timeout;
-
+    egg_t *eggs = NULL;
+    int egg_count = 0;
     populate_map(map);
 
     while (1)
@@ -132,6 +144,7 @@ void start_server(server_config_t config)
             exit(EXIT_FAILURE);
         }
 
+        add_egg_cycle(eggs, egg_count);
         if (FD_ISSET(server_socket, &read_fds))
         {
             accept_new_client(server_socket, players, max_clients, &config);
@@ -148,10 +161,10 @@ void start_server(server_config_t config)
                 if (!is_alive)
                     free_player(players[i]);
                 else
-                    execute_player_action(players[i], map, players, max_clients);
+                    execute_player_action(players[i], map, players, max_clients, eggs, &egg_count);
             }
         }
-
+        
         // Gestion du temps pour s'assurer que le cycle respecte la vitesse demandée
         time_t end = time(NULL);
         int elapsed_time = (int)(end - start);
@@ -164,9 +177,9 @@ void start_server(server_config_t config)
         }
 
         // print_players(players, max_clients);
-        log_printf(PRINT_INFORMATION, "- - - Cycle de jeu terminé - - -\n");
+        //log_printf(PRINT_INFORMATION, "- - - Cycle de jeu terminé - - -\n");
     }
-
+    free_egg_array(&eggs, &egg_count);
     free_players(players, max_clients);
     free_map(map);
     close(server_socket);
