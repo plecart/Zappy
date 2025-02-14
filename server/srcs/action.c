@@ -202,7 +202,16 @@ int action_incantation(player_t *player, map_t *map, player_t *players[], int ma
 
 int action_lay_egg(player_t *player, egg_t *eggs, int *egg_count)
 {
-    add_egg(&eggs, egg_count, (egg_t){player->team_name, player->socket, player->x, player->y, 42, 600});
+
+    egg_t new_egg = {0};
+    strcpy(new_egg.team_name, player->team_name);
+    new_egg.mother_socket = player->socket;
+    new_egg.x = player->x;
+    new_egg.y = player->y;
+    new_egg.time_before_spawn = 42;
+    new_egg.time_before_hatch = 600;
+
+    add_egg(&eggs, egg_count, new_egg);
     log_printf_identity(PRINT_INFORMATION, player, "commence a pondre un oeuf en [%d, %d]\n", player->x, player->y);
     send_message_player(*player, "ok\n");
     return 42;

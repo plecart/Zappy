@@ -18,12 +18,14 @@ int validate_team(const char *team_name, server_config_t *config)
     return 0;
 }
 
-int count_players_in_team(player_t *players[], int max_players, const char *team_name)
+int count_players_in_team(player_t *players[], const char *team_name)
 {
+    int i = 0;
     int count = 0;
-    for (int i = 0; i < max_players; i++)
+    while (players[i] != NULL)
+
     {
-        if (players[i] != NULL && strcmp(players[i]->team_name, team_name) == 0)
+        if (strcmp(players[i]->team_name, team_name) == 0)
         {
             count++;
         }
@@ -85,7 +87,7 @@ void assign_new_player(int client_socket, player_t *players[], int max_players, 
     close_invalid_client(client_socket, "Trop de joueurs connectés");
 }
 
-void accept_new_client(int server_socket, player_t *players[], int max_players, server_config_t *config, int *graphic_socket, bool *game_started)
+void accept_new_client(int server_socket, player_t *players[], int max_clients, server_config_t *config, int *graphic_socket, bool *game_started)
 {
     struct sockaddr_in client_addr;
     socklen_t addr_size = sizeof(client_addr);
@@ -134,13 +136,13 @@ void accept_new_client(int server_socket, player_t *players[], int max_players, 
     }
 
     // Vérifier si l'équipe a encore de la place
-    if (game_started == false && count_players_in_team(players, max_players, buffer) >= config->clients_per_team)
+    if (game_started == false && count_players_in_team(players, buffer) >= config->clients_per_team)
     {
         close_invalid_client(client_socket, "Équipe pleine");
         return;
     }
 
-    assign_new_player(client_socket, players, max_players, buffer, config);
+    assign_new_player(client_socket, players, max_clients, buffer, config);
 }
 
 void free_player(player_t *player)
@@ -154,14 +156,14 @@ void free_player(player_t *player)
     player = NULL;
 }
 
-void free_players(player_t *players[], int max_clients)
+void free_players(player_t *players[])
 {
-    for (int i = 0; i < max_clients; i++)
+    int player_count = 0;
+
+    while (players[player_count] != NULL)
     {
-        if (players[i] != NULL)
-        {
-            free_player(players[i]);
-        }
+        free_player(players[player_count]);
+        player_count++;
     }
 }
 

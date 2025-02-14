@@ -83,7 +83,6 @@ void send_message_egg(egg_t egg, const char *message)
     server_send_message(egg.mother_socket, message, egg.team_name);
 }
 
-
 void server_send_message(int socket, const char *message, char *team_name)
 {
     if (write(socket, message, strlen(message)) < 0)
@@ -112,7 +111,7 @@ void start_server(server_config_t config)
     struct timeval timeout;
     egg_t *eggs = NULL;
     int egg_count = 0;
-    int graphic_socket = -1;  // Stockage du socket graphique
+    int graphic_socket = -1; // Stockage du socket graphique
     bool game_started = false;
 
     populate_map(map);
@@ -123,20 +122,20 @@ void start_server(server_config_t config)
         FD_SET(server_socket, &read_fds);
         max_fd = server_socket;
 
-        if (graphic_socket != -1) {
+        if (graphic_socket != -1)
+        {
             FD_SET(graphic_socket, &read_fds);
             if (graphic_socket > max_fd)
                 max_fd = graphic_socket;
         }
 
-        for (int i = 0; i < max_clients; i++)
+        int i = 0;
+        while (players[i] != NULL && players[i]->socket > 0)
         {
-            if (players[i] && players[i]->socket > 0)
-            {
-                FD_SET(players[i]->socket, &read_fds);
-                if (players[i]->socket > max_fd)
-                    max_fd = players[i]->socket;
-            }
+
+            FD_SET(players[i]->socket, &read_fds);
+            if (players[i]->socket > max_fd)
+                max_fd = players[i]->socket;
         }
 
         timeout.tv_sec = 0;
@@ -151,14 +150,14 @@ void start_server(server_config_t config)
 
         if (game_started)
             add_egg_cycle(eggs, egg_count);
-            
+
         if (FD_ISSET(server_socket, &read_fds))
         {
             accept_new_client(server_socket, players, max_clients, &config, &graphic_socket, &game_started);
         }
 
         if (!game_started)
-            continue;  // La partie ne commence pas tant que le client graphique n'est pas là
+            continue; // La partie ne commence pas tant que le client graphique n'est pas là
 
         handle_client_messages(players, max_clients, &read_fds);
 
@@ -181,8 +180,7 @@ void start_server(server_config_t config)
     }
 
     free_egg_array(&eggs, &egg_count);
-    free_players(players, max_clients);
+    free_players(players);
     free_map(map);
     close(server_socket);
 }
-

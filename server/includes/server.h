@@ -93,7 +93,7 @@ void print_map(map_t *map);
 void free_map(map_t *map);
 
 void free_player(player_t *player);
-void free_players(player_t *players[], int max_clients);
+void free_players(player_t *players[]);
 void print_players(player_t *players[], int max_players);
 bool player_eat(player_t *player);
 void log_printf_identity(print_type type, player_t *player, const char *format, ...);
