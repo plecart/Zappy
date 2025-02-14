@@ -1,30 +1,37 @@
 #include "../includes/server.h"
 
-void close_invalid_client(int client_socket, const char *message) {
+void close_invalid_client(int client_socket, const char *message)
+{
     log_printf(PRINT_ERROR, "%s\n", message);
     close(client_socket);
 }
 
-int validate_team(const char *team_name, server_config_t *config) {
-    for (int i = 0; i < config->team_count; i++) {
-        if (strcmp(team_name, config->teams[i]) == 0) {
+int validate_team(const char *team_name, server_config_t *config)
+{
+    for (int i = 0; i < config->team_count; i++)
+    {
+        if (strcmp(team_name, config->teams[i]) == 0)
+        {
             return 1;
         }
     }
     return 0;
 }
 
-int count_players_in_team(player_t *players[], int max_players, const char *team_name) {
+int count_players_in_team(player_t *players[], int max_players, const char *team_name)
+{
     int count = 0;
-    for (int i = 0; i < max_players; i++) {
-        if (players[i] != NULL && strcmp(players[i]->team_name, team_name) == 0) {
+    for (int i = 0; i < max_players; i++)
+    {
+        if (players[i] != NULL && strcmp(players[i]->team_name, team_name) == 0)
+        {
             count++;
         }
     }
     return count;
 }
 
-void   log_printf_identity(print_type type, player_t *player, const char *format, ...)
+void log_printf_identity(print_type type, player_t *player, const char *format, ...)
 {
     log_printf(type, "[%d][%s], ", player->socket, player->team_name);
     va_list args;
@@ -33,7 +40,8 @@ void   log_printf_identity(print_type type, player_t *player, const char *format
     va_end(args);
 }
 
-player_t init_player(int client_socket, const char *team_name, server_config_t *config) {
+player_t init_player(int client_socket, const char *team_name, server_config_t *config)
+{
     player_t player;
 
     player.socket = client_socket;
@@ -59,14 +67,17 @@ player_t init_player(int client_socket, const char *team_name, server_config_t *
     return player;
 }
 
-void assign_new_player(int client_socket, player_t *players[], int max_players, const char *team_name, server_config_t *config) {
-    for (int i = 0; i < max_players; i++) {
-        if (players[i] == NULL) {
+void assign_new_player(int client_socket, player_t *players[], int max_players, const char *team_name, server_config_t *config)
+{
+    for (int i = 0; i < max_players; i++)
+    {
+        if (players[i] == NULL)
+        {
             players[i] = malloc(sizeof(player_t));
             *players[i] = init_player(client_socket, team_name, config);
 
             send_message_player(*players[i], "BIENVENUE\n");
-            log_printf_identity(PRINT_INFORMATION,players[i],  "est place en position [%d, %d], direction %s\n", players[i]->x, players[i]->y, get_player_direction(players[i]));
+            log_printf_identity(PRINT_INFORMATION, players[i], "est place en position [%d, %d], direction %s\n", players[i]->x, players[i]->y, get_player_direction(players[i]));
             dprintf(client_socket, "%d %d\n", players[i]->x, players[i]->y);
             return;
         }
@@ -74,54 +85,90 @@ void assign_new_player(int client_socket, player_t *players[], int max_players, 
     close_invalid_client(client_socket, "Trop de joueurs connectés");
 }
 
-void accept_new_client(int server_socket, player_t *players[], int max_players, server_config_t *config) {
+void accept_new_client(int server_socket, player_t *players[], int max_players, server_config_t *config, int *graphic_socket, bool *game_started)
+{
     struct sockaddr_in client_addr;
     socklen_t addr_size = sizeof(client_addr);
-    int client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &addr_size);
-    
-    if (client_socket < 0) {
+    int client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &addr_size);
+
+    if (client_socket < 0)
+    {
         log_printf(PRINT_ERROR, "Erreur lors de accept\n");
         return;
     }
-    
+
     log_printf(PRINT_INFORMATION, "Nouvelle connexion acceptée (socket %d)\n", client_socket);
-    
-    char team_name[BUFFER_SIZE];
-    read(client_socket, team_name, BUFFER_SIZE);
-    team_name[strcspn(team_name, "\n")] = 0; // Retirer le saut de ligne
-    
-    if (!validate_team(team_name, config)) {
+
+    char buffer[BUFFER_SIZE];
+    int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
+    if (bytes_read <= 0)
+    {
+        log_printf(PRINT_ERROR, "Erreur de lecture du client (socket %d)\n", client_socket);
+        close(client_socket);
+        return;
+    }
+
+    buffer[bytes_read] = '\0';
+    buffer[strcspn(buffer, "\n")] = 0;
+
+    // Vérifier si c'est le client graphique
+    if (strcmp(buffer, "GRAPHIC") == 0)
+    {
+        if (*graphic_socket != -1)
+        {
+            log_printf(PRINT_ERROR, "Un client graphique est déjà connecté\n");
+            close(client_socket);
+            return;
+        }
+        *graphic_socket = client_socket;
+        *game_started = true; // La partie peut commencer
+        log_printf(PRINT_INFORMATION, "Client graphique connecté (socket %d)\n", client_socket);
+        return;
+    }
+
+    // Vérifier si l'équipe est valide
+    if (!validate_team(buffer, config))
+    {
         close_invalid_client(client_socket, "Équipe invalide");
         return;
     }
-    
-    if (count_players_in_team(players, max_players, team_name) >= config->clients_per_team) {
+
+    // Vérifier si l'équipe a encore de la place
+    if (game_started == false && count_players_in_team(players, max_players, buffer) >= config->clients_per_team)
+    {
         close_invalid_client(client_socket, "Équipe pleine");
         return;
     }
-    
-    assign_new_player(client_socket, players, max_players, team_name, config);
+
+    assign_new_player(client_socket, players, max_players, buffer, config);
 }
 
-void free_player(player_t *player) {
+void free_player(player_t *player)
+{
     close(player->socket);
-    for (int i = 0; i < player->action_count; i++) {
+    for (int i = 0; i < player->action_count; i++)
+    {
         free(player->actions[i]);
     }
     free(player);
     player = NULL;
 }
 
-void free_players(player_t *players[], int max_clients) {
-     for (int i = 0; i < max_clients; i++) {
-        if (players[i] != NULL) {
+void free_players(player_t *players[], int max_clients)
+{
+    for (int i = 0; i < max_clients; i++)
+    {
+        if (players[i] != NULL)
+        {
             free_player(players[i]);
         }
     }
 }
 
-void add_action_to_player(player_t *player, const char *action) {
-    if (player->action_count >= MAX_ACTIONS) {
+void add_action_to_player(player_t *player, const char *action)
+{
+    if (player->action_count >= MAX_ACTIONS)
+    {
         log_printf(PRINT_ERROR, "Joueur %d : file d'attente pleine, actione ignorée\n", player->socket);
         return;
     }
@@ -129,32 +176,41 @@ void add_action_to_player(player_t *player, const char *action) {
     player->action_count++;
 }
 
-
-void print_players(player_t *players[], int max_players) {
+void print_players(player_t *players[], int max_players)
+{
     printf("- - - - - Liste des joueurs - - - - -\n");
-    for (int i = 0; i < max_players; i++) {
-        if (players[i] != NULL) {
+    for (int i = 0; i < max_players; i++)
+    {
+        if (players[i] != NULL)
+        {
             printf("Index: %d | Socket: %d | Team: %s | Position: [%d, %d]\n",
-                       i, players[i]->socket, players[i]->team_name, players[i]->x, players[i]->y);
-            if (players[i]->action_count > 0) {
+                   i, players[i]->socket, players[i]->team_name, players[i]->x, players[i]->y);
+            if (players[i]->action_count > 0)
+            {
                 printf("Action: ");
-                for (int j = 0; j < players[i]->action_count; j++) {
+                for (int j = 0; j < players[i]->action_count; j++)
+                {
                     if (players[i]->actions[j] != NULL)
                         printf("[%s]", players[i]->actions[j]);
                 }
                 printf("\n");
             }
-        } else {
+        }
+        else
+        {
             printf("Index: %d | Empty slot\n", i);
         }
     }
     printf("- - - - - - - - - - - - - - - - - - -\n");
 }
 
-bool player_eat(player_t *player) {
+bool player_eat(player_t *player)
+{
     player->life_cycle--;
-    if (player->life_cycle <= 0) {
-        if (player->inventory.nourriture > 0) {
+    if (player->life_cycle <= 0)
+    {
+        if (player->inventory.nourriture > 0)
+        {
             player->inventory.nourriture--;
             player->life_cycle = 126;
             return true;

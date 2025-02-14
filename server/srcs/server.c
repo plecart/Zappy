@@ -112,16 +112,22 @@ void start_server(server_config_t config)
     struct timeval timeout;
     egg_t *eggs = NULL;
     int egg_count = 0;
+    int graphic_socket = -1;  // Stockage du socket graphique
+    bool game_started = false;
+
     populate_map(map);
 
     while (1)
     {
-        time_t start = time(NULL);
-
-        // Réinitialisation du set de lecture
         FD_ZERO(&read_fds);
         FD_SET(server_socket, &read_fds);
         max_fd = server_socket;
+
+        if (graphic_socket != -1) {
+            FD_SET(graphic_socket, &read_fds);
+            if (graphic_socket > max_fd)
+                max_fd = graphic_socket;
+        }
 
         for (int i = 0; i < max_clients; i++)
         {
@@ -133,9 +139,8 @@ void start_server(server_config_t config)
             }
         }
 
-        // Timeout dynamique basé sur config.time_unit
         timeout.tv_sec = 0;
-        timeout.tv_usec = (1000000 / config.time_unit); // Ajustement du temps
+        timeout.tv_usec = (1000000 / config.time_unit);
 
         activity = select(max_fd + 1, &read_fds, NULL, NULL, &timeout);
         if (activity < 0)
@@ -144,17 +149,21 @@ void start_server(server_config_t config)
             exit(EXIT_FAILURE);
         }
 
-        add_egg_cycle(eggs, egg_count);
+        if (game_started)
+            add_egg_cycle(eggs, egg_count);
+            
         if (FD_ISSET(server_socket, &read_fds))
         {
-            accept_new_client(server_socket, players, max_clients, &config);
+            accept_new_client(server_socket, players, max_clients, &config, &graphic_socket, &game_started);
         }
+
+        if (!game_started)
+            continue;  // La partie ne commence pas tant que le client graphique n'est pas là
 
         handle_client_messages(players, max_clients, &read_fds);
 
         for (int i = 0; i < max_clients; i++)
         {
-
             if (players[i] != NULL)
             {
                 bool is_alive = player_eat(players[i]);
@@ -164,23 +173,16 @@ void start_server(server_config_t config)
                     execute_player_action(players[i], map, players, max_clients, eggs, &egg_count);
             }
         }
-        
-        // Gestion du temps pour s'assurer que le cycle respecte la vitesse demandée
-        time_t end = time(NULL);
-        int elapsed_time = (int)(end - start);
-        int cycle_duration = 1.0 / config.time_unit;
 
-        if (elapsed_time < cycle_duration)
+        if (graphic_socket != -1)
         {
-            struct timeval remaining_time = {0, (cycle_duration - elapsed_time) * 1000000};
-            select(0, NULL, NULL, NULL, &remaining_time);
+            send(graphic_socket, "OUI\n", 4, 0);
         }
-
-        // print_players(players, max_clients);
-        //log_printf(PRINT_INFORMATION, "- - - Cycle de jeu terminé - - -\n");
     }
+
     free_egg_array(&eggs, &egg_count);
     free_players(players, max_clients);
     free_map(map);
     close(server_socket);
 }
+

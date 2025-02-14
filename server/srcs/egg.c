@@ -1,6 +1,6 @@
 #include "../includes/server.h"
 
-void add_egg(egg_t **eggs, size_t *egg_count, egg_t new_egg)
+void add_egg(egg_t **eggs, int *egg_count, egg_t new_egg)
 {
     *eggs = realloc(*eggs, (*egg_count + 1) * sizeof(egg_t));
     if (!*eggs)
@@ -12,13 +12,13 @@ void add_egg(egg_t **eggs, size_t *egg_count, egg_t new_egg)
     (*egg_count)++;
 }
 
-void remove_egg(egg_t **eggs, size_t *egg_count, const char *team_name, int x, int y)
+void remove_egg(egg_t **eggs, int *egg_count, const char *team_name, int x, int y)
 {
-    for (size_t i = 0; i < *egg_count; i++)
+    for (int i = 0; i < *egg_count; i++)
     {
         if (strcmp((*eggs)[i].team_name, team_name) == 0 && (*eggs)[i].x == x && (*eggs)[i].y == y && (*eggs)[i].time_before_hatch == 0)
         {
-            for (size_t j = i; j < *egg_count - 1; j++)
+            for (int j = i; j < *egg_count - 1; j++)
             {
                 (*eggs)[j] = (*eggs)[j + 1];
             }
@@ -35,16 +35,16 @@ void remove_egg(egg_t **eggs, size_t *egg_count, const char *team_name, int x, i
     log_printf(PRINT_ERROR, "Aucun oeuf a retirer'\n");
 }
 
-void free_egg_array(egg_t **eggs, size_t *egg_count)
+void free_egg_array(egg_t **eggs, int *egg_count)
 {
     free(*eggs);
     *eggs = NULL;
     *egg_count = 0;
 }
 
-void add_egg_cycle(egg_t *eggs, size_t egg_count)
+void add_egg_cycle(egg_t *eggs, int egg_count)
 {
-    for (size_t i = 0; i < egg_count; i++)
+    for (int i = 0; i < egg_count; i++)
     {
         if (eggs[i].time_before_spawn > 0)
         {
