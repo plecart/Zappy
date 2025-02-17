@@ -244,7 +244,7 @@ void print_players(player_t *players[], int max_players)
     printf("- - - - - - - - - - - - - - - - - - -\n");
 }
 
-bool player_eat(player_t *player)
+bool player_eat(int graphic_socket, player_t *player)
 {
     player->life_cycle--;
     if (player->life_cycle <= 0)
@@ -257,6 +257,7 @@ bool player_eat(player_t *player)
         }
         log_printf_identity(PRINT_INFORMATION, player, "est mort de faim\n");
         send_message_player(*player, "mort\n");
+        send_graphic_player_death(graphic_socket, player->socket);
         return false;
     }
     return true;

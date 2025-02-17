@@ -222,3 +222,61 @@ void send_graphic_player_level(int graphic_socket, player_t *player)
     snprintf(buffer, sizeof(buffer), "plv #%d %d\n", player->socket, player->level);
     send(graphic_socket, buffer, strlen(buffer), 0);
 }
+
+void send_graphic_fork(int graphic_socket, player_t *player)
+{
+    if (graphic_socket == -1 || player == NULL) {
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+    snprintf(buffer, sizeof(buffer), "pfk #%d\n", player->socket);
+    send(graphic_socket, buffer, strlen(buffer), 0);
+}
+
+void send_graphic_egg_created(int graphic_socket, int egg_id, egg_t *egg)
+{
+    if (graphic_socket == -1 || egg == NULL) {
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+    snprintf(buffer, sizeof(buffer), "enw #%d #%d %d %d\n", egg_id, egg->mother_socket, egg->x, egg->y);
+    send(graphic_socket, buffer, strlen(buffer), 0);
+}
+
+void send_graphic_egg_hatched(int graphic_socket, int egg_id)
+{
+    if (graphic_socket == -1) {
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+    snprintf(buffer, sizeof(buffer), "eht #%d\n", egg_id);
+    send(graphic_socket, buffer, strlen(buffer), 0);
+}
+
+void send_graphic_player_death(int graphic_socket, player_t *player)
+{
+    if (graphic_socket == -1 || player == NULL) {
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+    snprintf(buffer, sizeof(buffer), "pdi #%d\n", player->socket);
+    send(graphic_socket, buffer, strlen(buffer), 0);
+}
+
+void send_graphic_game_end(int graphic_socket, const char *winning_team)
+{
+    if (graphic_socket == -1 || winning_team == NULL) {
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+    snprintf(buffer, sizeof(buffer), "seg %s\n", winning_team);
+    send(graphic_socket, buffer, strlen(buffer), 0);
+}
+
+
+

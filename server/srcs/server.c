@@ -150,7 +150,7 @@ void start_server(server_config_t config)
         }
 
         if (game_started)
-            add_egg_cycle(eggs, egg_count);
+            add_egg_cycle(graphic_socket, eggs, egg_count);
 
         if (FD_ISSET(server_socket, &read_fds))
         {
@@ -166,7 +166,7 @@ void start_server(server_config_t config)
             {
                 if (players[i] != NULL)
                 {
-                    bool is_alive = player_eat(players[i]);
+                    bool is_alive = player_eat(graphic_socket, players[i]);
                     if (!is_alive)
                         free_player(players[i]);
                     else

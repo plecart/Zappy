@@ -50,7 +50,7 @@ int action_switch(int graphic_socket, player_t *player, char *action, map_t *map
     if (strcmp(action, "incantation") == 0)
         return action_incantation(graphic_socket, player, map, players, max_players);
     if (strcmp(action, "fork") == 0)
-        return action_lay_egg(player, eggs, egg_count);
+        return action_lay_egg(graphic_socket, player, eggs, egg_count);
 
     log_printf_identity(PRINT_ERROR, player, "a envoye une commande inconnue: %s\n", action);
     send_message_player(*player, "Unknown command\n");
@@ -207,7 +207,7 @@ int action_incantation(int graphic_socket, player_t *player, map_t *map, player_
     return 7;
 }
 
-int action_lay_egg(player_t *player, egg_t *eggs[], int *egg_count)
+int action_lay_egg(int graphic_socket, player_t *player, egg_t *eggs[], int *egg_count)
 {
     egg_t *new_egg = malloc(sizeof(egg_t));  // ✅ Allouer la mémoire correctement
     if (!new_egg) {
@@ -230,5 +230,6 @@ int action_lay_egg(player_t *player, egg_t *eggs[], int *egg_count)
 
     log_printf_identity(PRINT_INFORMATION, player, "commence à pondre un œuf en [%d, %d]\n", player->x, player->y);
     send_message_player(*player, "ok\n");
+    send_graphic_fork(graphic_socket, player);
     return 4; //42 a remettre
 }

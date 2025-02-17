@@ -95,7 +95,7 @@ void free_map(map_t *map);
 void free_player(player_t *player);
 void free_players(player_t *players[]);
 void print_players(player_t *players[], int max_players);
-bool player_eat(player_t *player);
+bool player_eat(int graphic_socket, player_t *player);
 void log_printf_identity(print_type type, player_t *player, const char *format, ...);
 void add_action_to_player(player_t *player, const char *action);
 
@@ -126,11 +126,11 @@ int action_put(int graphic_socket, player_t *player, map_t *map, const char *act
 int action_kick(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players);
 int action_broadcast(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players, const char *action);
 int action_incantation(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players);
-int action_lay_egg(player_t *player, egg_t *eggs[], int *egg_count);
+int action_lay_egg(int graphic_socket, player_t *player, egg_t *eggs[], int *egg_count);
 
 void add_egg(egg_t *eggs[], int *egg_count, egg_t *new_egg);
 void remove_egg(egg_t *eggs[], int *egg_count, const char *team_name, int x, int y);
-void add_egg_cycle(egg_t *eggs[], int egg_count);
+void add_egg_cycle(int graphic_socket, egg_t *eggs[], int egg_count);
 
 void send_initial_graphic_data(int graphic_socket, server_config_t *config, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int egg_count);
 void send_graphic_cell(int graphic_socket, cell_t cell, int x, int y);
@@ -142,6 +142,13 @@ void send_graphic_broadcast(int graphic_socket, player_t *player, const char *me
 void send_graphic_incantation_start(int graphic_socket, player_t *player, player_t *players[], int max_players);
 void send_graphic_incantation_end(int graphic_socket, player_t *player, map_t *map, bool success);
 void send_graphic_player_level(int graphic_socket, player_t *player);
+void send_graphic_fork(int graphic_socket, player_t *player);
+void send_graphic_egg_created(int graphic_socket, int egg_id, egg_t *egg);
+void send_graphic_egg_hatched(int graphic_socket, int egg_id);
+void send_graphic_player_death(int graphic_socket, player_t *player);
+void send_graphic_game_end(int graphic_socket, const char *winning_team);
+
+
 
 
 

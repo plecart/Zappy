@@ -39,7 +39,7 @@ void remove_egg(egg_t *eggs[], int *egg_count, const char *team_name, int x, int
     log_printf(PRINT_ERROR, "Aucun œuf à retirer\n");
 }
 
-void add_egg_cycle(egg_t *eggs[], int egg_count)
+void add_egg_cycle(int graphic_socket, egg_t *eggs[], int egg_count)
 {
     for (int i = 0; i < egg_count; i++)
     {
@@ -53,6 +53,7 @@ void add_egg_cycle(egg_t *eggs[], int egg_count)
             {
                 log_printf(PRINT_INFORMATION, "Un oeuf de l'équipe [%s] est apparu en [%d, %d] (posé par %d)\n",
                            eggs[i]->team_name, eggs[i]->x, eggs[i]->y, eggs[i]->mother_socket);
+                send_graphic_egg_created(graphic_socket, i, eggs[i]);
             }
         }
         else if (eggs[i]->time_before_hatch > 0)
@@ -62,8 +63,8 @@ void add_egg_cycle(egg_t *eggs[], int egg_count)
             {
                 log_printf(PRINT_INFORMATION, "Un oeuf de l'équipe [%s] a éclos en [%d, %d] (en attente d'un nouveau client)\n",
                            eggs[i]->team_name, eggs[i]->x, eggs[i]->y, eggs[i]->mother_socket);
-
                 send_message_egg(*eggs[i], "egg hatched\n");
+                send_graphic_egg_hatched(graphic_socket, i);
             }
         }
     }
