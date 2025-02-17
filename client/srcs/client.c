@@ -74,9 +74,9 @@ void start_client(client_config_t config) {
     //wait_for_game_start(sock);
 
     // TEST
-    sleep(4);
+    sleep(2);
 
-    send_message(sock, "broadcast OO\n");
+    send_message(sock, "fork\n");
 
     // send_message(sock, "inventaire\n");
     // send_message(sock, "pose nourriture\n");

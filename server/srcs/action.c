@@ -1,6 +1,6 @@
 #include "../includes/server.h"
 
-void execute_player_action(player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs, int *egg_count)
+void execute_player_action(player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count)
 {
     if (player->current_execution_time > 1)
     {
@@ -24,7 +24,7 @@ void execute_player_action(player_t *player, map_t *map, player_t *players[], in
     player->action_count--;
 }
 
-int action_switch(player_t *player, char *action, map_t *map, player_t *players[], int max_players, egg_t *eggs, int *egg_count)
+int action_switch(player_t *player, char *action, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count)
 {
 
     log_printf_identity(PRINT_RECEIVE, player, "a [serveur] -> %s\n", action);
@@ -200,19 +200,28 @@ int action_incantation(player_t *player, map_t *map, player_t *players[], int ma
     return 7;
 }
 
-int action_lay_egg(player_t *player, egg_t *eggs, int *egg_count)
+int action_lay_egg(player_t *player, egg_t *eggs[], int *egg_count)
 {
+    egg_t *new_egg = malloc(sizeof(egg_t));  // ✅ Allouer la mémoire correctement
+    if (!new_egg) {
+        log_printf(PRINT_ERROR, "Échec de l'allocation mémoire pour un œuf\n");
+        return 0;
+    }
 
-    egg_t new_egg = {0};
-    strcpy(new_egg.team_name, player->team_name);
-    new_egg.mother_socket = player->socket;
-    new_egg.x = player->x;
-    new_egg.y = player->y;
-    new_egg.time_before_spawn = 42;
-    new_egg.time_before_hatch = 600;
+    strcpy(new_egg->team_name, player->team_name);
+    new_egg->mother_socket = player->socket;
+    new_egg->x = player->x;
+    new_egg->y = player->y;
+    new_egg->time_before_spawn = 4; // remettre 42
+    new_egg->time_before_hatch = 6; //remettre 600
 
-    add_egg(&eggs, egg_count, new_egg);
-    log_printf_identity(PRINT_INFORMATION, player, "commence a pondre un oeuf en [%d, %d]\n", player->x, player->y);
+    add_egg(eggs, egg_count, new_egg);
+
+    // ✅ Debugging : Afficher l'état de l'œuf ajouté
+    // printf("DEBUG: Œuf ajouté - Team: %s, Pos: (%d, %d), Spawn: %d, Hatch: %d, egg_count: %d\n",
+    //        new_egg->team_name, new_egg->x, new_egg->y, new_egg->time_before_spawn, new_egg->time_before_hatch, *egg_count);
+
+    log_printf_identity(PRINT_INFORMATION, player, "commence à pondre un œuf en [%d, %d]\n", player->x, player->y);
     send_message_player(*player, "ok\n");
-    return 42;
+    return 4; //42 a remettre
 }

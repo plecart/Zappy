@@ -1,0 +1,55 @@
+==308989== Memcheck, a memory error detector
+==308989== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==308989== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==308989== Command: ./zappy_server -p 4457 -x 5 -y 5 -n Team1 Team2 -c 2 -t 1
+==308989== Parent PID: 176908
+==308989== 
+==308989== Invalid read of size 8
+==308989==    at 0x10B20B: start_server (server.c:143)
+==308989==    by 0x10A693: main (main_server.c:6)
+==308989==  Address 0x4aa21e8 is 0 bytes after a block of size 8 alloc'd
+==308989==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==308989==    by 0x10AF11: start_server (server.c:107)
+==308989==    by 0x10A693: main (main_server.c:6)
+==308989== 
+==308989== Invalid read of size 8
+==308989==    at 0x10C6B3: print_players (player.c:220)
+==308989==    by 0x10B360: start_server (server.c:172)
+==308989==    by 0x10A693: main (main_server.c:6)
+==308989==  Address 0x4aa21e8 is 0 bytes after a block of size 8 alloc'd
+==308989==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==308989==    by 0x10AF11: start_server (server.c:107)
+==308989==    by 0x10A693: main (main_server.c:6)
+==308989== 
+==308989== Invalid read of size 4
+==308989==    at 0x10C6B6: print_players (player.c:219)
+==308989==    by 0x10B360: start_server (server.c:172)
+==308989==    by 0x10A693: main (main_server.c:6)
+==308989==  Address 0x40c is not stack'd, malloc'd or (recently) free'd
+==308989== 
+==308989== 
+==308989== Process terminating with default action of signal 11 (SIGSEGV)
+==308989==  Access not within mapped region at address 0x40C
+==308989==    at 0x10C6B6: print_players (player.c:219)
+==308989==    by 0x10B360: start_server (server.c:172)
+==308989==    by 0x10A693: main (main_server.c:6)
+==308989==  If you believe this happened as a result of a stack
+==308989==  overflow in your program's main thread (unlikely but
+==308989==  possible), you can try to increase the size of the
+==308989==  main thread stack using the --main-stacksize= flag.
+==308989==  The main thread stack size used in this run was 8388608.
+==308989== 
+==308989== HEAP SUMMARY:
+==308989==     in use at exit: 6,222 bytes in 22 blocks
+==308989==   total heap usage: 33 allocs, 11 frees, 20,240 bytes allocated
+==308989== 
+==308989== LEAK SUMMARY:
+==308989==    definitely lost: 10 bytes in 2 blocks
+==308989==    indirectly lost: 0 bytes in 0 blocks
+==308989==      possibly lost: 0 bytes in 0 blocks
+==308989==    still reachable: 6,212 bytes in 20 blocks
+==308989==         suppressed: 0 bytes in 0 blocks
+==308989== Rerun with --leak-check=full to see details of leaked memory
+==308989== 
+==308989== For lists of detected and suppressed errors, rerun with: -s
+==308989== ERROR SUMMARY: 29321 errors from 3 contexts (suppressed: 0 from 0)

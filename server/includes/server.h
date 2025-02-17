@@ -80,7 +80,7 @@ void print_server_config(server_config_t config);
 
 void start_server(server_config_t config);
 int init_server(int port);
-void accept_new_client(int server_socket, player_t *players[], int max_players, server_config_t *config, int *graphic_socket, bool *game_started);
+void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], int *egg_count, int max_players, server_config_t *config, int *graphic_socket, bool *game_started);
 void handle_client_messages(player_t *players[], int max_players, fd_set *read_fds);
 
 void send_message_egg(egg_t egg, const char *message);
@@ -116,8 +116,8 @@ void get_front_coordinate(int coordinate[2], player_t player, map_t *map);
 int get_sound_direction(player_t *sender, player_t *receiver, map_t *map);
 
 
-void execute_player_action(player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs, int *egg_count);
-int action_switch(player_t *player, char *action, map_t *map, player_t *players[], int max_players, egg_t *eggs, int *egg_count);
+void execute_player_action(player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count);
+int action_switch(player_t *player, char *action, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count);
 int action_move_forward(player_t *player, map_t *map);
 int action_turn(player_t *player, bool left);
 int action_see(player_t *player, map_t *map, player_t *players[], int max_players);
@@ -127,12 +127,11 @@ int action_put(player_t *player, map_t *map, const char *action);
 int action_kick(player_t *player, map_t *map, player_t *players[], int max_players);
 int action_broadcast(player_t *player, map_t *map, player_t *players[], int max_players, const char *action);
 int action_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
-int action_lay_egg(player_t *player, egg_t *eggs, int *egg_count);
+int action_lay_egg(player_t *player, egg_t *eggs[], int *egg_count);
 
 
-void add_egg(egg_t **eggs, int *egg_count, egg_t new_egg);
-void remove_egg(egg_t **eggs, int *egg_count, const char *team_name, int x, int y);
-void free_egg_array(egg_t **eggs, int *egg_count);
-void add_egg_cycle(egg_t *eggs, int egg_count);
+void add_egg(egg_t *eggs[], int *egg_count, egg_t *new_egg);
+void remove_egg(egg_t *eggs[], int *egg_count, const char *team_name, int x, int y);
+void add_egg_cycle(egg_t *eggs[], int egg_count);
 
 #endif
