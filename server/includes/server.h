@@ -133,12 +133,17 @@ void remove_egg(egg_t *eggs[], int *egg_count, const char *team_name, int x, int
 void add_egg_cycle(egg_t *eggs[], int egg_count);
 
 void send_initial_graphic_data(int graphic_socket, server_config_t *config, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int egg_count);
+void send_graphic_cell(int graphic_socket, cell_t cell, int x, int y);
 void send_graphic_new_player(int graphic_socket, player_t *player, bool from_egg, int egg_id);
 void send_graphic_player_position(int graphic_socket, player_t *player);
 void send_graphic_player_resources(int graphic_socket, player_t *player, map_t *map, bool take, int resource_index);
 void send_graphic_expulse(int graphic_socket, player_t *player);
 void send_graphic_broadcast(int graphic_socket, player_t *player, const char *message);
 void send_graphic_incantation_start(int graphic_socket, player_t *player, player_t *players[], int max_players);
+void send_graphic_incantation_end(int graphic_socket, player_t *player, map_t *map, bool success);
+void send_graphic_player_level(int graphic_socket, player_t *player);
+
+
 
 
 #endif

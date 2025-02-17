@@ -10,6 +10,7 @@ void execute_player_action(int graphic_socket, player_t *player, map_t *map, pla
     if (player->incantation_trigger == true)
     {
         player->incantation_trigger = false;
+        send_graphic_incantation_end(graphic_socket, player, map, can_incantation(player, map, players, max_players));
         level_up_players(players, max_players);
     }
     if (player->action_count == 0)

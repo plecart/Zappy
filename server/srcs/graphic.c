@@ -22,15 +22,7 @@ void send_initial_graphic_data(int graphic_socket, server_config_t *config, map_
     {
         for (int x = 0; x < config->width; x++)
         {
-            snprintf(buffer, sizeof(buffer), "bct %d %d %d %d %d %d %d %d %d\n", x, y,
-                     map->cells[y][x].resources.nourriture,
-                     map->cells[y][x].resources.linemate,
-                     map->cells[y][x].resources.deraumere,
-                     map->cells[y][x].resources.sibur,
-                     map->cells[y][x].resources.mendiane,
-                     map->cells[y][x].resources.phiras,
-                     map->cells[y][x].resources.thystame);
-            send(graphic_socket, buffer, strlen(buffer), 0);
+            send_graphic_cell(graphic_socket, map->cells[y][x], x, y);
         }
     }
 
@@ -61,11 +53,31 @@ void send_initial_graphic_data(int graphic_socket, server_config_t *config, map_
     }
 }
 
+void send_graphic_cell(int graphic_socket, cell_t cell, int x, int y)
+{
+    if (graphic_socket == -1)
+    {
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+
+    snprintf(buffer, sizeof(buffer), "bct %d %d %d %d %d %d %d %d %d\n", x, y,
+             cell.resources.nourriture,
+             cell.resources.linemate,
+             cell.resources.deraumere,
+             cell.resources.sibur,
+             cell.resources.mendiane,
+             cell.resources.phiras,
+             cell.resources.thystame);
+    send(graphic_socket, buffer, strlen(buffer), 0);
+}
+
 void send_graphic_new_player(int graphic_socket, player_t *player, bool from_egg, int egg_id)
 {
     if (graphic_socket == -1 || player == NULL)
     {
-        return; // Pas de client graphique connecté ou joueur invalide
+        return;
     }
 
     char buffer[BUFFER_SIZE];
@@ -129,24 +141,13 @@ void send_graphic_player_resources(int graphic_socket, player_t *player, map_t *
 
     send(graphic_socket, buffer, strlen(buffer), 0);
 
-    int x = player->x;
-    int y = player->y;
-    snprintf(buffer, sizeof(buffer), "bct %d %d %d %d %d %d %d %d %d\n",
-             x, y,
-             map->cells[y][x].resources.nourriture,
-             map->cells[y][x].resources.linemate,
-             map->cells[y][x].resources.deraumere,
-             map->cells[y][x].resources.sibur,
-             map->cells[y][x].resources.mendiane,
-             map->cells[y][x].resources.phiras,
-             map->cells[y][x].resources.thystame);
-
-    send(graphic_socket, buffer, strlen(buffer), 0);
+    send_graphic_cell(graphic_socket, map->cells[player->y][player->x], player->x, player->y);
 }
 
 void send_graphic_expulse(int graphic_socket, player_t *player)
 {
-    if (graphic_socket == -1 || player == NULL) {
+    if (graphic_socket == -1 || player == NULL)
+    {
         return;
     }
 
@@ -157,7 +158,8 @@ void send_graphic_expulse(int graphic_socket, player_t *player)
 
 void send_graphic_broadcast(int graphic_socket, player_t *player, const char *message)
 {
-    if (graphic_socket == -1 || player == NULL || message == NULL) {
+    if (graphic_socket == -1 || player == NULL || message == NULL)
+    {
         return;
     }
 
@@ -169,15 +171,18 @@ void send_graphic_broadcast(int graphic_socket, player_t *player, const char *me
 
 void send_graphic_incantation_start(int graphic_socket, player_t *player, player_t *players[], int max_players)
 {
-    if (graphic_socket == -1 || player == NULL) {
+    if (graphic_socket == -1 || player == NULL)
+    {
         return;
     }
 
     char buffer[BUFFER_SIZE];
     int pos = snprintf(buffer, sizeof(buffer), "pic %d %d %d", player->x, player->y, player->level);
 
-    for (int i = 0; i < max_players; i++) {
-        if (players[i] != NULL && players[i]->x == player->x && players[i]->y == player->y) {
+    for (int i = 0; i < max_players; i++)
+    {
+        if (players[i] != NULL && players[i]->x == player->x && players[i]->y == player->y)
+        {
             pos += snprintf(buffer + pos, sizeof(buffer) - pos, " #%d", players[i]->socket);
         }
     }
@@ -186,4 +191,34 @@ void send_graphic_incantation_start(int graphic_socket, player_t *player, player
     send(graphic_socket, buffer, strlen(buffer), 0);
 }
 
+void send_graphic_incantation_end(int graphic_socket, player_t *player, map_t *map, bool success)
+{
+    if (graphic_socket == -1 || player == NULL)
+    {
+        return;
+    }
 
+    char buffer[BUFFER_SIZE];
+
+    snprintf(buffer, sizeof(buffer), "pie %d %d %d\n", player->x, player->y, success ? 1 : 0);
+    send(graphic_socket, buffer, strlen(buffer), 0);
+
+    if (success)
+    {
+        send_graphic_player_level(graphic_socket, player);
+        send_graphic_cell(graphic_socket, map->cells[player->y][player->x], player->x, player->y);
+    }
+}
+
+void send_graphic_player_level(int graphic_socket, player_t *player)
+{
+    if (graphic_socket == -1 || player == NULL)
+    {
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+
+    snprintf(buffer, sizeof(buffer), "plv #%d %d\n", player->socket, player->level);
+    send(graphic_socket, buffer, strlen(buffer), 0);
+}
