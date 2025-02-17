@@ -167,3 +167,23 @@ void send_graphic_broadcast(int graphic_socket, player_t *player, const char *me
     send(graphic_socket, buffer, strlen(buffer), 0);
 }
 
+void send_graphic_incantation_start(int graphic_socket, player_t *player, player_t *players[], int max_players)
+{
+    if (graphic_socket == -1 || player == NULL) {
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+    int pos = snprintf(buffer, sizeof(buffer), "pic %d %d %d", player->x, player->y, player->level);
+
+    for (int i = 0; i < max_players; i++) {
+        if (players[i] != NULL && players[i]->x == player->x && players[i]->y == player->y) {
+            pos += snprintf(buffer + pos, sizeof(buffer) - pos, " #%d", players[i]->socket);
+        }
+    }
+
+    snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+    send(graphic_socket, buffer, strlen(buffer), 0);
+}
+
+

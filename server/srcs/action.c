@@ -47,7 +47,7 @@ int action_switch(int graphic_socket, player_t *player, char *action, map_t *map
     if (strncmp(action, "broadcast", 9) == 0)
         return action_broadcast(graphic_socket, player, map, players, max_players, action);
     if (strcmp(action, "incantation") == 0)
-        return action_incantation(player, map, players, max_players);
+        return action_incantation(graphic_socket, player, map, players, max_players);
     if (strcmp(action, "fork") == 0)
         return action_lay_egg(player, eggs, egg_count);
 
@@ -191,7 +191,7 @@ int action_broadcast(int graphic_socket, player_t *player, map_t *map, player_t 
     return 7;
 }
 
-int action_incantation(player_t *player, map_t *map, player_t *players[], int max_players)
+int action_incantation(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players)
 {
     if (can_incantation(player, map, players, max_players))
     {
@@ -199,6 +199,7 @@ int action_incantation(player_t *player, map_t *map, player_t *players[], int ma
         char buffer[BUFFER_SIZE_TINY];
         sprintf(buffer, "elevation en cours niveau actuel : %d\n", player->level);
         send_message_player(*player, buffer);
+        send_graphic_incantation_start(graphic_socket, player, players, max_players);
         return 300;
     }
     send_message_player(*player, "ko\n");

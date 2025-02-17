@@ -125,7 +125,7 @@ int action_take(int graphic_socket, player_t *player, map_t *map, const char *ac
 int action_put(int graphic_socket, player_t *player, map_t *map, const char *action);
 int action_kick(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players);
 int action_broadcast(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players, const char *action);
-int action_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
+int action_incantation(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players);
 int action_lay_egg(player_t *player, egg_t *eggs[], int *egg_count);
 
 void add_egg(egg_t *eggs[], int *egg_count, egg_t *new_egg);
@@ -138,6 +138,7 @@ void send_graphic_player_position(int graphic_socket, player_t *player);
 void send_graphic_player_resources(int graphic_socket, player_t *player, map_t *map, bool take, int resource_index);
 void send_graphic_expulse(int graphic_socket, player_t *player);
 void send_graphic_broadcast(int graphic_socket, player_t *player, const char *message);
+void send_graphic_incantation_start(int graphic_socket, player_t *player, player_t *players[], int max_players);
 
 
 #endif
