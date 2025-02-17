@@ -15,6 +15,7 @@ SERVER_SRCS	=	$(SERVER_DIR)main_server.c \
 				$(SERVER_DIR)get.c \
 				$(SERVER_DIR)action_data.c \
 				$(SERVER_DIR)egg.c \
+				$(SERVER_DIR)graphic.c \
 				$(TOOLS__SRCS)
 CLIENT_SRCS	=	$(CLIENT_DIR)main_client.c \
 				$(CLIENT_DIR)flags_client.c \

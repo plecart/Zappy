@@ -102,7 +102,7 @@ void server_send_message(int socket, const char *message, char *team_name)
 void start_server(server_config_t config)
 {
     int server_socket = init_server(config.port);
-    int max_clients = 8 * config.team_count;
+    int max_clients = 8 * config.team_count + 1;
     player_t *players[max_clients];
     memset(players, 0, sizeof(players));
     fd_set read_fds;
@@ -154,14 +154,15 @@ void start_server(server_config_t config)
 
         if (FD_ISSET(server_socket, &read_fds))
         {
-            accept_new_client(server_socket, players, eggs, &egg_count, max_clients, &config, &graphic_socket, &game_started);
+            accept_new_client(server_socket, players, eggs, &egg_count, max_clients - 1, &config, map, &graphic_socket, &game_started);
         }
-        handle_client_messages(players, max_clients, &read_fds);
+
+        handle_client_messages(players, max_clients - 1, &read_fds);
 
         if (game_started)
         { // La partie ne commence pas tant que le client graphique n'est pas là
 
-            for (int i = 0; i < max_clients; i++)
+            for (int i = 0; i < max_clients - 1; i++)
             {
                 if (players[i] != NULL)
                 {
@@ -169,17 +170,12 @@ void start_server(server_config_t config)
                     if (!is_alive)
                         free_player(players[i]);
                     else
-                        execute_player_action(players[i], map, players, max_clients, eggs, &egg_count);
+                        execute_player_action(graphic_socket, players[i], map, players, max_clients, eggs, &egg_count);
                 }
-            }
-
-            if (graphic_socket != -1)
-            {
-                send(graphic_socket, "OUI\n", 4, 0);
             }
         }
     }
-
+    
     free_players(players);
     free_map(map);
     close(server_socket);

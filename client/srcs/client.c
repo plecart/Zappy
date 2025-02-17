@@ -5,12 +5,14 @@
 // En cas d'échec à n'importe quelle étape, elle affiche un message d'erreur et retourne -1.
 // En cas de succès, elle retourne le descripteur du socket connecté.
 
-int connect_to_server(client_config_t config) {
+int connect_to_server(client_config_t config)
+{
     int sock;
     struct sockaddr_in server_addr;
 
     // Création d'un socket TCP avec `socket()`.
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
         log_printf(PRINT_ERROR, "Erreur lors de la création du socket\n");
         return -1;
     }
@@ -20,15 +22,16 @@ int connect_to_server(client_config_t config) {
     server_addr.sin_port = htons(config.port);
 
     // Conversion de l'adresse IP avec `inet_pton()`, avec vérification de sa validité.
-    if (inet_pton(AF_INET, config.hostname, &server_addr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, config.hostname, &server_addr.sin_addr) <= 0)
+    {
         log_printf(PRINT_ERROR, "Adresse du serveur invalide\n");
         close(sock);
         return -1;
     }
 
-
     // Tentative de connexion au serveur avec `connect()`
-    if (connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+    if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+    {
         log_printf(PRINT_ERROR, "Connexion au serveur échouée\n");
         close(sock);
         return -1;
@@ -42,16 +45,20 @@ int connect_to_server(client_config_t config) {
 // Cette fonction attend un message du serveur, le lit dans un tampon et l'affiche.
 // En cas d'erreur lors de la lecture, un message d'erreur est affiché.
 
-void receive_server_response(int sock) {
+void receive_server_response(int sock)
+{
     char buffer[BUFFER_SIZE];
 
     // Initialisation du tampon `buffer` avec des zéros pour éviter les données résiduelles.
     memset(buffer, 0, BUFFER_SIZE);
 
     // Lecture de la réponse du serveur avec `read()`, jusqu'à `BUFFER_SIZE - 1` octets.
-    if (read(sock, buffer, BUFFER_SIZE - 1) > 0) {
+    if (read(sock, buffer, BUFFER_SIZE - 1) > 0)
+    {
         log_printf(PRINT_RECEIVE, "Réponse du serveur: %s", buffer);
-    } else {
+    }
+    else
+    {
         log_printf(PRINT_ERROR, "Erreur lors de la réception de la réponse\n");
     }
 }
@@ -60,40 +67,67 @@ void receive_server_response(int sock) {
 // Cette fonction établit une connexion avec le serveur, envoie le nom d'équipe,
 // reçoit une réponse du serveur, puis ferme la connexion.
 
-void start_client(client_config_t config) {
+void start_client(client_config_t config)
+{
     // Connexion au serveur avec `connect_to_server()`.
     int sock = connect_to_server(config);
-    if (sock == -1) return;  
+    if (sock == -1)
+        return;
 
     // Envoi du nom de l'équipe avec `send_message()`.
-    send_message(sock, strcat(config.team_name,"\n"));
+    send_message(sock, strcat(config.team_name, "\n"));
 
     // Réception et affichage de la réponse du serveur avec `receive_server_response()`.
     receive_server_response(sock);
 
-    //wait_for_game_start(sock);
+    // wait_for_game_start(sock);
 
     // TEST
     sleep(2);
 
-    send_message(sock, "fork\n");
+    send_message(sock, "prendre\n");
+    send_message(sock, "avance\n");
+    send_message(sock, "deposer\n");
+    send_message(sock, "avance\n");
+    send_message(sock, "avance\n");
+    send_message(sock, "avance\n");
+    sleep(1);
+    send_message(sock, "prendre nourriture\n");
+    send_message(sock, "avance\n");
+    send_message(sock, "avance\n");
+    send_message(sock, "avance\n");
+    send_message(sock, "avance\n");
+    sleep(2);
+    send_message(sock, "avance\n");
+    send_message(sock, "\n");
+    send_message(sock, "avance\n");
+    send_message(sock, "avance\n");
+    send_message(sock, "avance\n");
+    send_message(sock, "avance\n");
+    sleep(2);
+    send_message(sock, "avance\n");
+    send_message(sock, "avance\n");
 
-    // send_message(sock, "inventaire\n");
+    // send_message(sock, "avance\n");
     // send_message(sock, "pose nourriture\n");
     // send_message(sock, "inventaire\n");
-    while(1) {
+    while (1)
+    {
         sleep(1);
     }
-    while (1) {
-        for (int i = 0; i < 12; i++) {
+    while (1)
+    {
+        for (int i = 0; i < 12; i++)
+        {
             send_message(sock, "avance\n");
-            //receive_server_response(sock);
+            // receive_server_response(sock);
         }
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 12; i++)
+        {
             send_message(sock, "droite\n");
-            //receive_server_response(sock);
+            // receive_server_response(sock);
         }
-       sleep(10);
+        sleep(10);
     }
 
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.

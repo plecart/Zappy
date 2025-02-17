@@ -106,25 +106,29 @@ player_t init_player(int client_socket, egg_t *eggs[], int *egg_count, const cha
     return player;
 }
 
-void assign_new_player(int client_socket, player_t *players[], egg_t *eggs[], int *egg_count, int max_players, const char *team_name, server_config_t *config)
+void assign_new_player(int graphic_socket, int client_socket, player_t *players[], egg_t *eggs[], int *egg_count, int max_players, const char *team_name, server_config_t *config)
 {
     for (int i = 0; i < max_players; i++)
     {
         if (players[i] == NULL)
         {
-            players[i] = malloc(sizeof(player_t));
+            players[i] = calloc(1, sizeof(player_t));
+            int previous_egg_count = *egg_count;
             *players[i] = init_player(client_socket, eggs, egg_count, team_name, config);
 
+            print_players(players, max_players);
+            
             send_message_player(*players[i], "BIENVENUE\n");
             log_printf_identity(PRINT_INFORMATION, players[i], "est place en position [%d, %d], direction %s\n", players[i]->x, players[i]->y, get_player_direction(players[i]));
             dprintf(client_socket, "%d %d\n", players[i]->x, players[i]->y);
+            send_graphic_new_player(graphic_socket, players[i], (previous_egg_count != *egg_count), *egg_count);
             return;
         }
     }
     close_invalid_client(client_socket, "Trop de joueurs connectés");
 }
 
-void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], int *egg_count, int max_clients, server_config_t *config, int *graphic_socket, bool *game_started)
+void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], int *egg_count, int max_clients, server_config_t *config, map_t *map, int *graphic_socket, bool *game_started)
 {
     struct sockaddr_in client_addr;
     socklen_t addr_size = sizeof(client_addr);
@@ -160,6 +164,7 @@ void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], in
         *graphic_socket = client_socket;
         *game_started = true; // La partie peut commencer
         log_printf(PRINT_INFORMATION, "Client graphique connecté (socket %d)\n", client_socket);
+        send_initial_graphic_data(*graphic_socket, config, map, players, max_clients, eggs, *egg_count);
         return;
     }
     // Vérifier si l'équipe est valide
@@ -175,7 +180,7 @@ void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], in
         return;
     }
 
-    assign_new_player(client_socket, players, eggs, egg_count, max_clients, buffer, config);
+    assign_new_player(*graphic_socket, client_socket, players, eggs, egg_count, max_clients, buffer, config);
 }
 
 void free_player(player_t *player)

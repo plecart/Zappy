@@ -36,6 +36,11 @@ void get_player_inventory(player_t *player, char *buffer, size_t size)
 
 int get_resource_index(const char *resource_name)
 {
+    if (resource_name == NULL)
+    {
+        return -1; // Erreur si le nom de ressource est invalide
+    }
+
     for (int i = 0; i < 7; i++)
     {
         if (strcmp(resource_name, resource_names[i]) == 0)
@@ -178,23 +183,26 @@ int get_sound_direction(player_t *sender, player_t *receiver, map_t *map)
     int dy = sender->y - receiver->y;
 
     // Gestion du torique (monde wrap-around)
-    dx = (dx > map->width / 2) ? dx - map->width : (dx < -map->width / 2) ? dx + map->width : dx;
-    dy = (dy > map->height / 2) ? dy - map->height : (dy < -map->height / 2) ? dy + map->height : dy;
+    dx = (dx > map->width / 2) ? dx - map->width : (dx < -map->width / 2) ? dx + map->width
+                                                                          : dx;
+    dy = (dy > map->height / 2) ? dy - map->height : (dy < -map->height / 2) ? dy + map->height
+                                                                             : dy;
 
     // Matrice de direction relative
     static const int directions[3][3] = {
         {8, 1, 2},
         {7, -1, 3},
-        {6, 5, 4}
-    };
+        {6, 5, 4}};
 
     if (dx == 0 && dy == 0)
         return 0;
-    
-    int index_x = (dx > 0) ? 2 : (dx < 0) ? 0 : 1;
-    int index_y = (dy > 0) ? 2 : (dy < 0) ? 0 : 1;
+
+    int index_x = (dx > 0) ? 2 : (dx < 0) ? 0
+                                          : 1;
+    int index_y = (dy > 0) ? 2 : (dy < 0) ? 0
+                                          : 1;
     int ret = directions[index_y][index_x];
-    
+
     ret = (6 * receiver->direction + ret) % 8;
     return ret == 0 ? 8 : ret;
 }

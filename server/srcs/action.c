@@ -1,6 +1,6 @@
 #include "../includes/server.h"
 
-void execute_player_action(player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count)
+void execute_player_action(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count)
 {
     if (player->current_execution_time > 1)
     {
@@ -14,7 +14,7 @@ void execute_player_action(player_t *player, map_t *map, player_t *players[], in
     }
     if (player->action_count == 0)
         return;
-    player->current_execution_time = action_switch(player, player->actions[0], map, players, max_players, eggs, egg_count);
+    player->current_execution_time = action_switch(graphic_socket, player, player->actions[0], map, players, max_players, eggs, egg_count);
     free(player->actions[0]);
     for (int i = 1; i < player->action_count; i++)
     {
@@ -24,29 +24,29 @@ void execute_player_action(player_t *player, map_t *map, player_t *players[], in
     player->action_count--;
 }
 
-int action_switch(player_t *player, char *action, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count)
+int action_switch(int graphic_socket, player_t *player, char *action, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count)
 {
 
     log_printf_identity(PRINT_RECEIVE, player, "a [serveur] -> %s\n", action);
     if (strcmp(action, "avance") == 0)
-        return action_move_forward(player, map);
+        return action_move_forward(graphic_socket, player, map);
     if (strcmp(action, "droite") == 0)
-        return action_turn(player, false);
+        return action_turn(graphic_socket, player, false);
     if (strcmp(action, "gauche") == 0)
-        return action_turn(player, true);
+        return action_turn(graphic_socket, player, true);
     if (strcmp(action, "voir") == 0)
         return action_see(player, map, players, max_players);
     if (strcmp(action, "inventaire") == 0)
         return action_inventory(player);
     if (strncmp(action, "prend", 5) == 0)
-        return action_take(player, map, action);
+        return action_take(graphic_socket, player, map, action);
     if (strncmp(action, "pose", 4) == 0)
-        return action_put(player, map, action);
+        return action_put(graphic_socket, player, map, action);
     if (strcmp(action, "expulse") == 0)
-        return action_kick(player, map, players, max_players);
+        return action_kick(graphic_socket, player, map, players, max_players);
     if (strncmp(action, "broadcast", 9) == 0)
-        return action_broadcast(player, map, players, max_players, action);
-    if (strcmp(action, "expulse") == 0)
+        return action_broadcast(graphic_socket, player, map, players, max_players, action);
+    if (strcmp(action, "incantation") == 0)
         return action_incantation(player, map, players, max_players);
     if (strcmp(action, "fork") == 0)
         return action_lay_egg(player, eggs, egg_count);
@@ -56,19 +56,21 @@ int action_switch(player_t *player, char *action, map_t *map, player_t *players[
     return 0;
 }
 
-int action_move_forward(player_t *player, map_t *map)
+int action_move_forward(int graphic_socket, player_t *player, map_t *map)
 {
     move_forward(player, map);
     log_printf_identity(PRINT_INFORMATION, player, "a avancé en direction de %s, en [%d, %d]\n", get_player_direction(player), player->x, player->y);
     send_message_player(*player, "ok\n");
+    send_graphic_player_position(graphic_socket, player);
     return 7;
 }
 
-int action_turn(player_t *player, bool left)
+int action_turn(int graphic_socket, player_t *player, bool left)
 {
     turn_player(player, left);
     log_printf_identity(PRINT_INFORMATION, player, "tourne à %s, nouvelle direction: %s\n", left ? "gauche" : "droite", get_player_direction(player));
     send_message_player(*player, "ok\n");
+    send_graphic_player_position(graphic_socket, player);
     return 7;
 }
 
@@ -96,7 +98,7 @@ int action_inventory(player_t *player)
     return 1;
 }
 
-int action_take(player_t *player, map_t *map, const char *action)
+int action_take(int graphic_socket, player_t *player, map_t *map, const char *action)
 {
     int resource_index;
     char *object = strchr(action, ' ') + 1;
@@ -107,7 +109,6 @@ int action_take(player_t *player, map_t *map, const char *action)
         send_message_player(*player, "ko\n");
         return 0;
     }
-
     int count = ((int *)&map->cells[player->y][player->x].resources)[resource_index];
     if (count <= 0)
     {
@@ -118,10 +119,11 @@ int action_take(player_t *player, map_t *map, const char *action)
     ((int *)&map->cells[player->y][player->x].resources)[resource_index]--;
     ((int *)&player->inventory)[resource_index]++;
     log_printf_identity(PRINT_INFORMATION, player, "a prit l'objet \"%s\", il y en reste %d en [%d, %d], la ou il se trouve (il en a possed %d dans son inventaire)\n", object, ((int *)&map->cells[player->y][player->x].resources)[resource_index], player->x, player->y, ((int *)&player->inventory)[resource_index]);
+    send_graphic_player_resources(graphic_socket, player, map, true, resource_index);
     return 7;
 }
 
-int action_put(player_t *player, map_t *map, const char *action)
+int action_put(int graphic_socket, player_t *player, map_t *map, const char *action)
 {
     int resource_index;
     char *object = strchr(action, ' ') + 1;
@@ -143,17 +145,19 @@ int action_put(player_t *player, map_t *map, const char *action)
     ((int *)&player->inventory)[resource_index]--;
     ((int *)&map->cells[player->y][player->x].resources)[resource_index]++;
     log_printf_identity(PRINT_INFORMATION, player, "a deposer l'objet \"%s\", il y en a miantenant %d en [%d, %d], la ou il se trouve (il en possede %d dans son inventaire)\n", object, ((int *)&map->cells[player->y][player->x].resources)[resource_index], player->x, player->y, ((int *)&player->inventory)[resource_index]);
+    send_graphic_player_resources(graphic_socket, player, map, false, resource_index);
     return 7;
 }
 
-int action_kick(player_t *player, map_t *map, player_t *players[], int max_players)
+int action_kick(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players)
 {
-    bool did_kicked = kick_players(player, map, players, max_players);
+    send_graphic_expulse(graphic_socket, player);
+    bool did_kicked = kick_players(graphic_socket, player, map, players, max_players);
     send_message_player(*player, did_kicked ? "ok\n" : "ko\n");
     return 7;
 }
 
-int action_broadcast(player_t *player, map_t *map, player_t *players[], int max_players, const char *action)
+int action_broadcast(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players, const char *action)
 {
     int player_count = 0;
     char *message = strchr(action, ' ') + 1;
@@ -183,6 +187,7 @@ int action_broadcast(player_t *player, map_t *map, player_t *players[], int max_
         }
         player_count++;
     }
+    send_graphic_broadcast(graphic_socket, player, message);
     return 7;
 }
 

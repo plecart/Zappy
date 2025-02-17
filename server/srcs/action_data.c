@@ -25,7 +25,7 @@ void move_forward(player_t *player, map_t *map)
     }
 }
 
-bool kick_players(player_t *player, map_t *map, player_t *players[], int max_players)
+bool kick_players(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players)
 {
     int coordinate[2];
     bool kicked_one = false;
@@ -41,6 +41,7 @@ bool kick_players(player_t *player, map_t *map, player_t *players[], int max_pla
             char buffer[24];
             sprintf(buffer, "deplacement %s\n", get_player_direction(players[i]));
             send_message_player(*players[i], buffer);
+            send_graphic_player_position(graphic_socket, player);
             kicked_one = true;
         }
     }
