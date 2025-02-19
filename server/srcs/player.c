@@ -257,7 +257,7 @@ bool player_eat(int graphic_socket, player_t *player)
         }
         log_printf_identity(PRINT_INFORMATION, player, "est mort de faim\n");
         send_message_player(*player, "mort\n");
-        send_graphic_player_death(graphic_socket, player->socket);
+        send_graphic_player_death(graphic_socket, player);
         return false;
     }
     return true;

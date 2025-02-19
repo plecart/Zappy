@@ -20,6 +20,8 @@ SERVER_SRCS	=	$(SERVER_DIR)main_server.c \
 CLIENT_SRCS	=	$(CLIENT_DIR)main_client.c \
 				$(CLIENT_DIR)flags_client.c \
 				$(CLIENT_DIR)client.c \
+				$(CLIENT_DIR)brain.c \
+				$(CLIENT_DIR)response.c \
 				$(TOOLS__SRCS)
 
 SERVER_OBJS	=	$(SERVER_SRCS:.c=.o)
