@@ -1,30 +1,42 @@
 #include "../includes/client.h"
-#include <math.h> 
 
-void brain(int sock)
+void brain(int sock, client_config_t config)
 {
     char RESPONSES_TAB;
     int response_count = 0;
 
-    // response_count = receive_server_response(sock, responses, response_count);
-    while (1)
+    for (int i = 0; i < 7; i++)
     {
         scan_for_resource(sock, responses, &response_count, "nourriture");
+        execute_action(sock, "fork\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
     }
+    while (1)
+    {
+        execute_action(sock, "gauche\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
+        execute_action(sock, "gauche\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
+        scan_for_resource(sock, responses, &response_count, "nourriture");
+        print_responses(responses, response_count);
+
+        if (did_egg_hatched(responses, &response_count) == true)
+            start_slave(config);
+    }
+    
 }
+
+
 
 void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *resource_name)
 {
     int resource_position = -1;
     int player_level = 1;
-    printf("debut du scan LOOK\n");
+    //printf("debut du scan LOOK\n");
     while (resource_position == -1)
     {
         int rotation = -1;
         while (++rotation < 4 && resource_position == -1){
             
             resource_position = look(sock, responses, response_count, resource_name, &player_level);
-            printf("[%d] - [%d]\n", resource_position, player_level);
+            //printf("[%d] - [%d]\n", resource_position, player_level);
         }
         //printf("---fini de LOOK\n"); 
         if (resource_position == -1)
@@ -35,33 +47,33 @@ void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *
            // printf("deplacement done\n");
             char buffer[BUFFER_SIZE_TINY];
             sprintf(buffer, "prend %s\n", resource_name);
-            printf("avant pickup\n");
+            //printf("avant pickup\n");
             execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
-            printf("Fini scan + pickup\n");    
+            //printf("Fini scan + pickup\n");    
         }
     }   
 }
 
 int execute_action(int sock, char *action, char RESPONSES_TAB, int *response_count, server_response_type_t response_type, bool delete)
 {
-    printf("\n-- DEbut execute --\n");
+    //printf("\n-- DEbut execute --\n");
     send_message(sock, action);
     int response_index = -1;
     while (response_index == -1)
     {
-        printf("DEBUT Boucle\n");
-        printf("RC[%d]\n", *response_count);
-        printf("1[0] = %s\n", responses[0]);
-        printf("1[1] = %s\n", responses[1]);
+        //printf("DEBUT Boucle\n");
+        // printf("RC[%d]\n", *response_count);
+        // printf("1[0] = %s\n", responses[0]);
+        // printf("1[1] = %s\n", responses[1]);
         *response_count = receive_server_response(sock, responses, *response_count);
-        printf("RC[%d]\n", *response_count);
-        printf("2[0] = %s\n", responses[0]);
-        printf("2[1] = %s\n", responses[1]);
-        printf("response_count = %d | type = %d\n", *response_count, response_type);
+        // printf("RC[%d]\n", *response_count);
+        // printf("2[0] = %s\n", responses[0]);
+        // printf("2[1] = %s\n", responses[1]);
+        // printf("response_count = %d | type = %d\n", *response_count, response_type);
         response_index = get_response_index(responses, response_type, *response_count);
-        printf("response_index = %d\n", response_index);
+        //printf("response_index = %d\n", response_index);
     }
-    printf("-- fiin execute --\n");
+    //printf("-- fiin execute --\n");
     if (delete)
         delete_response(responses, response_count, response_index);
     return response_index;
@@ -122,5 +134,18 @@ void go_to_cell(int resource_position, int sock, char RESPONSES_TAB, int *respon
         for (int i = 0; i < number_forward; i++)
             execute_action(sock, "avance\n", responses, response_count, SERVER_RESPONSE_OK_KO, true);
     }
+}
+
+bool did_egg_hatched(char RESPONSES_TAB, int *response_count)
+{
+   for (int i = 0; i < *response_count; i++)
+   {
+       if (strstr(responses[i], "egg hatched") != NULL)
+       {
+           delete_response(responses, response_count, i);
+           return true;
+       }
+   }
+   return false;
 }
 

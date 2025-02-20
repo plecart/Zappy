@@ -76,7 +76,7 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
 // Cette fonction établit une connexion avec le serveur, envoie le nom d'équipe,
 // reçoit une réponse du serveur, puis ferme la connexion.
 
-void start_client(client_config_t config)
+void start_client(client_config_t config, bool is_slave)
 {
     int sock = connect_to_server(config);
     if (sock == -1)
@@ -87,7 +87,8 @@ void start_client(client_config_t config)
     sleep(1);
     receive_server_response(sock, responses, 0);
 
-    brain(sock);
+    !is_slave ? brain(sock, config) : slave(sock);
+
 
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.
     close(sock);

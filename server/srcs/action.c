@@ -221,8 +221,8 @@ int action_lay_egg(int graphic_socket, player_t *player, egg_t *eggs[], int *egg
     new_egg->mother_socket = player->socket;
     new_egg->x = player->x;
     new_egg->y = player->y;
-    new_egg->time_before_spawn = 4; // remettre 42
-    new_egg->time_before_hatch = 6; //remettre 600
+    new_egg->time_before_spawn = 42; // remettre 42
+    new_egg->time_before_hatch = 600; //remettre 600
 
     add_egg(eggs, egg_count, new_egg);
 
@@ -233,5 +233,5 @@ int action_lay_egg(int graphic_socket, player_t *player, egg_t *eggs[], int *egg
     log_printf_identity(PRINT_INFORMATION, player, "commence à pondre un œuf en [%d, %d]\n", player->x, player->y);
     send_message_player(*player, "ok\n");
     send_graphic_fork(graphic_socket, player);
-    return 4; //42 a remettre
+    return 42; // a remettre
 }

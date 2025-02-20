@@ -55,7 +55,7 @@ void receive_messages(int sock) {
         int bytes_read = read(sock, buffer, sizeof(buffer) - 1);
         if (bytes_read > 0) {
             buffer[bytes_read] = '\0';
-            log_printf("Serveur : %s", buffer);
+            log_printf("%s", buffer);
 
             if (strcmp(buffer, "La partie commence !\n") == 0) {
                 log_printf("Détection du début de la partie !\n");
