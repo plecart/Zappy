@@ -187,13 +187,18 @@ void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], in
 
 void free_player(player_t *player)
 {
+    if (player == NULL)
+        return;
     close(player->socket);
     for (int i = 0; i < player->action_count; i++)
     {
         free(player->actions[i]);
+        player->actions[i] = NULL;
     }
-    free(player);
-    player = NULL;
+    if (player == NULL) {
+        free(player);
+        player = NULL;
+    }
 }
 
 void free_players(player_t *players[])
@@ -261,6 +266,18 @@ bool player_eat(int graphic_socket, player_t *player)
         send_message_player(*player, "mort\n");
         send_graphic_player_death(graphic_socket, player);
         return false;
+    }
+    return true;
+}
+
+bool are_players_dead(player_t *players[], int max_players)
+{
+    for (int i = 0; i < max_players; i++)
+    {
+        if (players[i] != NULL && players[i]->life_cycle > 0)
+        {
+            return false;
+        }
     }
     return true;
 }

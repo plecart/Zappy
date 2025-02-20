@@ -54,7 +54,7 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
     if (bytes_read <= 0)
     {
         log_printf(PRINT_ERROR, "Erreur lors de la réception de la réponse\n");
-        return 0;
+        exit(0);
     }
 
     buffer[bytes_read] = '\0';

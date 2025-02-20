@@ -1,20 +1,21 @@
 #include "../includes/server.h"
 
-void execute_player_action(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count)
+bool execute_player_action(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count)
 {
     if (player->current_execution_time > 1)
     {
         player->current_execution_time--;
-        return;
+        return false;
     }
     if (player->incantation_trigger == true)
     {
         player->incantation_trigger = false;
         send_graphic_incantation_end(graphic_socket, player, map, can_incantation(player, map, players, max_players));
-        level_up_players(players, max_players);
+        if (level_up_players(players, max_players) == true)
+            return true;
     }
     if (player->action_count == 0)
-        return;
+        return false;
     player->current_execution_time = action_switch(graphic_socket, player, player->actions[0], map, players, max_players, eggs, egg_count);
     free(player->actions[0]);
     for (int i = 1; i < player->action_count; i++)
@@ -23,6 +24,7 @@ void execute_player_action(int graphic_socket, player_t *player, map_t *map, pla
     }
     player->actions[player->action_count - 1] = NULL;
     player->action_count--;
+    return false;
 }
 
 int action_switch(int graphic_socket, player_t *player, char *action, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count)

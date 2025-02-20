@@ -86,7 +86,7 @@ bool can_incantation(player_t *player, map_t *map, player_t *players[], int max_
     return false;
 }
 
-void level_up_players(player_t *players[], int max_players)
+bool level_up_players(player_t *players[], int max_players)
 {
     int i = 0;
 
@@ -99,9 +99,12 @@ void level_up_players(player_t *players[], int max_players)
             char buffer[BUFFER_SIZE_TINY];
             sprintf(buffer, "level up : %d\n", players[i]->level);
             send_message_player(*players[i], buffer);
+            if (players[i]->level == 8)
+                return true;
         }
         i++;
     }
+    return false;
 }
 
 void start_incantation(player_t *player, map_t *map, player_t *players[], int max_players)

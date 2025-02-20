@@ -109,7 +109,7 @@ void start_server(server_config_t config)
     int max_fd, activity;
     map_t *map = create_map(config.width, config.height);
     struct timeval timeout;
-    egg_t *eggs[config.team_count + 8];
+    egg_t *eggs[config.team_count * 8];
     memset(eggs, 0, sizeof(eggs));
     int egg_count = 0;
     int graphic_socket = -1; // Stockage du socket graphique
@@ -168,15 +168,35 @@ void start_server(server_config_t config)
                 {
                     bool is_alive = player_eat(graphic_socket, players[i]);
                     if (!is_alive)
+                    {
                         free_player(players[i]);
+                        for (int j = i; j < max_clients - 1; j++)
+                            players[j] = players[j + 1];
+                        if (are_players_dead(players, max_clients - 1))
+                        {
+                            log_printf(PRINT_INFORMATION, "Tous les joueurs sont morts, il m'y a pas de gagnant\n");
+                            send_graphic_game_end(graphic_socket, "");
+                            free_all(players, map, server_socket);
+                        }
+                    }
                     else
-                        execute_player_action(graphic_socket, players[i], map, players, max_clients, eggs, &egg_count);
+                    {
+                        if (execute_player_action(graphic_socket, players[i], map, players, max_clients, eggs, &egg_count) == true)
+                        {
+                            log_printf(PRINT_INFORMATION, "L'équipe %s a gagné\n", players[i]->team_name);
+                            send_graphic_game_end(graphic_socket, players[i]->team_name);
+                            free_all(players, map, server_socket);
+                        }
+                    }
                 }
             }
         }
     }
-    
+}
+
+void free_all(player_t *players[], map_t *map, int server_socket){
     free_players(players);
     free_map(map);
     close(server_socket);
+    exit(EXIT_SUCCESS);
 }

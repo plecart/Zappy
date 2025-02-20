@@ -87,6 +87,8 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
 void send_message_egg(egg_t egg, const char *message);
 void send_message_player(player_t player, const char *message);
 void server_send_message(int socket, const char *message, char *team_name);
+void free_all(player_t *players[], map_t *map, int server_socket);
+
 
 map_t *create_map(int width, int height);
 void populate_map(map_t *map);
@@ -99,13 +101,15 @@ void print_players(player_t *players[], int max_players);
 bool player_eat(int graphic_socket, player_t *player);
 void log_printf_identity(print_type type, player_t *player, const char *format, ...);
 void add_action_to_player(player_t *player, const char *action);
+bool are_players_dead(player_t *players[], int max_players);
+
 
 void turn_player(player_t *player, bool left);
 void move_forward(player_t *player, map_t *map);
 bool kick_players(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players);
 bool can_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
 void start_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
-void level_up_players(player_t *players[], int max_players);
+bool level_up_players(player_t *players[], int max_players);
 
 char *get_player_direction(player_t *player);
 void get_player_inventory(player_t *player, char *buffer, size_t size);
@@ -116,7 +120,7 @@ void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_co
 void get_front_coordinate(int coordinate[2], player_t player, map_t *map);
 int get_sound_direction(player_t *sender, player_t *receiver, map_t *map);
 
-void execute_player_action(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count);
+bool execute_player_action(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count);
 int action_switch(int graphic_socket, player_t *player, char *action, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int *egg_count);
 int action_move_forward(int graphic_socket, player_t *player, map_t *map);
 int action_turn(int graphic_socket, player_t *player, bool left);
