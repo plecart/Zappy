@@ -35,6 +35,7 @@ typedef struct cell_s
 typedef struct egg_s
 {
     char team_name[BUFFER_SIZE_MEDIUM];
+    int id;
     int mother_socket;
     int x;
     int y;

@@ -211,18 +211,22 @@ int action_incantation(int graphic_socket, player_t *player, map_t *map, player_
 
 int action_lay_egg(int graphic_socket, player_t *player, egg_t *eggs[], int *egg_count)
 {
-    egg_t *new_egg = malloc(sizeof(egg_t));  // ✅ Allouer la mémoire correctement
-    if (!new_egg) {
+    egg_t *new_egg = malloc(sizeof(egg_t)); // ✅ Allouer la mémoire correctement
+    if (!new_egg)
+    {
         log_printf(PRINT_ERROR, "Échec de l'allocation mémoire pour un œuf\n");
         return 0;
     }
+
+    static int egg_id = 0;
 
     strcpy(new_egg->team_name, player->team_name);
     new_egg->mother_socket = player->socket;
     new_egg->x = player->x;
     new_egg->y = player->y;
-    new_egg->time_before_spawn = 42; // remettre 42
-    new_egg->time_before_hatch = 600; //remettre 600
+    new_egg->time_before_spawn = 42;  // remettre 42
+    new_egg->time_before_hatch = 600; // remettre 600
+    new_egg->id = egg_id++;
 
     add_egg(eggs, egg_count, new_egg);
 

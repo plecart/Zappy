@@ -42,7 +42,7 @@ void log_printf_identity(print_type type, player_t *player, const char *format, 
     va_end(args);
 }
 
-player_t init_player(int client_socket, egg_t *eggs[], int *egg_count, const char *team_name, server_config_t *config)
+player_t init_player(int client_socket, egg_t *eggs[], int *egg_id, int *egg_count, const char *team_name, server_config_t *config)
 {
     player_t player;
     bool egg_found = false;
@@ -62,6 +62,7 @@ player_t init_player(int client_socket, egg_t *eggs[], int *egg_count, const cha
                 // printf("DEBUG: Oeuf trouvé ! Assignation des coordonnées du joueur à (%d, %d)\n",
                 //        eggs[i]->x, eggs[i]->y);
                 egg_found = true;
+                *egg_id = eggs[i]->id;
                 player.x = eggs[i]->x;
                 player.y = eggs[i]->y;
 
@@ -114,14 +115,15 @@ void assign_new_player(int graphic_socket, int client_socket, player_t *players[
         {
             players[i] = calloc(1, sizeof(player_t));
             int previous_egg_count = *egg_count;
-            *players[i] = init_player(client_socket, eggs, egg_count, team_name, config);
+            int egg_id = -1;
+            *players[i] = init_player(client_socket, eggs, &egg_id, egg_count, team_name, config);
 
             print_players(players, max_players);
             
             send_message_player(*players[i], "BIENVENUE\n");
             log_printf_identity(PRINT_INFORMATION, players[i], "est place en position [%d, %d], direction %s\n", players[i]->x, players[i]->y, get_player_direction(players[i]));
             dprintf(client_socket, "%d %d\n", players[i]->x, players[i]->y);
-            send_graphic_new_player(graphic_socket, players[i], (previous_egg_count != *egg_count), *egg_count);
+            send_graphic_new_player(graphic_socket, players[i], previous_egg_count != *egg_count, egg_id);
             return;
         }
     }

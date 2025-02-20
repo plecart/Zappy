@@ -8,7 +8,6 @@ void add_egg(egg_t *eggs[], int *egg_count, egg_t *new_egg)
         log_printf(PRINT_ERROR, "Memory allocation failed for egg\n");
         return;
     }
-
     eggs[*egg_count] = new_egg; // ✅ Copy the new egg
     (*egg_count)++;
 }
@@ -64,7 +63,7 @@ void add_egg_cycle(int graphic_socket, egg_t *eggs[], int egg_count)
                 log_printf(PRINT_INFORMATION, "Un oeuf de l'équipe [%s] a éclos en [%d, %d] (en attente d'un nouveau client)\n",
                            eggs[i]->team_name, eggs[i]->x, eggs[i]->y, eggs[i]->mother_socket);
                 send_message_egg(*eggs[i], "egg hatched\n");
-                send_graphic_egg_hatched(graphic_socket, i);
+                send_graphic_egg_hatched(graphic_socket, eggs[i]->id);
             }
         }
     }
