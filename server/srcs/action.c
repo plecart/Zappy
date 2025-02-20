@@ -119,6 +119,7 @@ int action_take(int graphic_socket, player_t *player, map_t *map, const char *ac
     }
     ((int *)&map->cells[player->y][player->x].resources)[resource_index]--;
     ((int *)&player->inventory)[resource_index]++;
+    send_message_player(*player, "ok\n");
     log_printf_identity(PRINT_INFORMATION, player, "a prit l'objet \"%s\", il y en reste %d en [%d, %d], la ou il se trouve (il en a possed %d dans son inventaire)\n", object, ((int *)&map->cells[player->y][player->x].resources)[resource_index], player->x, player->y, ((int *)&player->inventory)[resource_index]);
     send_graphic_player_resources(graphic_socket, player, map, true, resource_index);
     return 7;
@@ -145,6 +146,7 @@ int action_put(int graphic_socket, player_t *player, map_t *map, const char *act
     }
     ((int *)&player->inventory)[resource_index]--;
     ((int *)&map->cells[player->y][player->x].resources)[resource_index]++;
+    send_message_player(*player, "ok\n");
     log_printf_identity(PRINT_INFORMATION, player, "a deposer l'objet \"%s\", il y en a miantenant %d en [%d, %d], la ou il se trouve (il en possede %d dans son inventaire)\n", object, ((int *)&map->cells[player->y][player->x].resources)[resource_index], player->x, player->y, ((int *)&player->inventory)[resource_index]);
     send_graphic_player_resources(graphic_socket, player, map, false, resource_index);
     return 7;

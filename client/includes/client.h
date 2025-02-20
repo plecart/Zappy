@@ -33,5 +33,12 @@ void delete_response(char RESPONSES_TAB, int *response_count, int index);
 
 void brain(int sock);
 void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *resource_name);
+int execute_action(int sock, char *action, char RESPONSES_TAB, int *response_count, server_response_type_t response_type, bool delete);
+int look(int sock, char RESPONSES_TAB, int *response_count, char *resource_name, int *player_level);
+void move_next_spot(int sock, int player_level, char RESPONSES_TAB, int *response_count);
+void go_to_cell(int resource_position, int sock, char RESPONSES_TAB, int *response_count);
+
 int get_view(char responses[BUFFER_SIZE_SMALL], char cells[8 * 8][BUFFER_SIZE]);
+int get_resource_position(char cells[8 * 8][BUFFER_SIZE], int cells_number, char *resource_name);
+
 #endif

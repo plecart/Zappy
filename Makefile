@@ -22,6 +22,7 @@ CLIENT_SRCS	=	$(CLIENT_DIR)main_client.c \
 				$(CLIENT_DIR)client.c \
 				$(CLIENT_DIR)brain.c \
 				$(CLIENT_DIR)response.c \
+				$(CLIENT_DIR)get.c \
 				$(TOOLS__SRCS)
 
 SERVER_OBJS	=	$(SERVER_SRCS:.c=.o)
@@ -36,10 +37,10 @@ CFLAGS		+=  -Wall -Wextra
 all: server client
 
 $(SERVER_NAME): $(SERVER_OBJS)
-	$(CC) -o $(SERVER_NAME) $(SERVER_OBJS)
+	$(CC) -o $(SERVER_NAME) $(SERVER_OBJS) 
 
 $(CLIENT_NAME): $(CLIENT_OBJS)
-	$(CC) -o $(CLIENT_NAME) $(CLIENT_OBJS)
+	$(CC) -o $(CLIENT_NAME) $(CLIENT_OBJS) -lm
 
 server: $(SERVER_NAME)
 
