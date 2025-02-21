@@ -25,6 +25,7 @@ void slave(int sock)
         execute_action(sock, "droite\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
         execute_action(sock, "droite\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
         scan_for_resource(sock, responses, &response_count, NOURRITURE);
-        print_responses(responses, response_count);
+        //printf("RESPONSE: %d\n", response_count);
+        //print_responses(responses, response_count);
     }
 }

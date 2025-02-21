@@ -20,3 +20,16 @@ int get_resource_position(char cells[8 * 8 + 3][BUFFER_SIZE], int cells_number, 
             return i;
     return -1;
 }
+
+bool did_egg_hatched(char RESPONSES_TAB, int *response_count)
+{
+    for (int i = 0; i < *response_count; i++)
+    {
+        if (strstr(responses[i], "egg hatched") != NULL)
+        {
+            delete_response(responses, response_count, i);
+            return true;
+        }
+    }
+    return false;
+}

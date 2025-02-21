@@ -197,6 +197,7 @@ int action_broadcast(int graphic_socket, player_t *player, map_t *map, player_t 
         }
         player_count++;
     }
+    send_message_player(*player, "ok\n");
     send_graphic_broadcast(graphic_socket, player, message);
     return 7;
 }

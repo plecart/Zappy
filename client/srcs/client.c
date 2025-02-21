@@ -61,7 +61,7 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
     int total_len = 0;
     while (1)
     {
-        printf("debut boucle\n");
+       printf("debut de read boucle\n");
         int bytes_read = read(sock, buffer, BUFFER_SIZE - 1);
         if (bytes_read <= 0)
         {
@@ -87,14 +87,14 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
         {
             break;  // Fin de la réponse
         }
-        printf("[%s]\n", buffer);
+        //printf("[%s]\n", buffer);
     }
 
-    printf("???\n");
+    //printf("???\n");
     //total[total_len + 1] = '\0';
-    printf("TOTAL = [%s]\n", total);
+    //printf("TOTAL = [%s]\n", total);
     char *response = strtok(total, "\n");
-    printf("response: %s\n", response);
+    //printf("response: %s\n", response);
     int response_index = response_count;
 
     while (response != NULL && response_index < MAX_RESPONSES_COMMANDS)
@@ -126,12 +126,12 @@ void start_client(client_config_t config, bool is_slave)
     if (sock == -1)
         return;
 
-    
     send_message(sock, strcat(config.team_name, "\n"));
     sleep(1);
     char RESPONSES_TAB;
     memset(responses, 0, sizeof(responses));
     receive_server_response(sock, responses, 0);
+    print_responses(responses, 3);
 
     !is_slave ? brain(sock, config) : slave(sock);
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.
