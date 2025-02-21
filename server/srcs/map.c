@@ -31,13 +31,13 @@ void populate_map(map_t *map) {
 
     for (int y = 0; y < map->height; y++) {
         for (int x = 0; x < map->width; x++) {
-            map->cells[y][x].resources.nourriture = rand() % 10;
-            map->cells[y][x].resources.linemate = rand() % 6;
-            map->cells[y][x].resources.deraumere = rand() % 6;
-            map->cells[y][x].resources.sibur = rand() % 6;
-            map->cells[y][x].resources.mendiane = rand() % 4;
-            map->cells[y][x].resources.phiras = rand() % 4;
-            map->cells[y][x].resources.thystame = rand() % 2;
+            map->cells[y][x].resources.nourriture = rand() % (MAX_NOURRITURE + 1);
+            map->cells[y][x].resources.linemate = rand() % (MAX_LINEMATE + 1);
+            map->cells[y][x].resources.deraumere = rand() % (MAX_DERAUMERE + 1);
+            map->cells[y][x].resources.sibur = rand() % (MAX_SIBUR + 1);
+            map->cells[y][x].resources.mendiane = rand() % (MAX_MENDIANE + 1);
+            map->cells[y][x].resources.phiras = rand() % (MAX_PHIRAS + 1);
+            map->cells[y][x].resources.thystame = rand() % (MAX_THYSTAME + 1);
         }
     }
 }

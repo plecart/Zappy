@@ -7,14 +7,14 @@ void brain(int sock, client_config_t config)
 
     for (int i = 0; i < 7; i++)
     {
-        scan_for_resource(sock, responses, &response_count, "nourriture");
+        scan_for_resource(sock, responses, &response_count, NOURRITURE);
         execute_action(sock, "fork\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
     }
     while (1)
     {
         execute_action(sock, "gauche\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
         execute_action(sock, "gauche\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
-        scan_for_resource(sock, responses, &response_count, "nourriture");
+        scan_for_resource(sock, responses, &response_count, NOURRITURE);
         print_responses(responses, response_count);
 
         if (did_egg_hatched(responses, &response_count) == true)

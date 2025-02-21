@@ -5,6 +5,14 @@
 
 #define MAX_ACTIONS 10
 
+#define MAX_NOURRITURE 10
+#define MAX_LINEMATE 5
+#define MAX_DERAUMERE 5
+#define MAX_SIBUR 5
+#define MAX_MENDIANE 4
+#define MAX_PHIRAS 4
+#define MAX_THYSTAME 2
+
 typedef struct server_config_s
 {
     int port;
@@ -117,6 +125,8 @@ int get_resource_index(const char *resource_name);
 int get_visible_cell_count(int level);
 void get_visible_cells_coordinates(player_t *player, map_t *map, int coordinates[][2]);
 void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_count, char *buffer, player_t *players[], int max_players);
+int get_elements_max_len(int max_players)
+;
 void get_front_coordinate(int coordinate[2], player_t player, map_t *map);
 int get_sound_direction(player_t *sender, player_t *receiver, map_t *map);
 

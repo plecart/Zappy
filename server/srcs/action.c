@@ -82,13 +82,18 @@ int action_see(player_t *player, map_t *map, player_t *players[], int max_player
     int visible_cell_count = get_visible_cell_count(player->level);
     int coordinates[visible_cell_count][2];
     get_visible_cells_coordinates(player, map, coordinates);
-    char buffer[96 * visible_cell_count];
+    int elements_max_len = get_elements_max_len(max_players);
+    int buffer_len = ((elements_max_len + 1) * visible_cell_count + 1);
+    char *buffer = malloc(buffer_len * sizeof(char));
     get_elements_from_coordinates(map, coordinates, visible_cell_count, buffer, players, max_players);
-    int buffer_len = strlen(buffer);
-    char package[buffer_len];
+    char *package = malloc((buffer_len + 4) * sizeof(char));
     snprintf(package, buffer_len + 4, "{%s}\n", buffer);
+    free(buffer);
+    buffer = NULL;
     log_printf_identity(PRINT_INFORMATION, player, "a demandé ce qu'il voiyait depuis [%d, %d] en direction du %s\n", player->x, player->y, get_player_direction(player));
     send_message_player(*player, package);
+    free(package);
+    package = NULL;
     return 7;
 }
 

@@ -21,6 +21,15 @@
 #define BUFFER_SIZE 1024
 #define BUFFER_SIZE_LARGE 2048
 
+#define NOURRITURE "nourriture"
+#define LINEMATE "linemate"
+#define DERAUMERE "deraumere"
+#define SIBUR "sibur"
+#define MENDIANE "mendiane"
+#define PHIRAS "phiras"
+#define THYSTAME "thystame"
+#define JOUEUR "joueur"
+
 typedef enum    print_type {
     PRINT_ERROR,
     PRINT_INFORMATION,

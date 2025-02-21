@@ -35,7 +35,7 @@ int count_players_in_team(player_t *players[], const char *team_name)
 
 void log_printf_identity(print_type type, player_t *player, const char *format, ...)
 {
-    log_printf(type, "[\"%d\"][%d].[%s].[%d][%d], ", player->socket, player->level, player->team_name, player->inventory.nourriture, player->life_cycle);
+    log_printf(type, "[\"%d\"][L%d].[%s].[N%d][C%d], ", player->socket, player->level, player->team_name, player->inventory.nourriture, player->life_cycle);
     va_list args;
     va_start(args, format);
     vprintf(format, args);
