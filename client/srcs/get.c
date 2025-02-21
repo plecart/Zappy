@@ -13,7 +13,7 @@ int get_view(char responses[BUFFER_SIZE_SMALL], char cells[8 * 8][BUFFER_SIZE])
     return j;
 }
 
-int get_resource_position(char cells[8 * 8][BUFFER_SIZE], int cells_number, char *resource_name)
+int get_resource_position(char cells[8 * 8 + 3][BUFFER_SIZE], int cells_number, char *resource_name)
 {
     for (int i = 0; i < cells_number; i++)
         if (strstr(cells[i], resource_name) != NULL)

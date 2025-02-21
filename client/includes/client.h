@@ -4,7 +4,7 @@
 #include "../../tools/includes/tools.h"
 
 #define MAX_RESPONSES_COMMANDS 15
-#define RESPONSES_TAB responses[MAX_RESPONSES_COMMANDS][BUFFER_SIZE_SMALL]
+#define RESPONSES_TAB *responses[MAX_RESPONSES_COMMANDS]
 
 typedef enum server_response_type_e
 {
@@ -40,8 +40,8 @@ void move_next_spot(int sock, int player_level, char RESPONSES_TAB, int *respons
 void go_to_cell(int resource_position, int sock, char RESPONSES_TAB, int *response_count);
 bool did_egg_hatched(char RESPONSES_TAB, int *response_count);
 
-int get_view(char responses[BUFFER_SIZE_SMALL], char cells[8 * 8][BUFFER_SIZE]);
-int get_resource_position(char cells[8 * 8][BUFFER_SIZE], int cells_number, char *resource_name);
+int get_view(char responses[BUFFER_SIZE_SMALL], char cells[8 * 8 + 3][BUFFER_SIZE]);
+int get_resource_position(char cells[8 * 8 + 3][BUFFER_SIZE], int cells_number, char *resource_name);
 
 void start_slave(client_config_t config);
 void slave(int sock);

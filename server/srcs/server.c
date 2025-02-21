@@ -161,7 +161,7 @@ void start_server(server_config_t config)
 
         if (game_started)
         { // La partie ne commence pas tant que le client graphique n'est pas là
-
+            printf("TOURN\n");
             for (int i = 0; i < max_clients - 1; i++)
             {
                 if (players[i] != NULL)

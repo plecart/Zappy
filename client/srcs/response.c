@@ -15,14 +15,29 @@ int get_response_index(char RESPONSES_TAB, server_response_type_t type, int resp
     return -1;
 };
 
-void delete_response(char RESPONSES_TAB, int *response_count, int index)
+void delete_response(char *responses[], int *response_count, int index)
 {
-    //printf("RETIR ORDRE -------- DELTE [%d][%d]RC\n", index, *response_count);
-    for (int j = index; j < *response_count - 1; j++)
-        strcpy(responses[j], responses[j + 1]);
+    // Vérification de l'index pour éviter les erreurs de dépassement
+    if (index < 0 || index >= *response_count) {
+        log_printf(PRINT_ERROR, "Index hors des limites dans delete_response\n");
+        return;
+    }
+
+    // Libération de la mémoire allouée pour la réponse à supprimer
+    free(responses[index]);
+
+    // Décalage des réponses restantes pour combler l'espace
+    for (int j = index; j < *response_count - 1; j++) {
+        responses[j] = responses[j + 1];
+    }
+
+    // Réduire le nombre de réponses
     (*response_count)--;
-    responses[*response_count][0] = '\0';
+
+    // S'assurer que la dernière réponse est NULL et libérer l'espace
+    responses[*response_count] = NULL;
 }
+
 
 void print_responses(char RESPONSES_TAB, int response_count)
 {

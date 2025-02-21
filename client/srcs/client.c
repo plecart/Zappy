@@ -47,28 +47,72 @@ int connect_to_server(client_config_t config)
 
 int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
 {
-    char buffer[BUFFER_SIZE];
-    memset(buffer, 0, BUFFER_SIZE);
-
-    int bytes_read = read(sock, buffer, BUFFER_SIZE - 1);
-    if (bytes_read <= 0)
+    char *total = malloc(BUFFER_SIZE);
+    if (total == NULL)
     {
-        log_printf(PRINT_ERROR, "Erreur lors de la réception de la réponse\n");
+        log_printf(PRINT_ERROR, "Erreur lors de l'allocation du tampon de réception\n");
         exit(0);
     }
+    memset(total, 0, BUFFER_SIZE);
 
-    buffer[bytes_read] = '\0';
-    
-    char *response = strtok(buffer, "\n");
+
+    char buffer[BUFFER_SIZE];
+    memset(buffer, 0, BUFFER_SIZE);
+    int total_len = 0;
+    while (1)
+    {
+        printf("debut boucle\n");
+        int bytes_read = read(sock, buffer, BUFFER_SIZE - 1);
+        if (bytes_read <= 0)
+        {
+            log_printf(PRINT_ERROR, "Erreur lors de la réception de la réponse\n");
+            exit(0);
+        }
+        if (bytes_read == 0) // Fin de fichier (aucune donnée à lire)
+        {
+            break;  // Quitter la boucle
+        }
+        buffer[bytes_read] = '\0';
+        int new_len = total_len + bytes_read;
+        total = realloc(total, new_len + 1); // +1 pour '\0'
+        if (total == NULL)
+        {
+            log_printf(PRINT_ERROR, "Erreur de réallocation de mémoire pour total\n");
+            exit(0);
+        }
+        strncat(total, buffer, bytes_read);  // Ajoute buffer à la fin de total
+        total_len = new_len;
+        printf("BBB %d != %d\n", bytes_read, BUFFER_SIZE - 1);
+        if (bytes_read != BUFFER_SIZE - 1 || buffer[bytes_read - 1] == '\n')
+        {
+            break;  // Fin de la réponse
+        }
+        printf("[%s]\n", buffer);
+    }
+
+    printf("???\n");
+    //total[total_len + 1] = '\0';
+    printf("TOTAL = [%s]\n", total);
+    char *response = strtok(total, "\n");
+    printf("response: %s\n", response);
     int response_index = response_count;
 
     while (response != NULL && response_index < MAX_RESPONSES_COMMANDS)
     {
-        strncpy(responses[response_index], response, BUFFER_SIZE - 1);
-        responses[response_index][BUFFER_SIZE - 1] = '\0'; // Ensure null termination
+        int response_len = strlen(response);
+        responses[response_index] = malloc(response_len + 1);
+        if (responses[response_index] == NULL)
+        {
+            log_printf(PRINT_ERROR, "Erreur lors de l'allocation de la réponse\n");
+            exit(0);
+        }
+        strncpy(responses[response_index], response, response_len);
+        responses[response_index][response_len] = '\0'; // Ensure null termination
         response_index++;
         response = strtok(NULL, "\n");
     }
+    free(total);
+    total = NULL;
     return response_index;
 }
 
@@ -82,14 +126,14 @@ void start_client(client_config_t config, bool is_slave)
     if (sock == -1)
         return;
 
-    char RESPONSES_TAB;
+    
     send_message(sock, strcat(config.team_name, "\n"));
     sleep(1);
+    char RESPONSES_TAB;
+    memset(responses, 0, sizeof(responses));
     receive_server_response(sock, responses, 0);
 
     !is_slave ? brain(sock, config) : slave(sock);
-
-
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.
     close(sock);
     log_printf(PRINT_INFORMATION, "Connexion fermée.\n");
