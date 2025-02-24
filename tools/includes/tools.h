@@ -13,6 +13,8 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <math.h>
+#include <ctype.h>
+
 
 
 #define BUFFER_SIZE_TINY 64

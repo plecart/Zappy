@@ -3,8 +3,11 @@
 
 #include "../../tools/includes/tools.h"
 
-#define MAX_RESPONSES_COMMANDS 15
+#define MAX_RESPONSES_COMMANDS 128
 #define RESPONSES_TAB *responses[MAX_RESPONSES_COMMANDS]
+
+extern const char *const resource_names[];
+extern const int  resource_total_needed[];
 
 typedef enum server_response_type_e
 {
@@ -30,23 +33,29 @@ void send_message(int sock, const char *message);
 
 int get_response_index(char RESPONSES_TAB, server_response_type_t type, int response_count);
 void delete_response(char RESPONSES_TAB, int *response_count, int index);
+void filter_responses(char RESPONSES_TAB, int *response_count, client_config_t config);
 void print_responses(char RESPONSES_TAB, int response_count);
 
-void brain(int sock, client_config_t config);
+void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t config);
 void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *resource_name);
 int execute_action(int sock, char *action, char RESPONSES_TAB, int *response_count, server_response_type_t response_type, bool delete);
 int look(int sock, char RESPONSES_TAB, int *response_count, char *resource_name, int *player_level);
 void move_next_spot(int sock, int player_level, char RESPONSES_TAB, int *response_count);
 void go_to_cell(int resource_position, int sock, char RESPONSES_TAB, int *response_count);
 void broadcast_mission(int sock, char RESPONSES_TAB, int *response_count, char *team_name);
+int inventory(int sock, char RESPONSES_TAB, int *response_count, char *resource_name);
 
-
-
+bool is_coordinate(char *str);
+bool is_broadcast_team(const char *str, const char *team_name);
+int get_mission(const char *str, const char *team_name, char *mission);
 int get_view(char responses[BUFFER_SIZE_SMALL], char cells[8 * 8 + 3][BUFFER_SIZE]);
 int get_resource_position(char cells[8 * 8 + 3][BUFFER_SIZE], int cells_number, char *resource_name);
 bool did_egg_hatched(char RESPONSES_TAB, int *response_count);
+int get_item_amount(char *inventory, char *resource_name);
+int get_index_ressource(const char *resource);
+
+
 
 void start_slave(client_config_t config);
-void slave(int sock);
-
+void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t config);
 #endif

@@ -1,10 +1,9 @@
 #include "../includes/client.h"
 
-void brain(int sock, client_config_t config)
-{
-    char RESPONSES_TAB;
-    int response_count = 0;
 
+
+void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t config)
+{
     for (int i = 0; i < 7; i++)
     {
         scan_for_resource(sock, responses, &response_count, NOURRITURE);
@@ -12,18 +11,16 @@ void brain(int sock, client_config_t config)
     }
     while (1)
     {
-        execute_action(sock, "gauche\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
-        execute_action(sock, "gauche\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
-        scan_for_resource(sock, responses, &response_count, NOURRITURE);
-        //print_responses(responses, response_count);
-        
         if (did_egg_hatched(responses, &response_count) == true)
         {
-            printf("SLAVE\n");
             start_slave(config);
-            printf("STARTED\n");
+            sleep(2);
             broadcast_mission(sock, responses, &response_count, config.team_name);
        }
+        if (7 > inventory(sock, responses, &response_count, NOURRITURE))
+            scan_for_resource(sock, responses, &response_count, NOURRITURE);
+        
+        
     }
 }
 
@@ -64,7 +61,7 @@ int execute_action(int sock, char *action, char RESPONSES_TAB, int *response_cou
     int response_index = -1;
     while (response_index == -1)
     {
-        printf("debut boucle\n");
+        // printf("debut boucle\n");
         // printf("DEBUT Boucle\n");
         //  printf("RC[%d]\n", *response_count);
         //  printf("1[0] = %s\n", responses[0]);
@@ -141,22 +138,30 @@ void go_to_cell(int resource_position, int sock, char RESPONSES_TAB, int *respon
     }
 }
 
-const char *const resource_names[] = {LINEMATE, DERAUMERE, SIBUR, PHIRAS, MENDIANE, THYSTAME};
-const int  resource_total_needed[] = {9, 8, 10, 5, 6, 1};
-
-
 void broadcast_mission(int sock, char RESPONSES_TAB, int *response_count, char *team_name)
 {
     static int mission_index = 0;
     if (mission_index > 4)
         mission_index = 0;
     char buffer[BUFFER_SIZE_SMALL];
-    team_name[strlen(team_name) - 1] = '\0';
-    sprintf(buffer, "broadcast %s %s %d\n", team_name, resource_names[mission_index], resource_total_needed[mission_index]);
-    printf("execute avtion : [%s]\n", buffer);
+    char trim_team_name[BUFFER_SIZE_TINY];
+    strcpy(trim_team_name, team_name);
+    trim_team_name[strlen(trim_team_name) - 1] = '\0';
+    sprintf(buffer, "broadcast %s %s %d\n", trim_team_name, resource_names[mission_index], resource_total_needed[mission_index]);
+    //printf("execute avtion : [%s]\n", buffer);
     execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
-    printf("FIN d'action\n");
+    //printf("FIN d'action\n");
     mission_index++;
 }
 
+int inventory(int sock, char RESPONSES_TAB, int *response_count, char *resource_name)
+{
+    int response_index = execute_action(sock, "inventaire\n", responses, response_count, SERVER_RESPONSE_OBJECT, false);
+    int quantity = get_item_amount(responses[response_index], resource_name);
+    //printf("[%s]\n", responses[response_index]);
+    delete_response(responses, response_count, response_index);
+    
+    //printf("QUQNTITYTYTYTYTYTY %d\n", quantity);
+    return quantity;
+}
 

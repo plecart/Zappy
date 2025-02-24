@@ -4,6 +4,7 @@
         "server.h": "c",
         "tools.h": "c",
         "inet.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "time.h": "c"
     }
 }

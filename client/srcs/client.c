@@ -61,9 +61,9 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
     int total_len = 0;
     while (1)
     {
-       printf("debut de read boucle\n");
+       // printf("debut de read boucle\n");
         int bytes_read = read(sock, buffer, BUFFER_SIZE - 1);
-        if (bytes_read <= 0)
+        if (bytes_read < 0)
         {
             log_printf(PRINT_ERROR, "Erreur lors de la réception de la réponse\n");
             exit(0);
@@ -82,7 +82,7 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
         }
         strncat(total, buffer, bytes_read);  // Ajoute buffer à la fin de total
         total_len = new_len;
-        printf("BBB %d != %d\n", bytes_read, BUFFER_SIZE - 1);
+        //printf("BBB %d != %d\n", bytes_read, BUFFER_SIZE - 1);
         if (bytes_read != BUFFER_SIZE - 1 || buffer[bytes_read - 1] == '\n')
         {
             break;  // Fin de la réponse
@@ -127,13 +127,18 @@ void start_client(client_config_t config, bool is_slave)
         return;
 
     send_message(sock, strcat(config.team_name, "\n"));
-    sleep(1);
+    sleep(2);
     char RESPONSES_TAB;
     memset(responses, 0, sizeof(responses));
-    receive_server_response(sock, responses, 0);
-    print_responses(responses, 3);
+    int response_count = receive_server_response(sock, responses, 0);
 
-    !is_slave ? brain(sock, config) : slave(sock);
+    printf("avant filtre\n");
+    print_responses(responses, response_count);
+    filter_responses(responses, &response_count, config);
+    printf("apres filtre\n");
+    print_responses(responses, response_count);
+
+    !is_slave ? brain(responses, response_count, sock, config) : slave(responses, response_count, sock, config);
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.
     close(sock);
     log_printf(PRINT_INFORMATION, "Connexion fermée.\n");
