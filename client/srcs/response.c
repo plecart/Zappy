@@ -39,13 +39,19 @@ void delete_response(char RESPONSES_TAB, int *response_count, int index)
     responses[*response_count] = NULL;
 }
 
-void filter_responses(char RESPONSES_TAB, int *response_count, client_config_t config)
+void filter_responses(char RESPONSES_TAB, int *response_count, client_config_t config, bool is_slave)
 {
+
     for (int i = 0; i < *response_count; i++)
     {
        // printf("- - -REPONSE[%d] = [%s]\n", i, responses[i]);
+       bool is_message = is_broadcast_team(responses[i], config.team_name);
+       //printf("id message = [%d] | is_slave == [%d] | res = [%s]\n", is_message, is_slave, responses[i]);
         if (strcmp(responses[i], "BIENVENUE") == 0 ||
-            is_coordinate(responses[i]) || is_broadcast_team(responses[i], config.team_name) == false
+            is_coordinate(responses[i]) ||
+            is_message == false ||
+            (is_message && is_slave && strstr(responses[i], "done") != NULL) ||
+            (is_message && !is_slave && strstr(responses[i], "mission") != NULL)
         )
         {
             delete_response(responses, response_count, i);

@@ -55,13 +55,12 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
     }
     memset(total, 0, BUFFER_SIZE);
 
-
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE);
     int total_len = 0;
     while (1)
     {
-       // printf("debut de read boucle\n");
+        // printf("debut de read boucle\n");
         int bytes_read = read(sock, buffer, BUFFER_SIZE - 1);
         if (bytes_read < 0)
         {
@@ -70,7 +69,7 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
         }
         if (bytes_read == 0) // Fin de fichier (aucune donnée à lire)
         {
-            break;  // Quitter la boucle
+            break; // Quitter la boucle
         }
         buffer[bytes_read] = '\0';
         int new_len = total_len + bytes_read;
@@ -80,21 +79,21 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
             log_printf(PRINT_ERROR, "Erreur de réallocation de mémoire pour total\n");
             exit(0);
         }
-        strncat(total, buffer, bytes_read);  // Ajoute buffer à la fin de total
+        strncat(total, buffer, bytes_read); // Ajoute buffer à la fin de total
         total_len = new_len;
-        //printf("BBB %d != %d\n", bytes_read, BUFFER_SIZE - 1);
+        // printf("BBB %d != %d\n", bytes_read, BUFFER_SIZE - 1);
         if (bytes_read != BUFFER_SIZE - 1 || buffer[bytes_read - 1] == '\n')
         {
-            break;  // Fin de la réponse
+            break; // Fin de la réponse
         }
-        //printf("[%s]\n", buffer);
+        // printf("[%s]\n", buffer);
     }
 
-    //printf("???\n");
-    //total[total_len + 1] = '\0';
-    //printf("TOTAL = [%s]\n", total);
+    // printf("???\n");
+    // total[total_len + 1] = '\0';
+    // printf("TOTAL = [%s]\n", total);
     char *response = strtok(total, "\n");
-    //printf("response: %s\n", response);
+    // printf("response: %s\n", response);
     int response_index = response_count;
 
     while (response != NULL && response_index < MAX_RESPONSES_COMMANDS)
@@ -122,21 +121,50 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
 
 void start_client(client_config_t config, bool is_slave)
 {
+    static int client_number = -1;
+
+    ++client_number;
     int sock = connect_to_server(config);
     if (sock == -1)
         return;
-
-    send_message(sock, strcat(config.team_name, "\n"));
     sleep(2);
+    send_message(sock, strcat(config.team_name, "\n"));
     char RESPONSES_TAB;
     memset(responses, 0, sizeof(responses));
+
     int response_count = receive_server_response(sock, responses, 0);
 
-    printf("avant filtre\n");
+    printf("-1---------\n");
     print_responses(responses, response_count);
-    filter_responses(responses, &response_count, config);
-    printf("apres filtre\n");
+    printf("-2---------\n");
+
+    filter_responses(responses, &response_count, config, is_slave);
     print_responses(responses, response_count);
+
+    if (is_slave)
+    {
+        bool found_mission = false;
+        while (!found_mission)
+        {
+           // printf("FOUND MISSION\n");
+            response_count = receive_server_response(sock, responses, response_count);
+            //printf("1 --->\n");
+           // print_responses(responses, response_count);
+            filter_responses(responses, &response_count, config, is_slave);
+           // printf("2 --->\n");
+           // print_responses(responses, response_count);
+            if (response_count != 0 && strstr(responses[0], "mission") != NULL)
+                found_mission = true;
+           // printf("3 --->\n");
+          //  print_responses(responses, response_count);
+        }
+    }
+
+    // printf("apres filtre\n");
+    // print_responses(responses, response_count);
+    // print_responses(responses, response_count);
+
+    printf("-3----------\n");
 
     !is_slave ? brain(responses, response_count, sock, config) : slave(responses, response_count, sock, config);
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.

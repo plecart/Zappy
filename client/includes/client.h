@@ -33,7 +33,7 @@ void send_message(int sock, const char *message);
 
 int get_response_index(char RESPONSES_TAB, server_response_type_t type, int response_count);
 void delete_response(char RESPONSES_TAB, int *response_count, int index);
-void filter_responses(char RESPONSES_TAB, int *response_count, client_config_t config);
+void filter_responses(char RESPONSES_TAB, int *response_count, client_config_t config, bool is_slave);
 void print_responses(char RESPONSES_TAB, int response_count);
 
 void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t config);
@@ -53,6 +53,7 @@ int get_resource_position(char cells[8 * 8 + 3][BUFFER_SIZE], int cells_number, 
 bool did_egg_hatched(char RESPONSES_TAB, int *response_count);
 int get_item_amount(char *inventory, char *resource_name);
 int get_index_ressource(const char *resource);
+int is_slave_ready(char RESPONSES_TAB, int *response_count);
 
 
 

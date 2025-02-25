@@ -118,8 +118,21 @@ int action_take(int graphic_socket, player_t *player, map_t *map, const char *ac
         return 0;
     }
     int count = ((int *)&map->cells[player->y][player->x].resources)[resource_index];
+
+    // printf("OGT[%d][%d][%d][%d][%d][%d][%d]\n",
+    //     map->cells[player->y][player->x].resources.nourriture,
+    //     map->cells[player->y][player->x].resources.linemate,
+    //     map->cells[player->y][player->x].resources.deraumere, 
+    //     map->cells[player->y][player->x].resources.sibur, 
+    //     map->cells[player->y][player->x].resources.mendiane, 
+    //     map->cells[player->y][player->x].resources.phiras, 
+    //     map->cells[player->y][player->x].resources.thystame
+        
+    // );
+    
     if (count <= 0)
     {
+        
         log_printf_identity(PRINT_ERROR, player, "a demandé à prendre l'objet \"%s\", il n'y en a pas en [%d, %d]\n", object, player->x, player->y);
         send_message_player(*player, "ko\n");
         return 0;

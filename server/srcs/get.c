@@ -152,7 +152,7 @@ void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_co
 
         // Calculer la taille nécessaire pour le buffer
         int temp_len = get_elements_max_len(max_players) + 3;
-        printf("temp_len: %d\n", temp_len);
+        //printf("temp_len: %d\n", temp_len);
         char *temp = malloc(temp_len * sizeof(char));  // Allocation du buffer temporaire
         temp[0] = '\0'; // Initialisation correcte
         int temp_pos = 0;

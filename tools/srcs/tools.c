@@ -22,6 +22,7 @@ void send_message(int sock, const char *message) {
     if (write(sock, message, strlen(message)) < 0) {
         log_printf(PRINT_ERROR, "Erreur lors de l'envoi du message\n");
     } else {
-        log_printf(PRINT_SEND, "[%d]Message envoyé: %s", sock, message);
+        if (strstr(message, "inventaire")== NULL)
+            log_printf(PRINT_SEND, "[%d] Message envoyé: %s", sock, message);
     }
 }

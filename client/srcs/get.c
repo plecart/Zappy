@@ -32,15 +32,18 @@ bool is_broadcast_team(const char *str, const char *team_name)
         return false;
     }
 
+    //printf("TEAMNAME = [%s]\n", team_name);
     char trim_team_name[BUFFER_SIZE_TINY];
     strcpy(trim_team_name, team_name);
     trim_team_name[strlen(trim_team_name) - 1] = '\0';
+    //printf("TRIM = [%s]\n---\n", trim_team_name);
 
     // Format attendu minimum : "message <digit>, <team_name>"
     static const char prefix[] = "message ";
     size_t prefix_len = sizeof(prefix) - 1; // équivalent à strlen("message ")
 
     // 1) Vérifier que la chaîne commence par "message "
+    //printf("CMP => [%s] - [%s] [%ld]\n", str, prefix, prefix_len);
     if (strncmp(str, prefix, prefix_len) != 0)
     {
         return false;
@@ -49,6 +52,7 @@ bool is_broadcast_team(const char *str, const char *team_name)
 
     // 2) Vérifier qu'il y a un et un seul chiffre
     //    (si vous voulez autoriser plusieurs chiffres, adaptez cette partie)
+    //printf("2\n");
     if (!isdigit((unsigned char)*str))
     {
         return false;
@@ -56,6 +60,7 @@ bool is_broadcast_team(const char *str, const char *team_name)
     str++; // avancer après le chiffre
            // printf("1\n");
     // 3) Vérifier qu'il y a ", "
+   // printf("3\n");
     if (*str != ',' || *(str + 1) != ' ')
     {
         return false;
@@ -66,6 +71,8 @@ bool is_broadcast_team(const char *str, const char *team_name)
 
     size_t team_len = strlen(trim_team_name);
     // printf("==/===> [%s] - [%s] [%ld]\n", str, trim_team_name, team_len);
+   // printf("4\n");
+   // printf("==/===> [%s] - [%s] [%ld]\n", str, trim_team_name, team_len);
     if (strncmp(str, trim_team_name, team_len - 1) != 0)
     {
         return false;
@@ -76,7 +83,7 @@ bool is_broadcast_team(const char *str, const char *team_name)
     // À partir d'ici, on ne fait plus AUCUNE vérification !
     // Qu'il y ait un espace, du texte, etc. on ignore tout.
     // Retourner true pour indiquer que tout le "préfixe" correspond au format attendu.
-    printf("TRUR\n");
+   // printf("TRUR\n");
     return true;
 }
 
@@ -84,18 +91,14 @@ int get_mission(const char *str, const char *team_name, char *mission)
 {
     // 1) Trouver la sous-chaîne "Team2" (ou team_name) dans str.
     //    (On suppose qu'elle existe et qu'elle n'est pas NULL, car la chaîne est déjà validée.)
-    //  printf("===> %s - %s\n", str, team_name);
+    printf("===> %s - %s|\n", str, team_name);
     if (!str || !team_name)
     {
         return -1;
     }
 
-    char trim_team_name[BUFFER_SIZE_TINY];
-    strcpy(trim_team_name, team_name);
-    trim_team_name[strlen(trim_team_name) - 2] = '\0';
-
-    // printf("===> [%s] - [%s] ????\n", str, trim_team_name);
-    const char *p = strstr(str, trim_team_name);
+    printf("===> [%s] - [%s] ????\n", str, team_name);
+    const char *p = strstr(str, team_name);
     if (!p)
     {
         // Si jamais vous vouliez gérer un cas d'erreur...
@@ -103,7 +106,7 @@ int get_mission(const char *str, const char *team_name, char *mission)
     }
     // printf("1\n");
     // Avancer de la longueur de team_name
-    p += strlen(trim_team_name);
+    p += strlen(team_name);
 
     // 2) Sauter les espaces éventuellement présents après "Team2"
     while (*p && isspace((unsigned char)*p))
@@ -214,4 +217,18 @@ int get_index_ressource(const char *resource)
             return i;
     }
     return -1;
+}
+
+int is_slave_ready(char RESPONSES_TAB, int *response_count)
+{
+    int total_ready = 0;
+    for (int i = 0; i < *response_count; i++)
+    {
+        if (strstr(responses[i], "done") != NULL)
+        {
+            delete_response(responses, response_count, i);
+            total_ready++;
+        }
+    }
+    return total_ready;
 }

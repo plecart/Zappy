@@ -1,7 +1,5 @@
 #include "../includes/client.h"
 
-
-
 void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t config)
 {
     for (int i = 0; i < 7; i++)
@@ -9,19 +7,38 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         scan_for_resource(sock, responses, &response_count, NOURRITURE);
         execute_action(sock, "fork\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
     }
-    while (1)
+
+    int slave_count = 0;
+    while (slave_count < 7)
     {
         if (did_egg_hatched(responses, &response_count) == true)
         {
+            printf("EGG\n");
             start_slave(config);
-            sleep(2);
+            sleep(1);
             broadcast_mission(sock, responses, &response_count, config.team_name);
-       }
+            slave_count++;
+        }
         if (7 > inventory(sock, responses, &response_count, NOURRITURE))
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
-        
-        
+
+        //filter_responses(responses, &response_count, config, false);
     }
+
+    int slave_ready = 0;
+    while (slave_ready < 7) {
+        if (7 > inventory(sock, responses, &response_count, NOURRITURE))
+            scan_for_resource(sock, responses, &response_count, NOURRITURE);
+        filter_responses(responses, &response_count, config, false);
+        int ret = 0;
+        
+        if ((ret = is_slave_ready(responses, &response_count) != 0))
+            slave_ready++;
+
+        printf("slave_ready = %d\n", slave_ready);
+    }
+
+    printf("REAY\n");
 }
 
 void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *resource_name)
@@ -67,11 +84,11 @@ int execute_action(int sock, char *action, char RESPONSES_TAB, int *response_cou
         //  printf("1[0] = %s\n", responses[0]);
         //  printf("1[1] = %s\n", responses[1]);
         *response_count = receive_server_response(sock, responses, *response_count);
-        //print_responses(responses, *response_count);
-        // printf("RC[%d]\n", *response_count);
-        // printf("2[0] = %s\n", responses[0]);
-        // printf("2[1] = %s\n", responses[1]);
-        // printf("response_count = %d | type = %d\n", *response_count, response_type);
+        // print_responses(responses, *response_count);
+        //  printf("RC[%d]\n", *response_count);
+        //  printf("2[0] = %s\n", responses[0]);
+        //  printf("2[1] = %s\n", responses[1]);
+        //  printf("response_count = %d | type = %d\n", *response_count, response_type);
         response_index = get_response_index(responses, response_type, *response_count);
         // printf("response_index = %d\n", response_index);
     }
@@ -85,12 +102,15 @@ int look(int sock, char RESPONSES_TAB, int *response_count, char *resource_name,
 {
     // printf("--- JE LOOK\n");
     int response_index = execute_action(sock, "voir\n", responses, response_count, SERVER_RESPONSE_OBJECT, false);
-    // printf("--- [%s] \n", responses[response_index]);
+    printf("--- [%s] \n", responses[response_index]);
     char cells[8 * 8][BUFFER_SIZE];
     int cells_number = get_view(responses[response_index], cells);
+
     delete_response(responses, response_count, response_index);
     *player_level = (int)(sqrt(cells_number) - 1);
-    return get_resource_position(cells, cells_number, resource_name);
+    int tmp =  get_resource_position(cells, cells_number, resource_name);
+    printf("[%d]\n", tmp);
+    return tmp;
 }
 
 void move_next_spot(int sock, int player_level, char RESPONSES_TAB, int *response_count)
@@ -141,16 +161,18 @@ void go_to_cell(int resource_position, int sock, char RESPONSES_TAB, int *respon
 void broadcast_mission(int sock, char RESPONSES_TAB, int *response_count, char *team_name)
 {
     static int mission_index = 0;
-    if (mission_index > 4)
+    
+    if (mission_index > 6)
         mission_index = 0;
     char buffer[BUFFER_SIZE_SMALL];
+    //printf("SENDMISSION%sn", resource_names[mission_index]);
     char trim_team_name[BUFFER_SIZE_TINY];
     strcpy(trim_team_name, team_name);
     trim_team_name[strlen(trim_team_name) - 1] = '\0';
-    sprintf(buffer, "broadcast %s %s %d\n", trim_team_name, resource_names[mission_index], resource_total_needed[mission_index]);
-    //printf("execute avtion : [%s]\n", buffer);
+    sprintf(buffer, "broadcast %s %s %d mission\n", trim_team_name, resource_names[mission_index], resource_total_needed[mission_index]);
+    // printf("execute avtion : [%s]\n", buffer);
     execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
-    //printf("FIN d'action\n");
+    // printf("FIN d'action\n");
     mission_index++;
 }
 
@@ -158,10 +180,9 @@ int inventory(int sock, char RESPONSES_TAB, int *response_count, char *resource_
 {
     int response_index = execute_action(sock, "inventaire\n", responses, response_count, SERVER_RESPONSE_OBJECT, false);
     int quantity = get_item_amount(responses[response_index], resource_name);
-    //printf("[%s]\n", responses[response_index]);
+    // printf("[%s]\n", responses[response_index]);
     delete_response(responses, response_count, response_index);
-    
-    //printf("QUQNTITYTYTYTYTYTY %d\n", quantity);
+
+    // printf("QUQNTITYTYTYTYTYTY %d\n", quantity);
     return quantity;
 }
-
