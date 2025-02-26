@@ -10,6 +10,9 @@ int get_response_index(char RESPONSES_TAB, server_response_type_t type, int resp
         // printf("NON\n");
         if (type == SERVER_RESPONSE_OBJECT && responses[i][0] == '{')
             return i;
+
+        if (type == SERVER_RESPONSE_BEACON && strstr(responses[i], "ici") != NULL)
+            return i;
     }
     return -1;
 };

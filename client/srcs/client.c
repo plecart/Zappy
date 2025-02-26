@@ -64,29 +64,34 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
         int bytes_read = read(sock, buffer, BUFFER_SIZE - 1);
         if (bytes_read < 0)
         {
+            printf("=== [%d][%d]\n", response_count, bytes_read);
+            print_responses(responses, response_count);
             log_printf(PRINT_ERROR, "Erreur lors de la réception de la réponse\n");
-            exit(0);
         }
         if (bytes_read == 0) // Fin de fichier (aucune donnée à lire)
         {
             break; // Quitter la boucle
         }
-        buffer[bytes_read] = '\0';
-        int new_len = total_len + bytes_read;
-        total = realloc(total, new_len + 1); // +1 pour '\0'
-        if (total == NULL)
+        if (bytes_read > 0) // Fin de fichier (aucune donnée à lire)
         {
-            log_printf(PRINT_ERROR, "Erreur de réallocation de mémoire pour total\n");
-            exit(0);
+
+            buffer[bytes_read] = '\0';
+            int new_len = total_len + bytes_read;
+            total = realloc(total, new_len + 1); // +1 pour '\0'
+            if (total == NULL)
+            {
+                log_printf(PRINT_ERROR, "Erreur de réallocation de mémoire pour total\n");
+                exit(0);
+            }
+            strncat(total, buffer, bytes_read); // Ajoute buffer à la fin de total
+            total_len = new_len;
+            // printf("BBB %d != %d\n", bytes_read, BUFFER_SIZE - 1);
+            if (bytes_read != BUFFER_SIZE - 1 || buffer[bytes_read - 1] == '\n')
+            {
+                break; // Fin de la réponse
+            }
+            // printf("[%s]\n", buffer);
         }
-        strncat(total, buffer, bytes_read); // Ajoute buffer à la fin de total
-        total_len = new_len;
-        // printf("BBB %d != %d\n", bytes_read, BUFFER_SIZE - 1);
-        if (bytes_read != BUFFER_SIZE - 1 || buffer[bytes_read - 1] == '\n')
-        {
-            break; // Fin de la réponse
-        }
-        // printf("[%s]\n", buffer);
     }
 
     // printf("???\n");
@@ -134,9 +139,9 @@ void start_client(client_config_t config, bool is_slave)
 
     int response_count = receive_server_response(sock, responses, 0);
 
-    printf("-1---------\n");
-    print_responses(responses, response_count);
-    printf("-2---------\n");
+    // printf("-1---------\n");
+    // print_responses(responses, response_count);
+    // printf("-2---------\n");
 
     filter_responses(responses, &response_count, config, is_slave);
     print_responses(responses, response_count);
@@ -146,17 +151,17 @@ void start_client(client_config_t config, bool is_slave)
         bool found_mission = false;
         while (!found_mission)
         {
-           // printf("FOUND MISSION\n");
+            // printf("FOUND MISSION\n");
             response_count = receive_server_response(sock, responses, response_count);
-            //printf("1 --->\n");
-           // print_responses(responses, response_count);
+            // printf("1 --->\n");
+            // print_responses(responses, response_count);
             filter_responses(responses, &response_count, config, is_slave);
-           // printf("2 --->\n");
-           // print_responses(responses, response_count);
+            // printf("2 --->\n");
+            // print_responses(responses, response_count);
             if (response_count != 0 && strstr(responses[0], "mission") != NULL)
                 found_mission = true;
-           // printf("3 --->\n");
-          //  print_responses(responses, response_count);
+            // printf("3 --->\n");
+            //  print_responses(responses, response_count);
         }
     }
 
@@ -164,7 +169,7 @@ void start_client(client_config_t config, bool is_slave)
     // print_responses(responses, response_count);
     // print_responses(responses, response_count);
 
-    printf("-3----------\n");
+    // printf("-3----------\n");
 
     !is_slave ? brain(responses, response_count, sock, config) : slave(responses, response_count, sock, config);
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.

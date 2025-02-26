@@ -13,6 +13,7 @@ typedef enum server_response_type_e
 {
     SERVER_RESPONSE_OK_KO,
     SERVER_RESPONSE_OBJECT,
+    SERVER_RESPONSE_BEACON,
 } server_response_type_t;
 
 typedef struct client_config_s
@@ -44,6 +45,9 @@ void move_next_spot(int sock, int player_level, char RESPONSES_TAB, int *respons
 void go_to_cell(int resource_position, int sock, char RESPONSES_TAB, int *response_count);
 void broadcast_mission(int sock, char RESPONSES_TAB, int *response_count, char *team_name);
 int inventory(int sock, char RESPONSES_TAB, int *response_count, char *resource_name);
+int how_much_players(int sock, char RESPONSES_TAB, int *response_count);
+void broadcast_beacon(int sock, char RESPONSES_TAB, int *response_count, char *team_name);
+
 
 bool is_coordinate(char *str);
 bool is_broadcast_team(const char *str, const char *team_name);
@@ -54,8 +58,7 @@ bool did_egg_hatched(char RESPONSES_TAB, int *response_count);
 int get_item_amount(char *inventory, char *resource_name);
 int get_index_ressource(const char *resource);
 int is_slave_ready(char RESPONSES_TAB, int *response_count);
-
-
+int get_players_count(const char *str);
 
 void start_slave(client_config_t config);
 void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t config);

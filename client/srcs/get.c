@@ -232,3 +232,32 @@ int is_slave_ready(char RESPONSES_TAB, int *response_count)
     }
     return total_ready;
 }
+
+int get_players_count(const char *str)
+{
+    const char *comma_pos = strchr(str, ',');
+    int count = 0;
+
+    // Si on trouve une virgule, on ne traitera que la partie avant celle-ci
+    size_t length = comma_pos ? (size_t)(comma_pos - str) : strlen(str);
+
+    // On recopie cette portion dans un buffer temporaire pour la tokeniser
+    char *temp = malloc(length + 1);
+    if (!temp)
+        return -1; // erreur d'allocation
+
+    memcpy(temp, str, length);
+    temp[length] = '\0';
+
+    // Tokenisation par espaces
+    char *token = strtok(temp, " \t\n");
+    while (token) {
+        if (strcmp(token, "joueur") == 0) {
+            count++;
+        }
+        token = strtok(NULL, " \t\n");
+    }
+
+    free(temp);
+    return count;
+}

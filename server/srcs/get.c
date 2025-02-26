@@ -15,7 +15,6 @@ char *get_player_direction(player_t *player)
     return strdup(directions[player->direction]);
 }
 
-
 void get_player_inventory(player_t *player, char *buffer, size_t size)
 {
     snprintf(buffer, size, "{%s: %d, %s: %d, %s: %d, %s: %d, %s: %d, %s: %d, %s: %d}\n",
@@ -152,19 +151,24 @@ void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_co
 
         // Calculer la taille nécessaire pour le buffer
         int temp_len = get_elements_max_len(max_players) + 3;
-        //printf("temp_len: %d\n", temp_len);
-        char *temp = malloc(temp_len * sizeof(char));  // Allocation du buffer temporaire
-        temp[0] = '\0'; // Initialisation correcte
+        // printf("temp_len: %d\n", temp_len);
+        char *temp = malloc(temp_len * sizeof(char)); // Allocation du buffer temporaire
+        temp[0] = '\0';                               // Initialisation correcte
         int temp_pos = 0;
         int player_count = 0;
+        int player_index = 0;
 
-        if (i != 0)
+        while (player_index < max_players && players[player_index] != NULL)
         {
-            while (player_count < max_players && players[player_count] != NULL && players[player_count]->x != x && players[player_count]->y != y)
+            if (players[player_index]->x == x && players[player_index]->y == y)
                 player_count++;
-            if (player_count != max_players && players[player_count] != NULL)
-                temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "joueur ");
+            player_index++;
         }
+        if (i == 0)
+            player_count--;
+        if (player_count > 0)
+            for (int j = 0; j < player_count; j++)
+                temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "joueur ");
 
         // Répéter les ressources en fonction de leur quantité
         if (cell->resources.nourriture > 0)
@@ -188,7 +192,7 @@ void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_co
         if (cell->resources.thystame > 0)
             for (int j = 0; j < cell->resources.thystame; j++)
                 temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "thystame ");
-        if (cell->resources.nourriture == 0 && cell->resources.linemate == 0 && cell->resources.deraumere == 0 && cell->resources.sibur == 0 && cell->resources.mendiane == 0 && cell->resources.phiras == 0 && cell->resources.thystame == 0 && player_count == max_players)
+        if (cell->resources.nourriture == 0 && cell->resources.linemate == 0 && cell->resources.deraumere == 0 && cell->resources.sibur == 0 && cell->resources.mendiane == 0 && cell->resources.phiras == 0 && cell->resources.thystame == 0 && player_count <= 0)
             temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "vide ");
 
         // Supprimer l'espace en trop à la fin de temp
@@ -203,11 +207,10 @@ void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_co
         if (pos > 0)
             pos += snprintf(buffer + pos, temp_len * cell_count - pos, ", ");
         pos += snprintf(buffer + pos, temp_len * cell_count - pos, "%s", temp);
-        
-        free(temp);  // Libérer le buffer temporaire
+
+        free(temp); // Libérer le buffer temporaire
     }
 }
-
 
 int get_sound_direction(player_t *sender, player_t *receiver, map_t *map)
 {

@@ -5,6 +5,7 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     for (int i = 0; i < 7; i++)
     {
         scan_for_resource(sock, responses, &response_count, NOURRITURE);
+        //printf("???\n");
         execute_action(sock, "fork\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
     }
 
@@ -25,6 +26,7 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         //filter_responses(responses, &response_count, config, false);
     }
 
+    printf("Waiting For Slavec\n");
     int slave_ready = 0;
     while (slave_ready != 6) {
         if (7 > inventory(sock, responses, &response_count, NOURRITURE))
@@ -33,12 +35,20 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         int ret = 0;
         
         if ((ret = is_slave_ready(responses, &response_count) != 0))
+        {
+            printf("Slave READY\n");
             slave_ready++;
-
+        }
         printf("slave_ready = %d\n", slave_ready);
     }
 
-    printf("REAY\n");
+    int slave_arrived = 0;
+    while (slave_arrived != 6)
+    {
+        slave_arrived = how_much_players(sock, responses, &response_count);
+        broadcast_beacon(sock, responses, &response_count, config.team_name);
+    }
+    
 }
 
 void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *resource_name)
@@ -51,9 +61,10 @@ void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *
         int rotation = -1;
         while (++rotation < 4 && resource_position == -1)
         {
-
+           // printf("!\n");
             resource_position = look(sock, responses, response_count, resource_name, &player_level);
             // printf("[%d] - [%d]\n", resource_position, player_level);
+          //  printf("??\n");
         }
         // printf("---fini de LOOK\n");
         if (resource_position == -1)
@@ -160,12 +171,13 @@ void go_to_cell(int resource_position, int sock, char RESPONSES_TAB, int *respon
 
 void broadcast_mission(int sock, char RESPONSES_TAB, int *response_count, char *team_name)
 {
-    static int mission_index = 0;
+    static int mission_index = 1;
     
     if (mission_index > 6)
-        mission_index = 0;
+        mission_index = 1;
     char buffer[BUFFER_SIZE_SMALL];
-    //printf("SENDMISSION%sn", resource_names[mission_index]);
+    printf("[%d]SEND MISSION[%s][%d]\nn", mission_index, resource_names[mission_index], resource_total_needed[mission_index]);
+    
     char trim_team_name[BUFFER_SIZE_TINY];
     strcpy(trim_team_name, team_name);
     trim_team_name[strlen(trim_team_name) - 1] = '\0';
@@ -185,4 +197,23 @@ int inventory(int sock, char RESPONSES_TAB, int *response_count, char *resource_
 
     // printf("QUQNTITYTYTYTYTYTY %d\n", quantity);
     return quantity;
+}
+
+int how_much_players(int sock, char RESPONSES_TAB, int *response_count)
+{
+    int response_index = execute_action(sock, "voir\n", responses, response_count, SERVER_RESPONSE_OBJECT, false);
+    int quantity = get_players_count(responses[response_index]);
+    delete_response(responses, response_count, response_index);
+    return quantity;
+}
+
+void broadcast_beacon(int sock, char RESPONSES_TAB, int *response_count, char *team_name)
+{
+
+    char buffer[BUFFER_SIZE_SMALL];
+    char trim_team_name[BUFFER_SIZE_TINY];
+    strcpy(trim_team_name, team_name);
+    trim_team_name[strlen(trim_team_name) - 1] = '\0';
+    sprintf(buffer, "broadcast %s ici\n", trim_team_name);
+    execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
 }
