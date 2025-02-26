@@ -26,7 +26,7 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     }
 
     int slave_ready = 0;
-    while (slave_ready < 7) {
+    while (slave_ready != 6) {
         if (7 > inventory(sock, responses, &response_count, NOURRITURE))
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
         filter_responses(responses, &response_count, config, false);

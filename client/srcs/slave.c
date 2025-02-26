@@ -35,6 +35,9 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
 
     while (quantity < quantity_needed)
     {
+        if (4 > inventory(sock, responses, &response_count, NOURRITURE))
+            scan_for_resource(sock, responses, &response_count, NOURRITURE);    
+
         printf("quantity = %d (%s) < %d\n", quantity, mission, quantity_needed);
         scan_for_resource(sock, responses, &response_count, mission);
         quantity = inventory(sock, responses, &response_count, mission);
@@ -46,6 +49,7 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     
     while (1)
     {
+        
      //   print_responses(responses, response_count);
      //   filter_responses (responses, &response_count, config, true);
      //   print_responses(responses, response_count);

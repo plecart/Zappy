@@ -188,6 +188,8 @@ void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_co
         if (cell->resources.thystame > 0)
             for (int j = 0; j < cell->resources.thystame; j++)
                 temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "thystame ");
+        if (cell->resources.nourriture == 0 && cell->resources.linemate == 0 && cell->resources.deraumere == 0 && cell->resources.sibur == 0 && cell->resources.mendiane == 0 && cell->resources.phiras == 0 && cell->resources.thystame == 0 && player_count == max_players)
+            temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "vide ");
 
         // Supprimer l'espace en trop à la fin de temp
         if (temp_pos > 0 && temp[temp_pos - 1] == ' ')

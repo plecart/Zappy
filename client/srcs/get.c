@@ -1,7 +1,7 @@
 #include "../includes/client.h"
 
-const char *const resource_names[] = {LINEMATE, DERAUMERE, SIBUR, PHIRAS, MENDIANE, THYSTAME};
-const int  resource_total_needed[] = {9, 8, 10, 5, 6, 1};
+const char *const resource_names[] = {NOURRITURE, LINEMATE, DERAUMERE, SIBUR, PHIRAS, MENDIANE, THYSTAME};
+const int  resource_total_needed[] = {0, 9, 8, 10, 5, 6, 1};
 
 bool is_coordinate(char *str)
 {
