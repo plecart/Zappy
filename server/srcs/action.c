@@ -117,18 +117,19 @@ int action_take(int graphic_socket, player_t *player, map_t *map, const char *ac
         send_message_player(*player, "ko\n");
         return 0;
     }
+
+    printf("RESSOURCE INDEX: %d\n", resource_index);
     int count = ((int *)&map->cells[player->y][player->x].resources)[resource_index];
 
-    // printf("OGT[%d][%d][%d][%d][%d][%d][%d]\n",
-    //     map->cells[player->y][player->x].resources.nourriture,
-    //     map->cells[player->y][player->x].resources.linemate,
-    //     map->cells[player->y][player->x].resources.deraumere, 
-    //     map->cells[player->y][player->x].resources.sibur, 
-    //     map->cells[player->y][player->x].resources.mendiane, 
-    //     map->cells[player->y][player->x].resources.phiras, 
-    //     map->cells[player->y][player->x].resources.thystame
-        
-    // );
+    printf("OGT[%d][%d][%d][%d][%d][%d][%d]\n",
+        map->cells[player->y][player->x].resources.nourriture,
+        map->cells[player->y][player->x].resources.linemate,
+        map->cells[player->y][player->x].resources.deraumere, 
+        map->cells[player->y][player->x].resources.sibur, 
+        map->cells[player->y][player->x].resources.mendiane, 
+        map->cells[player->y][player->x].resources.phiras, 
+        map->cells[player->y][player->x].resources.thystame
+    );
     
     if (count <= 0)
     {

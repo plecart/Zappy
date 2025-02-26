@@ -5,8 +5,8 @@ static const char *const resource_names[] = {
     LINEMATE,
     DERAUMERE,
     SIBUR,
-    PHIRAS,
     MENDIANE,
+    PHIRAS,
     THYSTAME};
 
 char *get_player_direction(player_t *player)

@@ -2,9 +2,9 @@
 
 void send_initial_graphic_data(int graphic_socket, server_config_t *config, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int egg_count)
 {
-
-    if (graphic_socket == -1 || map == NULL || players == NULL)
+    if (graphic_socket == -1 || map == NULL || players == NULL) {
         return;
+    }
 
     char buffer[BUFFER_SIZE];
 

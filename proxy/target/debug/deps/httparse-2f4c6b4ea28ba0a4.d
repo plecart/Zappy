@@ -1,0 +1,10 @@
+/Users/chancka/zappy-git/proxy/target/debug/deps/libhttparse-2f4c6b4ea28ba0a4.rmeta: /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/lib.rs /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/iter.rs /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/macros.rs /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/simd/mod.rs /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/simd/swar.rs /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/simd/neon.rs
+
+/Users/chancka/zappy-git/proxy/target/debug/deps/httparse-2f4c6b4ea28ba0a4.d: /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/lib.rs /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/iter.rs /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/macros.rs /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/simd/mod.rs /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/simd/swar.rs /Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/simd/neon.rs
+
+/Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/lib.rs:
+/Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/iter.rs:
+/Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/macros.rs:
+/Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/simd/mod.rs:
+/Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/simd/swar.rs:
+/Users/chancka/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/httparse-1.10.0/src/simd/neon.rs:

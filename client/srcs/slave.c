@@ -35,7 +35,7 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
 
     while (quantity < quantity_needed)
     {
-        printf("quantity = %d (%s) < %d\n", quantity,mission, quantity_needed);
+        printf("quantity = %d (%s) < %d\n", quantity, mission, quantity_needed);
         scan_for_resource(sock, responses, &response_count, mission);
         quantity = inventory(sock, responses, &response_count, mission);
     }
