@@ -52,9 +52,8 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
 
     printf("MISSION DONE\n");
     int message_origin = -1;
-    while (1)
+    while (message_origin != 0)
     {
-        
         int response_index = -1;
         while (response_index == -1)
         {
@@ -67,16 +66,68 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
             print_responses(responses, response_count);
             // printf("MESSAGE DU SERV : %s\n", responses[response_index]);
             response_index = get_response_index(responses, SERVER_RESPONSE_BEACON, response_count);
-            //printf("RESPONS COUNT = %d | response_index = %d\n", response_count, response_index);
-            
+            // printf("RESPONS COUNT = %d | response_index = %d\n", response_count, response_index);
         }
 
         message_origin = get_message_direction(responses[response_index]);
         printf("ORIGIN : %d - %s\n", message_origin, responses[response_index]);
-        
-        if (response_index != -1)
-               delete_response(responses, &response_count, response_index);
+        one_step_to_master(message_origin, sock, responses, &response_count);
+        delete_response(responses, &response_count, response_index);
 
         //   print_responses(responses, response_count);
     }
+
+    while (1)
+    {
+        printf("ARRIVE %s\n", mission);
+    }
+}
+
+void one_step_to_master(int direction, int sock, char RESPONSES_TAB, int *response_count)
+{
+    char buffer[BUFFER_SIZE_TINY];
+
+    if (direction == 8 || direction == 2)
+    {
+        sprintf(buffer, "avance\n");
+        execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
+        if (direction == 8)
+            sprintf(buffer, "gauche\n");
+        else if (direction == 2)
+            sprintf(buffer, "droite\n");
+        execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
+    }
+    else if (direction == 3 || direction == 4)
+    {
+        sprintf(buffer, "droite\n");
+        execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
+        if (direction == 4)
+        {
+            sprintf(buffer, "avance\n");
+            execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
+            sprintf(buffer, "droite\n");
+            execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
+        }
+    }
+    else if (direction == 7 || direction == 6)
+    {
+        sprintf(buffer, "gauche\n");
+        execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
+        if (direction == 6)
+        {
+            sprintf(buffer, "avance\n");
+            execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
+            sprintf(buffer, "gauche\n");
+            execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
+        }
+    }
+    else if (direction == 5)
+    {
+        sprintf(buffer, "droite\n");
+        execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
+        sprintf(buffer, "droite\n");
+        execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
+    }
+    sprintf(buffer, "avance\n");
+    execute_action(sock, buffer, responses, response_count, SERVER_RESPONSE_OK_KO, true);
 }

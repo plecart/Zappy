@@ -113,7 +113,7 @@ int look(int sock, char RESPONSES_TAB, int *response_count, char *resource_name,
 {
     // printf("--- JE LOOK\n");
     int response_index = execute_action(sock, "voir\n", responses, response_count, SERVER_RESPONSE_OBJECT, false);
-    printf("--- [%s] \n", responses[response_index]);
+    //printf("--- [%s] \n", responses[response_index]);
     char cells[8 * 8][BUFFER_SIZE];
     int cells_number = get_view(responses[response_index], cells);
 

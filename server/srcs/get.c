@@ -224,10 +224,25 @@ int get_sound_direction(player_t *sender, player_t *receiver, map_t *map)
                                                                              : dy;
 
     // Matrice de direction relative
-    static const int directions[3][3] = {
+    static const int north_directions[3][3] = {
         {8, 1, 2},
         {7, -1, 3},
         {6, 5, 4}};
+
+    static const int east_directions[3][3] = {
+        {6, 7, 8},
+        {5, -1, 1},
+        {4, 3, 2}};
+
+    static const int south_directions[3][3] = {
+        {4, 5, 6},
+        {3, -1, 7},
+        {2, 1, 8}};
+
+    static const int west_directions[3][3] = {
+        {2, 3, 4},
+        {1, -1, 5},
+        {8, 7, 6}};
 
     if (dx == 0 && dy == 0)
         return 0;
@@ -236,8 +251,17 @@ int get_sound_direction(player_t *sender, player_t *receiver, map_t *map)
                                           : 1;
     int index_y = (dy > 0) ? 2 : (dy < 0) ? 0
                                           : 1;
-    int ret = directions[index_y][index_x];
-
-    ret = (6 * receiver->direction + ret) % 8;
-    return ret == 0 ? 8 : ret;
+    printf("[%d], [%d][%d] - [%d][%d] - [%d][%d]\n",  receiver->direction, receiver->x, receiver->y, dx, dy, index_x, index_y);
+    switch (receiver->direction)
+    {
+    case NORTH:
+        return north_directions[index_y][index_x];
+    case EAST:
+        return east_directions[index_y][index_x];
+    case SOUTH:
+        return south_directions[index_y][index_x];
+    case WEST:
+        return west_directions[index_y][index_x];
+    }
+    return -1;
 }
