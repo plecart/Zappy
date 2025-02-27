@@ -47,30 +47,36 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     printf("BOucle de recherche terminée\n");
 
     char buffer[BUFFER_SIZE];
-    sprintf(buffer, "broadcast %s done\n", trim_team_name);
+    sprintf(buffer, "broadcast %s done %s\n", trim_team_name, mission);
     execute_action(sock, buffer, responses, &response_count, SERVER_RESPONSE_OK_KO, true);
 
-    while(1)
-    {}
-    // while (1)
-    // {
-    //     printf("MISSION DONE\n");
-    //     int response_index = -1;
-    //     while (response_index == -1)
-    //     {
-    //         response_count = receive_server_response(sock, responses, response_count);
-    //         printf("AVANT FILTRE ---\n");
-    //         print_responses(responses, response_count);
-    //         filter_responses(responses, &response_count, config, true);
-    //         printf("APRES FILTRE ---\n");
-    //         print_responses(responses, response_count);
-    //         printf("MESSAGE DU SERV : %s\n", responses[response_index]);
-    //         response_index = get_response_index(responses, SERVER_RESPONSE_BEACON, response_count);
-    //         printf("RESPONS COUNT = %d | response_index = %d\n", response_count, response_index);
+    printf("MISSION DONE\n");
+    int message_origin = -1;
+    while (1)
+    {
+        
+        int response_index = -1;
+        while (response_index == -1)
+        {
+            response_count = receive_server_response(sock, responses, response_count);
+            // printf("AVANT FILTRE ---\n");
+            // print_responses(responses, response_count);
+            filter_responses(responses, &response_count, config, true);
+            filter_slaves_extra_responses(responses, &response_count);
+            // printf("APRES FILTRE ---\n");
+            print_responses(responses, response_count);
+            // printf("MESSAGE DU SERV : %s\n", responses[response_index]);
+            response_index = get_response_index(responses, SERVER_RESPONSE_BEACON, response_count);
+            //printf("RESPONS COUNT = %d | response_index = %d\n", response_count, response_index);
+            
+        }
 
-    //         delete_response(responses, &response_count, response_index);
-    //     }
+        message_origin = get_message_direction(responses[response_index]);
+        printf("ORIGIN : %d - %s\n", message_origin, responses[response_index]);
+        
+        if (response_index != -1)
+               delete_response(responses, &response_count, response_index);
 
-    //     //   print_responses(responses, response_count);
-    // }
+        //   print_responses(responses, response_count);
+    }
 }

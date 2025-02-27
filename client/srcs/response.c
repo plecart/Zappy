@@ -63,6 +63,18 @@ void filter_responses(char RESPONSES_TAB, int *response_count, client_config_t c
     }
 }
 
+void filter_slaves_extra_responses(char RESPONSES_TAB, int *response_count)
+{
+    for (int i = 0; i < *response_count; i++)
+    {
+        if (strstr(responses[i], "mission") != NULL)
+        {
+            delete_response(responses, response_count, i);
+            i--;
+        }
+    }
+}
+
 void print_responses(char RESPONSES_TAB, int response_count)
 {
     for (int i = 0; i < response_count; i++)

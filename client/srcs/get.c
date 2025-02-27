@@ -261,3 +261,22 @@ int get_players_count(const char *str)
     free(temp);
     return count;
 }
+
+int get_message_direction(const char *str)
+{
+    // On cherche la sous-chaîne "message "
+    const char *p = strstr(str, "message ");
+    if (p == NULL) {
+        return -1; // Pas trouvé
+    }
+    // On avance le pointeur juste après "message "
+    p += strlen("message ");
+
+    // On vérifie que le caractère suivant est bien un chiffre
+    if (!isdigit((unsigned char)*p)) {
+        return -1; // Pas un chiffre
+    }
+
+    // On convertit le caractère en entier (par exemple '3' -> 3)
+    return *p - '0';
+}

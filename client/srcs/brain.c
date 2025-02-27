@@ -2,7 +2,7 @@
 
 void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t config)
 {
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 6; i++)
     {
         scan_for_resource(sock, responses, &response_count, NOURRITURE);
         //printf("???\n");
@@ -10,7 +10,7 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     }
 
     int slave_count = 0;
-    while (slave_count < 7)
+    while (slave_count < 6)
     {
         if (did_egg_hatched(responses, &response_count) == true)
         {
@@ -26,7 +26,7 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         //filter_responses(responses, &response_count, config, false);
     }
 
-    printf("Waiting For Slavec\n");
+   // printf("Waiting For Slavec\n");
     int slave_ready = 0;
     while (slave_ready != 6) {
         if (7 > inventory(sock, responses, &response_count, NOURRITURE))
@@ -36,8 +36,8 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         
         if ((ret = is_slave_ready(responses, &response_count) != 0))
         {
-            printf("Slave READY\n");
-            slave_ready++;
+            //printf("Slave READY [%d]\n", ret);
+            slave_ready += ret;
         }
         printf("slave_ready = %d\n", slave_ready);
     }
