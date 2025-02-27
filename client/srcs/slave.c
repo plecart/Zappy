@@ -33,30 +33,31 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
 
     int quantity = 0;
 
-    printf("DEBUT DE RECHERCHE [%s][%d]\n", mission, quantity_needed);
+    printf("slave - DEBUT DE RECHERCHE [%s][%d]\n", mission, quantity_needed);
     while (quantity < quantity_needed)
     {
-        printf("BOUCLE CHERCHER\n");
+        printf("slave - BOUCLE CHERCHER\n");
         if (4 > inventory(sock, responses, &response_count, NOURRITURE))
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
 
-        printf("quantity = %d (%s) < %d\n", quantity, mission, quantity_needed);
+        printf("slave - quantity = %d (%s) < %d\n", quantity, mission, quantity_needed);
         scan_for_resource(sock, responses, &response_count, mission);
         quantity = inventory(sock, responses, &response_count, mission);
     }
-    printf("BOucle de recherche terminée\n");
+    printf("slave - BOucle de recherche terminée\n");
 
     char buffer[BUFFER_SIZE];
     sprintf(buffer, "broadcast %s done %s\n", trim_team_name, mission);
     execute_action(sock, buffer, responses, &response_count, SERVER_RESPONSE_OK_KO, true);
 
-    printf("MISSION DONE\n");
+    printf("slave - MISSION DONE\n");
     int message_origin = -1;
     while (message_origin != 0)
     {
         int response_index = -1;
         while (response_index == -1)
         {
+        
             response_count = receive_server_response(sock, responses, response_count);
             // printf("AVANT FILTRE ---\n");
             // print_responses(responses, response_count);
@@ -70,16 +71,18 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         }
 
         message_origin = get_message_direction(responses[response_index]);
-        printf("ORIGIN : %d - %s\n", message_origin, responses[response_index]);
-        one_step_to_master(message_origin, sock, responses, &response_count);
+        printf("slave - ORIGIN : %d - %s\n", message_origin, responses[response_index]);
+        if (message_origin != 0)
+            one_step_to_master(message_origin, sock, responses, &response_count);
         delete_response(responses, &response_count, response_index);
 
         //   print_responses(responses, response_count);
     }
 
+    printf("slave - ARRIVE %s\n", mission);
     while (1)
     {
-        printf("ARRIVE %s\n", mission);
+        
     }
 }
 

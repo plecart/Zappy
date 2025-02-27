@@ -23,24 +23,27 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         if (7 > inventory(sock, responses, &response_count, NOURRITURE))
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
 
-        //filter_responses(responses, &response_count, config, false);
+        
     }
 
-   // printf("Waiting For Slavec\n");
+   printf("Waiting For Slave\n");
+   print_responses(responses, response_count);
     int slave_ready = 0;
     while (slave_ready != 6) {
         if (7 > inventory(sock, responses, &response_count, NOURRITURE))
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
+        print_responses(responses, response_count);
         filter_responses(responses, &response_count, config, false);
         int ret = 0;
         
         if ((ret = is_slave_ready(responses, &response_count) != 0))
-        {
-            //printf("Slave READY [%d]\n", ret);
+        {   
+            printf("Slave READY [%d]\n", ret);
+            print_responses(responses, response_count);
             slave_ready += ret;
         }
-        printf("slave_ready = %d\n", slave_ready);
     }
+    printf("ENOUGH SLAVE\n");
 
     int slave_arrived = 0;
     while (slave_arrived != 6)
@@ -119,9 +122,7 @@ int look(int sock, char RESPONSES_TAB, int *response_count, char *resource_name,
 
     delete_response(responses, response_count, response_index);
     *player_level = (int)(sqrt(cells_number) - 1);
-    int tmp =  get_resource_position(cells, cells_number, resource_name);
-    printf("[%d]\n", tmp);
-    return tmp;
+    return get_resource_position(cells, cells_number, resource_name);
 }
 
 void move_next_spot(int sock, int player_level, char RESPONSES_TAB, int *response_count)

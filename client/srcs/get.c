@@ -228,6 +228,7 @@ int is_slave_ready(char RESPONSES_TAB, int *response_count)
         {
             delete_response(responses, response_count, i);
             total_ready++;
+            i = 0;
         }
     }
     return total_ready;

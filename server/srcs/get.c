@@ -251,7 +251,7 @@ int get_sound_direction(player_t *sender, player_t *receiver, map_t *map)
                                           : 1;
     int index_y = (dy > 0) ? 2 : (dy < 0) ? 0
                                           : 1;
-    printf("[%d], [%d][%d] - [%d][%d] - [%d][%d]\n",  receiver->direction, receiver->x, receiver->y, dx, dy, index_x, index_y);
+    //printf("[%d], [%d][%d] - [%d][%d] - [%d][%d]\n",  receiver->direction, receiver->x, receiver->y, dx, dy, index_x, index_y);
     switch (receiver->direction)
     {
     case NORTH:
