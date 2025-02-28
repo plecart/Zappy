@@ -49,16 +49,16 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
     {
         if (players[i] != NULL && FD_ISSET(players[i]->socket, read_fds))
         {
-
             int bytes_read = read(players[i]->socket, buffer, sizeof(buffer) - 1);
-            if (bytes_read <= 0)
+            if (bytes_read < 0)
             {
+                //printf("[%d] bytes_read = %d\n", players[i]->socket, bytes_read);
                 log_printf(PRINT_INFORMATION, "Client déconnecté (socket %d)\n", players[i]->socket);
                 close(players[i]->socket);
                 free(players[i]);
                 players[i] = NULL;
             }
-            else
+            else if (bytes_read > 0)
             {
                 buffer[bytes_read] = '\0';
 

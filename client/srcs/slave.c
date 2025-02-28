@@ -57,7 +57,12 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         int response_index = -1;
         while (response_index == -1)
         {
-        
+            while (response_count > 0)
+            {
+                printf("{%d}\n", response_count);
+                delete_response(responses, &response_count, 0);
+            }
+            // printf(".slave - %s\n", mission);
             response_count = receive_server_response(sock, responses, response_count);
             // printf("AVANT FILTRE ---\n");
             // print_responses(responses, response_count);
@@ -71,18 +76,15 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         }
 
         message_origin = get_message_direction(responses[response_index]);
-        printf("slave - ORIGIN : %d - %s\n", message_origin, responses[response_index]);
+        printf("slave - ORIGIN : %d - %s [%s]\n", message_origin, responses[response_index], mission);
         if (message_origin != 0)
             one_step_to_master(message_origin, sock, responses, &response_count);
-        delete_response(responses, &response_count, response_index);
-
-        //   print_responses(responses, response_count);
+        
     }
 
     printf("slave - ARRIVE %s\n", mission);
     while (1)
     {
-        
     }
 }
 

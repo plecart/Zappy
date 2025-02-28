@@ -222,20 +222,25 @@ int get_index_ressource(const char *resource)
 int is_slave_ready(char RESPONSES_TAB, int *response_count)
 {
     int total_ready = 0;
-    for (int i = 0; i < *response_count; i++)
+    int i = 0;
+    while (i < *response_count)
     {
+        printf("---[%s]\n", responses[i]);
         if (strstr(responses[i], "done") != NULL)
         {
             delete_response(responses, response_count, i);
             total_ready++;
             i = 0;
+            printf("DELETE\n");
         }
+        i++;
     }
     return total_ready;
 }
 
 int get_players_count(const char *str)
 {
+    printf("STRING : %s\n", str);
     const char *comma_pos = strchr(str, ',');
     int count = 0;
 
@@ -251,7 +256,7 @@ int get_players_count(const char *str)
     temp[length] = '\0';
 
     // Tokenisation par espaces
-    char *token = strtok(temp, " \t\n");
+    char *token = strtok(temp, " \t\n{}");
     while (token) {
         if (strcmp(token, "joueur") == 0) {
             count++;

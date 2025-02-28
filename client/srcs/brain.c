@@ -36,7 +36,7 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         filter_responses(responses, &response_count, config, false);
         int ret = 0;
         
-        if ((ret = is_slave_ready(responses, &response_count) != 0))
+        if ((ret = is_slave_ready(responses, &response_count)) != 0)
         {   
             printf("Slave READY [%d]\n", ret);
             print_responses(responses, response_count);
@@ -49,8 +49,12 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     while (slave_arrived != 6)
     {
         slave_arrived = how_much_players(sock, responses, &response_count);
-        broadcast_beacon(sock, responses, &response_count, config.team_name);
+        printf("BEFORE BEACON %d\n", slave_arrived);
+        if (slave_arrived != 6)
+            broadcast_beacon(sock, responses, &response_count, config.team_name);
     }
+
+    printf("LETS GOOOO\n");
     
 }
 
