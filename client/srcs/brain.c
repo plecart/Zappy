@@ -53,18 +53,20 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     }
     printf("ENOUGH SLAVE\n");
 
+
+    while (20 > inventory(sock, responses, &response_count, NOURRITURE))
+        scan_for_resource(sock, responses, &response_count, NOURRITURE);
+
     int slave_arrived = 0;
     while (slave_arrived != 6)
     {
         slave_arrived = how_much_players(sock, responses, &response_count);
         printf("BEFORE BEACON %d\n", slave_arrived);
-        if (slave_arrived != 6)
             broadcast_beacon(sock, responses, &response_count, config.team_name);
     }
 
 
-    if (3 > inventory(sock, responses, &response_count, NOURRITURE))
-        scan_for_resource(sock, responses, &response_count, NOURRITURE);
+    
         
     int level = 1;
     while (level < 8)

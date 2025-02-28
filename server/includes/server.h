@@ -5,7 +5,7 @@
 
 #define MAX_ACTIONS 10
 
-#define MAX_NOURRITURE 10
+#define MAX_NOURRITURE 18
 #define MAX_LINEMATE 5
 #define MAX_DERAUMERE 5
 #define MAX_SIBUR 5
