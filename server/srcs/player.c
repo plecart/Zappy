@@ -230,8 +230,8 @@ void print_players(player_t *players[], int max_players)
     {
         if (players[i] != NULL)
         {
-            printf("Index: %d | Socket: %d | Team: %s | Position: [%d, %d]\n",
-                   i, players[i]->socket, players[i]->team_name, players[i]->x, players[i]->y);
+            printf("Index: %d | Socket: %d | Team: %s | Position: [%d, %d] | Level : [%d]\n",
+                   i, players[i]->socket, players[i]->team_name, players[i]->x, players[i]->y, players[i]->level);
             if (players[i]->action_count > 0)
             {
                 printf("Action: ");

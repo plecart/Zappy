@@ -14,6 +14,7 @@ typedef enum server_response_type_e
     SERVER_RESPONSE_OK_KO,
     SERVER_RESPONSE_OBJECT,
     SERVER_RESPONSE_BEACON,
+    SERVER_RESPONSE_INCANTATION,
 } server_response_type_t;
 
 typedef struct client_config_s
@@ -48,6 +49,7 @@ void broadcast_mission(int sock, char RESPONSES_TAB, int *response_count, char *
 int inventory(int sock, char RESPONSES_TAB, int *response_count, char *resource_name);
 int how_much_players(int sock, char RESPONSES_TAB, int *response_count);
 void broadcast_beacon(int sock, char RESPONSES_TAB, int *response_count, char *team_name);
+bool enough_resources(int sock, char RESPONSES_TAB, int *response_count, int required_resources[6]);
 
 
 bool is_coordinate(char *str);
@@ -61,6 +63,8 @@ int get_index_ressource(const char *resource);
 int is_slave_ready(char RESPONSES_TAB, int *response_count);
 int get_players_count(const char *str);
 int get_message_direction(const char *str);
+bool is_item_enough(const char *view, const int required_resources[6])
+;
 
 
 void start_slave(client_config_t config);

@@ -79,10 +79,27 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         printf("slave - ORIGIN : %d - %s [%s]\n", message_origin, responses[response_index], mission);
         if (message_origin != 0)
             one_step_to_master(message_origin, sock, responses, &response_count);
-        
     }
 
     printf("slave - ARRIVE %s\n", mission);
+
+    printf("SLAVE POSE %s\n", mission);
+    while (quantity_needed > 0)
+    {
+        sprintf(buffer, "pose %s\n", mission);
+        execute_action(sock, buffer, responses, &response_count, SERVER_RESPONSE_OK_KO, true);
+        printf("%s poser[%d]\n", mission, quantity_needed);
+        print_responses(responses, response_count);
+        quantity_needed--;
+    }
+    
+    // for (int i = 0; i < quantity_needed; i++)
+    // {
+    //     sprintf(buffer, "pose %s\n", mission);
+    //     execute_action(sock, buffer, responses, &response_count, SERVER_RESPONSE_OK_KO, true);
+    // }
+
+    printf("FINI POSER %s\n", mission);
     while (1)
     {
     }

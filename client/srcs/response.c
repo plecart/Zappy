@@ -13,6 +13,9 @@ int get_response_index(char RESPONSES_TAB, server_response_type_t type, int resp
 
         if (type == SERVER_RESPONSE_BEACON && strstr(responses[i], "ici") != NULL)
             return i;
+
+        if (type == SERVER_RESPONSE_INCANTATION && strstr(responses[i], "elevation") != NULL)
+            return i;
     }
     return -1;
 };

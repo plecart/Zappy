@@ -60,26 +60,36 @@ const resources_t level_up_requirement[] = {
 bool can_incantation(player_t *player, map_t *map, player_t *players[], int max_players)
 {
     int required_players = player->level - (player->level % 2);
-    int i = 0;
+    int good_players = 0;
 
     // Vérifier la présence des joueurs du même niveau
     for (int i = 0; i < max_players; i++)
     {
-        if (players[i] != NULL && players[i]->x == player->x && players[i]->y == player->y && (players[i]->level == player->level || players[i]->level == player->level + 1))
-            i++;
+        if (players[i] != NULL)
+            printf("[%d, %d] - [%d, %d] - [%d, %d]\n", players[i]->x, players[i]->y, player->x, player->y, players[i]->level, player->level);
+        if (
+            players[i] != NULL &&
+            players[i]->x == player->x &&
+            players[i]->y == player->y &&
+            (players[i]->level == player->level || players[i]->level == (player->level + 1)))
+            good_players++;
     }
 
-    if (i < required_players)
+    if (good_players < required_players)
     {
-        log_printf_identity(PRINT_ERROR, player, "a tenté d'incanter mais il n'y a pas assez de joueurs du même niveau (il n'y en a que %d joueurs de niveau %d ou %d, il en fallait %d)\n", i, player->level, required_players);
+        print_players(players, max_players);
+        log_printf_identity(PRINT_ERROR, player, "a tenté d'incanter mais il n'y a pas assez de joueurs du même niveau (il n'y en a %d joueurs de niveau %d ou %d, il en fallait %d)\n", good_players, player->level, player->level + 1, required_players);
         return false; // Pas assez de joueurs du même niveau
     }
 
     // Vérifier si les ressources requises sont disponibles
-    cell_t *cell = &map->cells[player->x][player->y];
-
+    cell_t *cell = &map->cells[player->y][player->x];
+    // printf("AU SOL---- : %d %d %d %d %d %d\n", cell->resources.linemate, cell->resources.deraumere, cell->resources.sibur, cell->resources.mendiane, cell->resources.phiras, cell->resources.thystame);
+    // printf("NECESSAIRE : %d %d %d %d %d %d\n", level_up_requirement[player->level].linemate, level_up_requirement[player->level].deraumere, level_up_requirement[player->level].sibur, level_up_requirement[player->level].mendiane, level_up_requirement[player->level].phiras, level_up_requirement[player->level].thystame);
     if (
-        cell->resources.linemate == level_up_requirement[player->level].linemate && cell->resources.deraumere == level_up_requirement[player->level].deraumere && cell->resources.sibur == level_up_requirement[player->level].sibur && cell->resources.mendiane == level_up_requirement[player->level].mendiane && cell->resources.phiras == level_up_requirement[player->level].phiras && cell->resources.thystame == level_up_requirement[player->level].thystame)
+        cell->resources.linemate >= level_up_requirement[player->level - 1].linemate && cell->resources.deraumere >= level_up_requirement[player->level - 1].deraumere && cell->resources.sibur >= level_up_requirement[player->level - 1].sibur &&
+        cell->resources.mendiane >= level_up_requirement[player->level - 1].mendiane && cell->resources.phiras >= level_up_requirement[player->level - 1].phiras &&
+        cell->resources.thystame >= level_up_requirement[player->level - 1].thystame)
 
         return true;
 
@@ -92,7 +102,8 @@ bool level_up_players(player_t *players[], int max_players)
 
     while (players[i] != NULL && i < max_players)
     {
-        if (players[i]->need_level_up)
+        printf("DO player %d - need levelup[%d]\n", players[i]->socket, players[i]->need_level_up);
+        if (players[i]->need_level_up == true)
         {
             players[i]->level++;
             players[i]->need_level_up = false;
@@ -111,14 +122,18 @@ void start_incantation(player_t *player, map_t *map, player_t *players[], int ma
 {
     int i = 0;
 
+    player->incantation_trigger = true;
     while (players[i] != NULL && i < max_players)
     {
         if (players[i]->x == player->x && players[i]->y == player->y)
+        {
+            printf("player %d - need levelup\n", players[i]->socket);
             players[i]->need_level_up = true;
+        }
         i++;
     }
 
-    cell_t *cell = &map->cells[player->x][player->y];
+    cell_t *cell = &map->cells[player->y][player->x];
     int index_requirement = player->level - 1;
     cell->resources.linemate -= level_up_requirement[index_requirement].linemate;
     cell->resources.deraumere -= level_up_requirement[index_requirement].deraumere;
@@ -126,5 +141,4 @@ void start_incantation(player_t *player, map_t *map, player_t *players[], int ma
     cell->resources.mendiane -= level_up_requirement[index_requirement].mendiane;
     cell->resources.phiras -= level_up_requirement[index_requirement].phiras;
     cell->resources.thystame -= level_up_requirement[index_requirement].thystame;
-
 }

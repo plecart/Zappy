@@ -286,3 +286,83 @@ int get_message_direction(const char *str)
     // On convertit le caractère en entier (par exemple '3' -> 3)
     return *p - '0';
 }
+
+bool is_item_enough(const char *view, const int required_resources[6])
+{
+    // Ressources à vérifier (ordre strict : linemate->deraumere->sibur->mendiane->phiras->thystame)
+    static const char *res_names[6] = {
+        "linemate",
+        "deraumere",
+        "sibur",
+        "mendiane",
+        "phiras",
+        "thystame"
+    };
+    int counts[6] = {0, 0, 0, 0, 0, 0};
+
+    // On va copier l'inventaire dans un buffer modifiable
+    // pour pouvoir y placer un '\0' après la première virgule.
+    char buffer[2048];
+    strncpy(buffer, view, sizeof(buffer) - 1);
+    buffer[sizeof(buffer) - 1] = '\0'; // Sécurité
+
+    // Cherche la première virgule
+    char *comma_pos = strchr(buffer, ',');
+    if (comma_pos != NULL) {
+        // Coupe la chaîne : on ignore tout après la 1ère virgule
+        *comma_pos = '\0';
+    }
+    
+    // Maintenant, on ne travaille plus que sur buffer (avant la virgule)
+    // On va extraire des "tokens" en se séparant par des espaces ou symboles
+    // comme '{' ou '}' qu'on peut ignorer.
+    
+    // Pour simplifier, on va se contenter de séparer sur les espaces
+    // et filtrer les caractères type '{' '}' ensuite.
+    char *token = strtok(buffer, " \t\n");
+    while (token != NULL) {
+        // On retire d'éventuels caractères parasites en début ou fin ({} ,)
+        // ex: "{joueur" -> "joueur" ou "thystame}" -> "thystame"
+        // Pour rester simple, on peut nettoyer en place :
+        // (enlever tout caractère non-alphabétique en début et fin du token)
+        char *start = token;
+        // Avance start tant qu'il n'est pas alphabétique
+        while (*start && !isalpha((unsigned char)*start))
+            start++;
+        // Trouve la fin
+        char *end = token + strlen(token) - 1;
+        while (end > start && !isalpha((unsigned char)*end)) {
+            *end = '\0';
+            end--;
+        }
+
+        // "start" pointe sur le 1er char alphabétique, token a peut-être bougé
+        // On rebouge le contenu pour que token devienne "nettoyé"
+        if (start != token) {
+            memmove(token, start, strlen(start) + 1);
+        }
+
+        // Maintenant token est potentiellement "linemate", "sibur", "joueur", etc.
+        // On regarde si ça correspond à une ressource qu'on suit
+        for (int i = 0; i < 6; i++) {
+            if (strcmp(token, res_names[i]) == 0) {
+                counts[i]++;
+                break;
+            }
+        }
+
+        // Prochain token
+        token = strtok(NULL, " \t\n");
+    }
+
+    // Maintenant qu'on a fini de compter, on compare nos counts à required_resources
+    printf("CAN INCANTAION : [%d][%d][%d][%d][%d][%d]\n", counts[0], counts[1], counts[2], counts[3], counts[4], counts[5]);
+    printf("REQUIRED : [%d][%d][%d][%d][%d][%d]\n", required_resources[0], required_resources[1], required_resources[2], required_resources[3], required_resources[4], required_resources[5]);
+    printf("VIEW[%s]\n", view);
+    for (int i = 0; i < 6; i++) {
+        if (counts[i] < required_resources[i]) {
+            return false;
+        }
+    }
+    return true;
+}
