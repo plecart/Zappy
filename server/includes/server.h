@@ -124,7 +124,7 @@ void move_forward(player_t *player, map_t *map);
 bool kick_players(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players);
 bool can_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
 void start_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
-bool level_up_players(player_t *players[], player_t *player, int max_players);
+bool level_up_players(int graphic_socket, player_t *players[], player_t *player, int max_players);
 
 char *get_player_direction(player_t *player);
 int get_random_between(int min, int max);

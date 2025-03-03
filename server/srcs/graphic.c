@@ -208,7 +208,6 @@ void send_graphic_incantation_end(int graphic_socket, player_t *player, map_t *m
 
     if (success)
     {
-        send_graphic_player_level(graphic_socket, player);
         send_graphic_cell(graphic_socket, map->cells[player->y][player->x], player->x, player->y);
     }
 }

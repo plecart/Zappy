@@ -96,7 +96,7 @@ bool can_incantation(player_t *player, map_t *map, player_t *players[], int max_
     return false;
 }
 
-bool level_up_players(player_t *players[], player_t *player, int max_players)
+bool level_up_players(int graphic_socket, player_t *players[], player_t *player, int max_players)
 {
     int i = 0;
 
@@ -107,9 +107,11 @@ bool level_up_players(player_t *players[], player_t *player, int max_players)
         {
             players[i]->level++;
             players[i]->need_level_up = false;
+            send_graphic_player_level(graphic_socket, player);
             char buffer[BUFFER_SIZE_TINY];
             sprintf(buffer, "level up : %d\n", players[i]->level);
             send_message_player(*players[i], buffer);
+            
             if (players[i]->level == 8)
                 return true;
         }
