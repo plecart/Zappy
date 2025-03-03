@@ -111,3 +111,12 @@ void print_responses(char RESPONSES_TAB, int response_count)
     }
     printf(" - - - - - - - - \n");
 }
+
+void free_all_responses(char *responses[], int *response_count)
+{
+    for (int i = 0; i < *response_count; i++) {
+        free(responses[i]);  // Libère la chaîne si elle existe
+        responses[i] = NULL;
+    }
+    *response_count = 0;
+}

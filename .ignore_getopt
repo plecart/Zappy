@@ -1,0 +1,7 @@
+{
+   ignore_getopt_leaks
+   Memcheck:Leak
+   ...
+   obj:*/libc.so.*
+   fun:getopt*
+}

@@ -39,6 +39,7 @@ void delete_response(char RESPONSES_TAB, int *response_count, int index);
 void filter_responses(char RESPONSES_TAB, int *response_count, client_config_t config, bool is_slave);
 void filter_slaves_extra_responses(char RESPONSES_TAB, int *response_count);
 void print_responses(char RESPONSES_TAB, int response_count);
+void free_all_responses(char *responses[], int *response_count);
 
 void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t config);
 void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *resource_name);

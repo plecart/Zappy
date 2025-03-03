@@ -101,7 +101,10 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         if (get_response_index(responses, SERVER_RESPONSE_OVER, response_count) != -1)
             over = true;
     }
+
+    
     printf("DECO %s\n", mission);
+    free_all_responses(responses, &response_count);
 }
 
 void one_step_to_master(int direction, int sock, char RESPONSES_TAB, int *response_count)

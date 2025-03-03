@@ -87,7 +87,10 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         if (get_response_index(responses, SERVER_RESPONSE_OVER, response_count) != -1)
             over = true;
     }
+
+    
     printf("DECO BRAIN\n");
+    free_all_responses(responses, &response_count);
 }
 
 void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *resource_name)

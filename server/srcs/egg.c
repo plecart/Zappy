@@ -2,7 +2,6 @@
 
 void add_egg(egg_t *eggs[], int *egg_count, egg_t *new_egg)
 {
-    eggs[*egg_count] = malloc(sizeof(egg_t)); // ✅ Allocate memory
     if (eggs[*egg_count] == NULL)
     {
         log_printf(PRINT_ERROR, "Memory allocation failed for egg\n");
