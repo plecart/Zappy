@@ -5,12 +5,19 @@
 
 #define MAX_ACTIONS 10
 
+#define MIN_NOURRITURE 8
 #define MAX_NOURRITURE 18
+#define MIN_LINEMATE 2
 #define MAX_LINEMATE 5
+#define MIN_DERAUMERE 2
 #define MAX_DERAUMERE 5
+#define MIN_SIBUR 2
 #define MAX_SIBUR 5
+#define MIN_MENDIANE 1
 #define MAX_MENDIANE 4
+#define MIN_PHIRAS 1
 #define MAX_PHIRAS 4
+#define MIN_THYSTAME 0
 #define MAX_THYSTAME 2
 
 typedef struct server_config_s
@@ -117,9 +124,10 @@ void move_forward(player_t *player, map_t *map);
 bool kick_players(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players);
 bool can_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
 void start_incantation(player_t *player, map_t *map, player_t *players[], int max_players);
-bool level_up_players(player_t *players[], int max_players);
+bool level_up_players(player_t *players[], player_t *player, int max_players);
 
 char *get_player_direction(player_t *player);
+int get_random_between(int min, int max);
 void get_player_inventory(player_t *player, char *buffer, size_t size);
 int get_resource_index(const char *resource_name);
 int get_visible_cell_count(int level);

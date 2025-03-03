@@ -96,14 +96,14 @@ bool can_incantation(player_t *player, map_t *map, player_t *players[], int max_
     return false;
 }
 
-bool level_up_players(player_t *players[], int max_players)
+bool level_up_players(player_t *players[], player_t *player, int max_players)
 {
     int i = 0;
 
     while (players[i] != NULL && i < max_players)
     {
-        printf("DO player %d - need levelup[%d]\n", players[i]->socket, players[i]->need_level_up);
-        if (players[i]->need_level_up == true)
+        //printf("DO player %d - need levelup[%d]\n", players[i]->socket, players[i]->need_level_up);
+        if (players[i]->need_level_up == true && strcmp(players[i]->team_name, player->team_name) == 0 )
         {
             players[i]->level++;
             players[i]->need_level_up = false;

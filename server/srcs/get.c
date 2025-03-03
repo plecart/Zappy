@@ -15,6 +15,10 @@ char *get_player_direction(player_t *player)
     return strdup(directions[player->direction]);
 }
 
+int get_random_between(int min, int max) {
+    return min + rand() % (max - min + 1);
+}
+
 void get_player_inventory(player_t *player, char *buffer, size_t size)
 {
     snprintf(buffer, size, "{%s: %d, %s: %d, %s: %d, %s: %d, %s: %d, %s: %d, %s: %d}\n",

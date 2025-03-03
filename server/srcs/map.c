@@ -31,13 +31,13 @@ void populate_map(map_t *map) {
 
     for (int y = 0; y < map->height; y++) {
         for (int x = 0; x < map->width; x++) {
-            map->cells[y][x].resources.nourriture = rand() % (MAX_NOURRITURE + 1);
-            map->cells[y][x].resources.linemate = rand() % (MAX_LINEMATE + 1);
-            map->cells[y][x].resources.deraumere = rand() % (MAX_DERAUMERE + 1);
-            map->cells[y][x].resources.sibur = rand() % (MAX_SIBUR + 1);
-            map->cells[y][x].resources.mendiane = rand() % (MAX_MENDIANE + 1);
-            map->cells[y][x].resources.phiras = rand() % (MAX_PHIRAS + 1);
-            map->cells[y][x].resources.thystame = rand() % (MAX_THYSTAME + 1);
+            map->cells[y][x].resources.nourriture = get_random_between(MIN_NOURRITURE, MAX_NOURRITURE);
+            map->cells[y][x].resources.linemate = get_random_between(MIN_LINEMATE, MAX_LINEMATE);
+            map->cells[y][x].resources.deraumere = get_random_between(MIN_DERAUMERE, MAX_DERAUMERE);
+            map->cells[y][x].resources.sibur = get_random_between(MIN_SIBUR, MAX_SIBUR);
+            map->cells[y][x].resources.mendiane = get_random_between(MIN_MENDIANE, MAX_MENDIANE);
+            map->cells[y][x].resources.phiras = get_random_between(MIN_PHIRAS, MAX_PHIRAS);
+            map->cells[y][x].resources.thystame = get_random_between(MIN_THYSTAME, MAX_THYSTAME);
         }
     }
 }

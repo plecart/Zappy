@@ -12,7 +12,7 @@ bool execute_player_action(int graphic_socket, player_t *player, map_t *map, pla
         printf("INCANTATION TR IGGER\n");
         player->incantation_trigger = false;
         send_graphic_incantation_end(graphic_socket, player, map, can_incantation(player, map, players, max_players));
-        if (level_up_players(players, max_players) == true)
+        if (level_up_players(players, player, max_players) == true)
             return true;
     }
     if (player->action_count == 0)
