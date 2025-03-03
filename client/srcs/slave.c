@@ -37,7 +37,7 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     while (quantity < quantity_needed)
     {
         printf("slave - BOUCLE CHERCHER\n");
-        while (30 > inventory(sock, responses, &response_count, NOURRITURE))
+        while (25 > inventory(sock, responses, &response_count, NOURRITURE))
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
 
         printf("slave - quantity = %d (%s) < %d\n", quantity, mission, quantity_needed);
@@ -92,17 +92,16 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         print_responses(responses, response_count);
         quantity_needed--;
     }
-    
-    // for (int i = 0; i < quantity_needed; i++)
-    // {
-    //     sprintf(buffer, "pose %s\n", mission);
-    //     execute_action(sock, buffer, responses, &response_count, SERVER_RESPONSE_OK_KO, true);
-    // }
 
+    bool over = false;
     printf("FINI POSER %s\n", mission);
-    while (1)
+    while (over == false)
     {
+        response_count = receive_server_response(sock, responses, response_count);
+        if (get_response_index(responses, SERVER_RESPONSE_OVER, response_count) != -1)
+            over = true;
     }
+    printf("DECO %s\n", mission);
 }
 
 void one_step_to_master(int direction, int sock, char RESPONSES_TAB, int *response_count)

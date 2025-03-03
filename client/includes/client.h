@@ -15,6 +15,7 @@ typedef enum server_response_type_e
     SERVER_RESPONSE_OBJECT,
     SERVER_RESPONSE_BEACON,
     SERVER_RESPONSE_INCANTATION,
+    SERVER_RESPONSE_OVER,
 } server_response_type_t;
 
 typedef struct client_config_s

@@ -65,13 +65,10 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
             broadcast_beacon(sock, responses, &response_count, config.team_name);
     }
 
-
-    
-        
+    bool over = false;
     int level = 1;
-    while (level < 8)
+    while (level < 8 && over == false)
     {
-        
         if (enough_resources(sock, responses, &response_count, level_up_requirement[level - 1]) == true)
         {
             char buffer[BUFFER_SIZE_TINY];
@@ -79,14 +76,18 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
             execute_action(sock, buffer, responses, &response_count, SERVER_RESPONSE_INCANTATION, true);
             level++;
         }
+        if (get_response_index(responses, SERVER_RESPONSE_OVER, response_count) != -1)
 
+            over = true;
     }
 
-    
-    printf("END\n");
-    while(1) {
-        
+    while (over == false)
+    {
+        response_count = receive_server_response(sock, responses, response_count);
+        if (get_response_index(responses, SERVER_RESPONSE_OVER, response_count) != -1)
+            over = true;
     }
+    printf("DECO BRAIN\n");
 }
 
 void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *resource_name)
