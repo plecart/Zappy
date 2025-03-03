@@ -159,6 +159,7 @@ void send_initial_graphic_data(int graphic_socket, server_config_t *config, map_
 void send_graphic_cell(int graphic_socket, cell_t cell, int x, int y);
 void send_graphic_new_player(int graphic_socket, player_t *player, bool from_egg, int egg_id);
 void send_graphic_player_position(int graphic_socket, player_t *player);
+void send_graphic_player_inventory(int graphic_socket, player_t *player);
 void send_graphic_player_resources(int graphic_socket, player_t *player, map_t *map, bool take, int resource_index);
 void send_graphic_expulse(int graphic_socket, player_t *player);
 void send_graphic_broadcast(int graphic_socket, player_t *player, const char *message);

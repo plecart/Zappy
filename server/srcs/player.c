@@ -258,6 +258,7 @@ bool player_eat(int graphic_socket, player_t *player)
     {
         if (player->inventory.nourriture > 0)
         {
+            send_graphic_player_inventory(graphic_socket, player);
             player->inventory.nourriture--;
             player->life_cycle = 126;
             return true;

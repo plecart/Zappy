@@ -117,17 +117,8 @@ void send_graphic_player_position(int graphic_socket, player_t *player)
     send(graphic_socket, buffer, strlen(buffer), 0);
 }
 
-void send_graphic_player_resources(int graphic_socket, player_t *player, map_t *map, bool take, int resource_index)
-{
-    if (graphic_socket == -1 || player == NULL)
-    {
-        return; // Aucun client graphique ou joueur invalide
-    }
-
+void send_graphic_player_inventory(int graphic_socket, player_t *player){
     char buffer[BUFFER_SIZE];
-    snprintf(buffer, sizeof(buffer), "%s #%d %d\n", take ? "pgt" : "pdr", player->socket, resource_index);
-    send(graphic_socket, buffer, strlen(buffer), 0);
-
     snprintf(buffer, sizeof(buffer), "pin #%d %d %d %d %d %d %d %d %d %d\n",
              player->socket,       // ID du joueur
              player->x, player->y, // Position
@@ -140,7 +131,19 @@ void send_graphic_player_resources(int graphic_socket, player_t *player, map_t *
              player->inventory.thystame);
 
     send(graphic_socket, buffer, strlen(buffer), 0);
+}
 
+void send_graphic_player_resources(int graphic_socket, player_t *player, map_t *map, bool take, int resource_index)
+{
+    if (graphic_socket == -1 || player == NULL)
+    {
+        return; // Aucun client graphique ou joueur invalide
+    }
+
+    char buffer[BUFFER_SIZE];
+    snprintf(buffer, sizeof(buffer), "%s #%d %d\n", take ? "pgt" : "pdr", player->socket, resource_index);
+    send(graphic_socket, buffer, strlen(buffer), 0);
+    send_graphic_player_inventory(graphic_socket, player);
     send_graphic_cell(graphic_socket, map->cells[player->y][player->x], player->x, player->y);
 }
 
