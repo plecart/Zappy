@@ -1,20 +1,26 @@
 import asyncio
 import websockets
 import socket
+import argparse
 
+# Configuration par défaut
 TCP_HOST = "127.0.0.1"
-TCP_PORT = 4459
 WS_HOST = "0.0.0.0"
 WS_PORT = 8080
 
 ws_clients = set()
 
-def create_tcp_connection():
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Proxy TCP vers WebSocket")
+    parser.add_argument("tcp_port", type=int, help="Port du serveur TCP")
+    return parser.parse_args()
+
+def create_tcp_connection(tcp_port):
     """Crée une connexion persistante au serveur TCP."""
     tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    tcp_socket.connect((TCP_HOST, TCP_PORT))
+    tcp_socket.connect((TCP_HOST, tcp_port))
     tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-    print(f"✅ Connecté en permanence au serveur TCP {TCP_HOST}:{TCP_PORT}")
+    print(f"✅ Connecté en permanence au serveur TCP {TCP_HOST}:{tcp_port}")
     return tcp_socket
 
 async def handle_tcp(tcp_socket):
@@ -49,7 +55,8 @@ async def handle_websocket(websocket, tcp_socket):
         ws_clients.discard(websocket)
 
 async def main():
-    tcp_socket = create_tcp_connection()
+    args = parse_arguments()
+    tcp_socket = create_tcp_connection(args.tcp_port)
     loop = asyncio.get_event_loop()
     loop.create_task(handle_tcp(tcp_socket))
     start_server = await websockets.serve(lambda ws: handle_websocket(ws, tcp_socket), WS_HOST, WS_PORT)

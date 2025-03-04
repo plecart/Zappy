@@ -31,11 +31,12 @@ CLIENT_OBJS =	$(CLIENT_SRCS:.c=.o)
 
 SERVER_NAME	=	zappy_server
 CLIENT_NAME	=	zappy_client
+GFX_NAME	=	zappy_gfx
 
 RM			=	rm -rf
 CFLAGS		+=  -Wall -Wextra
 
-all: server client
+all: server client gfx
 
 $(SERVER_NAME): $(SERVER_OBJS)
 	$(CC) -o $(SERVER_NAME) $(SERVER_OBJS) 
@@ -43,9 +44,16 @@ $(SERVER_NAME): $(SERVER_OBJS)
 $(CLIENT_NAME): $(CLIENT_OBJS)
 	$(CC) -o $(CLIENT_NAME) $(CLIENT_OBJS) -lm
 
+$(GFX_NAME):
+	echo "#!/bin/bash" > $(GFX_NAME)
+	echo "cd front && flutter run -d chrome" >> $(GFX_NAME)
+	chmod +x $(GFX_NAME)
+
 server: $(SERVER_NAME)
 
 client: $(CLIENT_NAME)
+
+gfx: $(GFX_NAME)
 
 clean:
 	$(RM) $(SERVER_OBJS)
@@ -54,7 +62,8 @@ clean:
 fclean: clean
 	$(RM) $(SERVER_NAME)
 	$(RM) $(CLIENT_NAME)
+	$(RM) $(GFX_NAME)
 
 re: fclean all
 
-.PHONY: server client all clean fclean re 
+.PHONY: server client gfx all clean fclean re 
