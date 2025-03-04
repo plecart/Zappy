@@ -74,7 +74,6 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
 
 void send_message_player(player_t player, const char *message)
 {
-
         server_send_message(player.socket, message, player.team_name);
 }
 
@@ -88,10 +87,25 @@ void server_send_message(int socket, const char *message, char *team_name)
     if (write(socket, message, strlen(message)) < 0)
     {
         log_printf(PRINT_ERROR, "Erreur lors de l'envoi du message\n");
+        return ;
     }
-    else
-    {
+    size_t length = strlen(message);
+    if (length <= 200) {
+        // Message court, on l'affiche en entier
         log_printf(PRINT_SEND, "[serveur], a [%d][%s]: %s", socket, team_name, message);
+    } else {
+        // Message trop long : on tronque à 200 caractères
+        char truncated[MAX_PRINT_CHAR + 10];
+        // Copie des 200 premiers caractères
+        strncpy(truncated, message, MAX_PRINT_CHAR);
+        // On ferme la chaîne
+        truncated[MAX_PRINT_CHAR] = '\0';
+        // On ajoute la suite " [...]\n"
+        // (7 octets : un espace, 5 points et le \n final)
+        strcat(truncated, " [...]\n\0");
+
+        // On log seulement la version tronquée
+        log_printf(PRINT_SEND, "[serveur], a [%d][%s]: %s", socket, team_name, truncated);
     }
 }
 

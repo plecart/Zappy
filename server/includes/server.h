@@ -5,7 +5,7 @@
 
 #define MAX_ACTIONS 10
 
-#define MAX_PRINT_CHAR 400
+#define MAX_PRINT_CHAR 128
 
 #define MIN_NOURRITURE 8
 #define MAX_NOURRITURE 18

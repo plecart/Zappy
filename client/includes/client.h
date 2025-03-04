@@ -69,7 +69,7 @@ bool is_item_enough(const char *view, const int required_resources[6])
 ;
 
 
-void start_slave(client_config_t config);
+bool start_slave(client_config_t config);
 void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t config);
 void one_step_to_master(int direction, int sock, char RESPONSES_TAB, int *response_count);
 #endif

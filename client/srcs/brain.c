@@ -26,7 +26,11 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         if (did_egg_hatched(responses, &response_count) == true)
         {
             printf("EGG\n");
-            start_slave(config);
+            if (start_slave(config) == false)
+            {
+                free_all_responses(responses, &response_count);
+                return;
+            }
             sleep(1);
             broadcast_mission(sock, responses, &response_count, config.team_name);
             slave_count++;

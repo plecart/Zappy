@@ -1,18 +1,19 @@
 #include "../includes/client.h"
 
-void start_slave(client_config_t config)
+bool start_slave(client_config_t config)
 {
     pid_t pid = fork();
 
     if (pid == 0)
     {
         start_client(config, true);
-        exit(0);
+        return false;
     }
     else if (pid < 0)
     {
         log_printf(PRINT_ERROR, "Erreur lors de la création du processus fils\n");
     }
+    return true;
 }
 
 void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t config)
