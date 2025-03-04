@@ -114,9 +114,10 @@ void print_responses(char RESPONSES_TAB, int response_count)
 
 void free_all_responses(char *responses[], int *response_count)
 {
-    for (int i = 0; i < *response_count; i++) {
-        free(responses[i]);  // Libère la chaîne si elle existe
-        responses[i] = NULL;
+    int i = 0;
+    while (i < *response_count)
+
+    {
+        delete_response(responses, response_count, i);
     }
-    *response_count = 0;
 }

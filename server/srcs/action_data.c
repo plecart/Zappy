@@ -39,7 +39,9 @@ bool kick_players(int graphic_socket, player_t *player, map_t *map, player_t *pl
             players[i]->y = coordinate[1];
             log_printf_identity(PRINT_INFORMATION, player, "a expulsé le joueur %d de l'equipe %s sur la case [%d, %d]\n", players[i]->socket, players[i]->team_name, players[i]->x, players[i]->y);
             char buffer[24];
-            sprintf(buffer, "deplacement %s\n", get_player_direction(players[i]));
+            char *dir = get_player_direction(players[i]);
+            sprintf(buffer, "deplacement %s\n", dir);
+            free(dir);
             send_message_player(*players[i], buffer);
             send_graphic_player_position(graphic_socket, player);
             kicked_one = true;
@@ -66,7 +68,7 @@ bool can_incantation(player_t *player, map_t *map, player_t *players[], int max_
     for (int i = 0; i < max_players; i++)
     {
         if (players[i] != NULL)
-            printf("[%d, %d] - [%d, %d] - [%d, %d]\n", players[i]->x, players[i]->y, player->x, player->y, players[i]->level, player->level);
+           // printf("[%d, %d] - [%d, %d] - [%d, %d]\n", players[i]->x, players[i]->y, player->x, player->y, players[i]->level, player->level);
         if (
             players[i] != NULL &&
             players[i]->x == player->x &&
@@ -129,7 +131,7 @@ void start_incantation(player_t *player, map_t *map, player_t *players[], int ma
     {
         if (players[i]->x == player->x && players[i]->y == player->y)
         {
-            printf("player %d - need levelup\n", players[i]->socket);
+            //printf("player %d - need levelup\n", players[i]->socket);
             players[i]->need_level_up = true;
         }
         i++;

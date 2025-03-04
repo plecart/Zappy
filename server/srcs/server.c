@@ -54,8 +54,7 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
             {
                 //printf("[%d] bytes_read = %d\n", players[i]->socket, bytes_read);
                 log_printf(PRINT_INFORMATION, "Client déconnecté (socket %d)\n", players[i]->socket);
-                close(players[i]->socket);
-                free(players[i]);
+                free_player(players[i]);
                 players[i] = NULL;
             }
             else if (bytes_read > 0)
@@ -118,7 +117,8 @@ void start_server(server_config_t config)
 
     populate_map(map);
 
-    while (1)
+    bool game_over = false;
+    while (game_over == false)
     {
         FD_ZERO(&read_fds);
         FD_SET(server_socket, &read_fds);
@@ -163,7 +163,9 @@ void start_server(server_config_t config)
         if (game_started)
         { // La partie ne commence pas tant que le client graphique n'est pas là
            // printf("TOURN\n");
-            for (int i = 0; i < max_clients; i++)
+           int i = 0;
+        
+            while( i < max_clients && game_over == false)
             {
                 if (players[i] != NULL)
                 {
@@ -177,7 +179,7 @@ void start_server(server_config_t config)
                         {
                             log_printf(PRINT_INFORMATION, "Tous les joueurs sont morts, il m'y a pas de gagnant\n");
                             send_graphic_game_end(graphic_socket, "");
-                            free_all(players, map, server_socket);
+                            game_over = true;
                         }
                     }
                     else
@@ -191,18 +193,21 @@ void start_server(server_config_t config)
                                 if (players[j] != NULL)
                                     send_message_player(*players[j], "fini\n");
                             }
-                            free_all(players, map, server_socket);
+                            game_over = true;
                         }
                     }
                 }
+                i++;
             }
         }
     }
+    free_all(players, map, &config, server_socket);
 }
 
-void free_all(player_t *players[], map_t *map, int server_socket){
+void free_all(player_t *players[], map_t *map, server_config_t *config,  int server_socket){
     free_players(players);
     free_map(map);
+    free(config->teams);
     close(server_socket);
     exit(EXIT_SUCCESS);
 }

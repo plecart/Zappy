@@ -173,6 +173,7 @@ void start_client(client_config_t config, bool is_slave)
 
     !is_slave ? brain(responses, response_count, sock, config) : slave(responses, response_count, sock, config);
     // Fermeture du socket avec `close(sock)`, suivie d'un message indiquant la fin de la connexion.
+    free_all_responses(responses, &response_count);
     close(sock);
     log_printf(PRINT_INFORMATION, "Connexion fermée.\n");
 }

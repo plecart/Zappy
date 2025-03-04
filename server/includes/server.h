@@ -104,7 +104,7 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
 void send_message_egg(egg_t egg, const char *message);
 void send_message_player(player_t player, const char *message);
 void server_send_message(int socket, const char *message, char *team_name);
-void free_all(player_t *players[], map_t *map, int server_socket);
+void free_all(player_t *players[], map_t *map, server_config_t *config,  int server_socket);
 
 map_t *create_map(int width, int height);
 void populate_map(map_t *map);
