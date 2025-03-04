@@ -1,12 +1,25 @@
 #include "../includes/server.h"
 
-void add_egg(egg_t *eggs[], int *egg_count, egg_t *new_egg)
+void add_egg(egg_t *eggs[], int *egg_count, player_t *player)
 {
-    if (eggs[*egg_count] == NULL)
+
+    egg_t *new_egg = malloc(sizeof(egg_t)); // ✅ Allouer la mémoire correctement
+    if (!new_egg)
     {
-        log_printf(PRINT_ERROR, "Memory allocation failed for egg\n");
-        return;
+        log_printf(PRINT_ERROR, "Échec de l'allocation mémoire pour un œuf\n");
+        return ;
     }
+
+    static int egg_id = 0;
+    
+    strcpy(new_egg->team_name, player->team_name);
+    new_egg->mother_socket = player->socket;
+    new_egg->x = player->x;
+    new_egg->y = player->y;
+    new_egg->time_before_spawn = 42;  // remettre 42
+    new_egg->time_before_hatch = 600; // remettre 600
+    new_egg->id = egg_id++;
+    
     eggs[*egg_count] = new_egg; // ✅ Copy the new egg
     (*egg_count)++;
 }
@@ -65,5 +78,13 @@ void add_egg_cycle(int graphic_socket, egg_t *eggs[], int egg_count)
                 send_graphic_egg_hatched(graphic_socket, eggs[i]->id);
             }
         }
+    }
+}
+
+void free_eggs(egg_t *eggs[], int egg_count)
+{
+    for (int i = 0; i < egg_count; i++) {
+        free(eggs[i]);
+        eggs[i] = NULL;
     }
 }

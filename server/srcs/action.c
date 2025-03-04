@@ -126,7 +126,7 @@ int action_take(int graphic_socket, player_t *player, map_t *map, const char *ac
     printf("RESSOURCE INDEX: %d\n", resource_index);
     int count = ((int *)&map->cells[player->y][player->x].resources)[resource_index];
 
-    printf("OGT[%d][%d][%d][%d][%d][%d][%d]\n",
+    printf("RESSOURCES ON THE GROUNDS[%d][%d][%d][%d][%d][%d][%d]\n",
         map->cells[player->y][player->x].resources.nourriture,
         map->cells[player->y][player->x].resources.linemate,
         map->cells[player->y][player->x].resources.deraumere, 
@@ -238,24 +238,9 @@ int action_incantation(int graphic_socket, player_t *player, map_t *map, player_
 
 int action_lay_egg(int graphic_socket, player_t *player, egg_t *eggs[], int *egg_count)
 {
-    egg_t *new_egg = malloc(sizeof(egg_t)); // ✅ Allouer la mémoire correctement
-    if (!new_egg)
-    {
-        log_printf(PRINT_ERROR, "Échec de l'allocation mémoire pour un œuf\n");
-        return 0;
-    }
 
-    static int egg_id = 0;
 
-    strcpy(new_egg->team_name, player->team_name);
-    new_egg->mother_socket = player->socket;
-    new_egg->x = player->x;
-    new_egg->y = player->y;
-    new_egg->time_before_spawn = 42;  // remettre 42
-    new_egg->time_before_hatch = 600; // remettre 600
-    new_egg->id = egg_id++;
-
-    add_egg(eggs, egg_count, new_egg);
+    add_egg(eggs, egg_count, player);
 
     // ✅ Debugging : Afficher l'état de l'œuf ajouté
     // printf("DEBUG: Œuf ajouté - Team: %s, Pos: (%d, %d), Spawn: %d, Hatch: %d, egg_count: %d\n",

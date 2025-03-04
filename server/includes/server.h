@@ -5,6 +5,8 @@
 
 #define MAX_ACTIONS 10
 
+#define MAX_PRINT_CHAR 400
+
 #define MIN_NOURRITURE 8
 #define MAX_NOURRITURE 18
 #define MIN_LINEMATE 2
@@ -151,7 +153,7 @@ int action_broadcast(int graphic_socket, player_t *player, map_t *map, player_t 
 int action_incantation(int graphic_socket, player_t *player, map_t *map, player_t *players[], int max_players);
 int action_lay_egg(int graphic_socket, player_t *player, egg_t *eggs[], int *egg_count);
 
-void add_egg(egg_t *eggs[], int *egg_count, egg_t *new_egg);
+void add_egg(egg_t *eggs[], int *egg_count, player_t *player);
 void remove_egg(egg_t *eggs[], int *egg_count, const char *team_name, int x, int y);
 void add_egg_cycle(int graphic_socket, egg_t *eggs[], int egg_count);
 

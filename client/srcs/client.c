@@ -64,8 +64,8 @@ int receive_server_response(int sock, char RESPONSES_TAB, int response_count)
         int bytes_read = read(sock, buffer, BUFFER_SIZE - 1);
         if (bytes_read < 0)
         {
-            //printf("=== [%d][%d]\n", response_count, bytes_read);
-            //print_responses(responses, response_count);
+            // printf("=== [%d][%d]\n", response_count, bytes_read);
+            // print_responses(responses, response_count);
             log_printf(PRINT_ERROR, "Erreur lors de la réception de la réponse\n");
         }
         if (bytes_read == 0) // Fin de fichier (aucune donnée à lire)
@@ -143,8 +143,8 @@ void start_client(client_config_t config, bool is_slave)
     // print_responses(responses, response_count);
     // printf("-2---------\n");
 
-    //filter_responses(responses, &response_count, config, is_slave);
-   // print_responses(responses, response_count);
+    // filter_responses(responses, &response_count, config, is_slave);
+    // print_responses(responses, response_count);
 
     if (is_slave)
     {

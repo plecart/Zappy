@@ -11,6 +11,7 @@ int level_up_requirement[7][6] = {
 
 void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t config)
 {
+    log_printf(PRINT_INFORMATION, "[Brain][1] - Recolte nourriture et pond des oeufs\n");
     for (int i = 0; i < 6; i++)
     {
         scan_for_resource(sock, responses, &response_count, NOURRITURE);
@@ -18,6 +19,7 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         execute_action(sock, "fork\n", responses, &response_count, SERVER_RESPONSE_OK_KO, true);
     }
 
+    log_printf(PRINT_INFORMATION, "[Brain][2] - Attend l'ecolsion, donne la mission, recolte nourriture\n");
     int slave_count = 0;
     while (slave_count < 6)
     {
@@ -33,40 +35,40 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
     }
 
-    printf("Waiting For Slave\n");
-    print_responses(responses, response_count);
+    log_printf(PRINT_INFORMATION, "[Brain][3] - Attend que les \"slaves\" remplisse leur mission\n");
     int slave_ready = 0;
     while (slave_ready != 6)
     {
         if (7 > inventory(sock, responses, &response_count, NOURRITURE))
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
-        print_responses(responses, response_count);
+        //print_responses(responses, response_count);
         filter_responses(responses, &response_count, config, false);
         int ret = 0;
 
         if ((ret = is_slave_ready(responses, &response_count)) != 0)
         {
-            printf("Slave READY [%d]\n", ret);
-            print_responses(responses, response_count);
+           // printf("Slave READY [%d]\n", ret);
+            //print_responses(responses, response_count);
             slave_ready += ret;
         }
     }
-    printf("ENOUGH SLAVE\n");
 
-
+    log_printf(PRINT_INFORMATION, "[Brain][4] - Stock 20 de nourriture\n");
     while (20 > inventory(sock, responses, &response_count, NOURRITURE))
         scan_for_resource(sock, responses, &response_count, NOURRITURE);
 
+    log_printf(PRINT_INFORMATION, "[Brain][5] - Appel les \"slaves\" jusqu'a lui\n");
     int slave_arrived = 0;
     while (slave_arrived != 6)
     {
         slave_arrived = how_much_players(sock, responses, &response_count);
         printf("BEFORE BEACON %d\n", slave_arrived);
-            broadcast_beacon(sock, responses, &response_count, config.team_name);
+        broadcast_beacon(sock, responses, &response_count, config.team_name);
     }
 
     bool over = false;
     int level = 1;
+    log_printf(PRINT_INFORMATION, "[Brain][6] - Fait l'incantation en boucle\n");
     while (level < 8 && over == false)
     {
         if (enough_resources(sock, responses, &response_count, level_up_requirement[level - 1]) == true)
@@ -77,7 +79,6 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
             level++;
         }
         if (get_response_index(responses, SERVER_RESPONSE_OVER, response_count) != -1)
-
             over = true;
     }
 
@@ -88,9 +89,9 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
             over = true;
     }
 
-    
-    printf("DECO BRAIN\n");
     free_all_responses(responses, &response_count);
+    log_printf(PRINT_INFORMATION, "[Brain][7] - Quitte\n");
+
 }
 
 void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *resource_name)
@@ -105,6 +106,7 @@ void scan_for_resource(int sock, char RESPONSES_TAB, int *response_count, char *
         {
             // printf("!\n");
             resource_position = look(sock, responses, response_count, resource_name, &player_level);
+
             // printf("[%d] - [%d]\n", resource_position, player_level);
             //  printf("??\n");
         }
@@ -157,7 +159,9 @@ int look(int sock, char RESPONSES_TAB, int *response_count, char *resource_name,
     int response_index = execute_action(sock, "voir\n", responses, response_count, SERVER_RESPONSE_OBJECT, false);
     // printf("--- [%s] \n", responses[response_index]);
     char cells[8 * 8][BUFFER_SIZE];
+    //printf("[%s]\n", responses[response_index]);
     int cells_number = get_view(responses[response_index], cells);
+    //printf("[%d]\n", cells_number);
 
     delete_response(responses, response_count, response_index);
     *player_level = (int)(sqrt(cells_number) - 1);
@@ -216,7 +220,7 @@ void broadcast_mission(int sock, char RESPONSES_TAB, int *response_count, char *
     if (mission_index > 6)
         mission_index = 1;
     char buffer[BUFFER_SIZE_SMALL];
-    printf("[%d]SEND MISSION[%s][%d]\nn", mission_index, resource_names[mission_index], resource_total_needed[mission_index]);
+   // printf("[%d]SEND MISSION[%s][%d]\n", mission_index, resource_names[mission_index], resource_total_needed[mission_index]);
 
     char trim_team_name[BUFFER_SIZE_TINY];
     strcpy(trim_team_name, team_name);

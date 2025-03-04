@@ -1,7 +1,7 @@
 #include "../includes/client.h"
 
 const char *const resource_names[] = {NOURRITURE, LINEMATE, DERAUMERE, SIBUR, PHIRAS, MENDIANE, THYSTAME};
-const int  resource_total_needed[] = {0, 9, 8, 10, 5, 6, 1};
+const int  resource_total_needed[] = {0, 10, 9, 11, 6, 7, 2};
 
 bool is_coordinate(char *str)
 {
@@ -91,13 +91,13 @@ int get_mission(const char *str, const char *team_name, char *mission)
 {
     // 1) Trouver la sous-chaîne "Team2" (ou team_name) dans str.
     //    (On suppose qu'elle existe et qu'elle n'est pas NULL, car la chaîne est déjà validée.)
-    printf("===> %s - %s|\n", str, team_name);
+    //printf("===> %s - %s|\n", str, team_name);
     if (!str || !team_name)
     {
         return -1;
     }
 
-    printf("===> [%s] - [%s] ????\n", str, team_name);
+    //printf("===> [%s] - [%s] ????\n", str, team_name);
     const char *p = strstr(str, team_name);
     if (!p)
     {
@@ -151,7 +151,7 @@ int get_view(char responses[BUFFER_SIZE_SMALL], char cells[8 * 8][BUFFER_SIZE])
 int get_resource_position(char cells[8 * 8 + 3][BUFFER_SIZE], int cells_number, char *resource_name)
 {
     for (int i = 0; i < cells_number; i++)
-        if (strstr(cells[i], resource_name) != NULL && strstr(cells[i], "joueur") == NULL)
+        if (strstr(cells[i], resource_name) != NULL)
             return i;
     return -1;
 }
@@ -225,13 +225,13 @@ int is_slave_ready(char RESPONSES_TAB, int *response_count)
     int i = 0;
     while (i < *response_count)
     {
-        printf("---[%s]\n", responses[i]);
+        //printf("---[%s]\n", responses[i]);
         if (strstr(responses[i], "done") != NULL)
         {
             delete_response(responses, response_count, i);
             total_ready++;
             i = 0;
-            printf("DELETE\n");
+            //printf("DELETE\n");
         }
         i++;
     }
@@ -356,6 +356,7 @@ bool is_item_enough(const char *view, const int required_resources[6])
     }
 
     // Maintenant qu'on a fini de compter, on compare nos counts à required_resources
+    printf("view {%s}\n", view);
     printf("CAN INCANTAION : [%d][%d][%d][%d][%d][%d]\n", counts[0], counts[1], counts[2], counts[3], counts[4], counts[5]);
     printf("REQUIRED : [%d][%d][%d][%d][%d][%d]\n", required_resources[0], required_resources[1], required_resources[2], required_resources[3], required_resources[4], required_resources[5]);
    // printf("VIEW[%s]\n", view);
