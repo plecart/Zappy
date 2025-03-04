@@ -41,17 +41,6 @@ class GameScreenState extends State<GameScreen> {
   bool isLost = false;
 
   @override
-  void initState() {
-    super.initState();
-    connectWebSocket(handleServerMessage);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blueGrey[900],
@@ -71,6 +60,7 @@ class GameScreenState extends State<GameScreen> {
                         () => zoomLevel = (zoomLevel / 1.05).clamp(0.01, 2.0)),
                     onHideMessages: () =>
                         setState(() => hideMessages = !hideMessages),
+                    onPlayTap: () => connectWebSocket(handleServerMessage),
                   ),
                   const SizedBox(height: 20),
                   TeamRecap(
