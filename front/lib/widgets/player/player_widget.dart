@@ -19,7 +19,7 @@ class PlayerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 1),
       left: player.x * cellSize,
       top: player.y * cellSize,
       child: SizedBox(

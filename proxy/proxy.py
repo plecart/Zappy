@@ -3,7 +3,7 @@ import websockets
 import socket
 
 TCP_HOST = "127.0.0.1"
-TCP_PORT = 4458
+TCP_PORT = 4459
 WS_HOST = "0.0.0.0"
 WS_PORT = 8080
 

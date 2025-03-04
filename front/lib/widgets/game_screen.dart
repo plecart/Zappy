@@ -44,10 +44,6 @@ class GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     connectWebSocket(handleServerMessage);
-    // simulateServerMessages();
-    // tcpClient.sendMessage("GRAPHIC");
-    // tcpClient.onMessageReceived = handleServerMessage;
-    // localhost and 4453
   }
 
   @override
@@ -225,7 +221,7 @@ class GameScreenState extends State<GameScreen> {
         });
       } else if (parts[0] == "pbc") {
         int playerId = int.parse(parts[1].substring(1));
-        String message = parts[2];
+        String message = parts.sublist(2).join(" ");
 
         setState(() {
           for (Team team in teams) {
