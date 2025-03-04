@@ -54,7 +54,7 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     }
 
     log_printf(PRINT_INFORMATION, "[Brain][4] - Stock 20 de nourriture\n");
-    while (20 > inventory(sock, responses, &response_count, NOURRITURE))
+    while (25 > inventory(sock, responses, &response_count, NOURRITURE))
         scan_for_resource(sock, responses, &response_count, NOURRITURE);
 
     log_printf(PRINT_INFORMATION, "[Brain][5] - Appel les \"slaves\" jusqu'a lui\n");

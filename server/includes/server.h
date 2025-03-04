@@ -58,7 +58,7 @@ typedef struct egg_s
     int y;
     int time_before_spawn;
     int time_before_hatch;
-}               egg_t;
+} egg_t;
 
 typedef struct map_s
 {
@@ -106,7 +106,6 @@ void send_message_player(player_t player, const char *message);
 void server_send_message(int socket, const char *message, char *team_name);
 void free_all(player_t *players[], map_t *map, int server_socket);
 
-
 map_t *create_map(int width, int height);
 void populate_map(map_t *map);
 void print_map(map_t *map);
@@ -119,7 +118,6 @@ bool player_eat(int graphic_socket, player_t *player);
 void log_printf_identity(print_type type, player_t *player, const char *format, ...);
 void add_action_to_player(player_t *player, const char *action);
 bool are_players_dead(player_t *players[], int max_players);
-
 
 void turn_player(player_t *player, bool left);
 void move_forward(player_t *player, map_t *map);
@@ -134,9 +132,8 @@ void get_player_inventory(player_t *player, char *buffer, size_t size);
 int get_resource_index(const char *resource_name);
 int get_visible_cell_count(int level);
 void get_visible_cells_coordinates(player_t *player, map_t *map, int coordinates[][2]);
-void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_count, char *buffer, player_t *players[], int max_players);
-int get_elements_max_len(int max_players)
-;
+void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_count, char *buffer, size_t buffer_size, player_t *players[], int max_players);
+int get_elements_max_len(int max_players);
 void get_front_coordinate(int coordinate[2], player_t player, map_t *map);
 int get_sound_direction(player_t *sender, player_t *receiver, map_t *map);
 
@@ -173,10 +170,5 @@ void send_graphic_egg_created(int graphic_socket, int egg_id, egg_t *egg);
 void send_graphic_egg_hatched(int graphic_socket, int egg_id);
 void send_graphic_player_death(int graphic_socket, player_t *player);
 void send_graphic_game_end(int graphic_socket, const char *winning_team);
-
-
-
-
-
 
 #endif

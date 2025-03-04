@@ -24,7 +24,7 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     strcpy(trim_team_name, config.team_name);
     trim_team_name[strlen(trim_team_name) - 2] = '\0';
 
-    
+    log_printf(PRINT_INFORMATION, "[Slave][0] - get mission from (%s)\n", responses[0]);
     if ((quantity_needed = get_mission(responses[0], trim_team_name, mission)) == -1)
     {
         log_printf(PRINT_ERROR, "Erreur lors de la récupération de la mission\n");
@@ -39,7 +39,7 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     while (quantity < quantity_needed)
     {
         //printf("slave - BOUCLE CHERCHER\n");
-        while (20 > inventory(sock, responses, &response_count, NOURRITURE))
+        while (25 > inventory(sock, responses, &response_count, NOURRITURE))
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
 
         //printf("slave - quantity = %d (%s) < %d\n", quantity, mission, quantity_needed);

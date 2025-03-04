@@ -75,22 +75,8 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
 
 void send_message_player(player_t player, const char *message)
 {
-    size_t length = strlen(message);
 
-    if (length > MAX_PRINT_CHAR) {
-
-        char short_message[MAX_PRINT_CHAR + 8];
-        
-
-        snprintf(short_message, sizeof(short_message), "%.*s [...]\n", 
-                 MAX_PRINT_CHAR, 
-                 message);
-        
-        server_send_message(player.socket, short_message, player.team_name);
-    } else {
-        // Si le message tient déjà, on l'envoie tel quel
         server_send_message(player.socket, message, player.team_name);
-    }
 }
 
 void send_message_egg(egg_t egg, const char *message)

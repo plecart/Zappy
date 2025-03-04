@@ -356,7 +356,7 @@ bool is_item_enough(const char *view, const int required_resources[6])
     }
 
     // Maintenant qu'on a fini de compter, on compare nos counts à required_resources
-    printf("view {%s}\n", view);
+    //printf("view {%s}\n", view);
     printf("CAN INCANTAION : [%d][%d][%d][%d][%d][%d]\n", counts[0], counts[1], counts[2], counts[3], counts[4], counts[5]);
     printf("REQUIRED : [%d][%d][%d][%d][%d][%d]\n", required_resources[0], required_resources[1], required_resources[2], required_resources[3], required_resources[4], required_resources[5]);
    // printf("VIEW[%s]\n", view);

@@ -15,7 +15,8 @@ char *get_player_direction(player_t *player)
     return strdup(directions[player->direction]);
 }
 
-int get_random_between(int min, int max) {
+int get_random_between(int min, int max)
+{
     return min + rand() % (max - min + 1);
 }
 
@@ -142,77 +143,174 @@ int get_elements_max_len(int max_players)
     return nourriture_len + linemate_len + deraumere_len + sibur_len + mendiane_len + phiras_len + thystame_len + player_len;
 }
 
-void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_count, char *buffer, player_t *players[], int max_players)
+void get_elements_from_coordinates(map_t *map, int coordinates[][2], int cell_count, char *buffer, size_t buffer_size, player_t *players[], int max_players)
 {
-    int pos = 0;
-    buffer[0] = '\0'; // Initialisation correcte
+    // 'pos' tracks how many bytes we've placed into 'buffer'.
+    // Always ensure buffer[pos] is valid and we never exceed (buffer_size - 1).
+    int pos = 0;            
+    buffer[0] = '\0';       // Start with an empty string
 
-    for (int i = 0; i < cell_count; i++)
-    {
+    for (int i = 0; i < cell_count; i++) {
+        // We'll build a small temporary string for this cell:
+        char temp[1024];
+        temp[0] = '\0';
+        int temp_pos = 0;
+
+        // Extract the cell coordinates
         int x = coordinates[i][0];
         int y = coordinates[i][1];
         cell_t *cell = &map->cells[y][x];
 
-        // Calculer la taille nécessaire pour le buffer
-        int temp_len = get_elements_max_len(max_players) + 3;
-        // printf("temp_len: %d\n", temp_len);
-        char *temp = malloc(temp_len * sizeof(char)); // Allocation du buffer temporaire
-        temp[0] = '\0';                               // Initialisation correcte
-        int temp_pos = 0;
+        // Count how many players are on this cell
         int player_count = 0;
-        int player_index = 0;
-
-        while (player_index < max_players && players[player_index] != NULL)
-        {
-            if (players[player_index]->x == x && players[player_index]->y == y)
+        for (int p = 0; p < max_players; p++) {
+            if (players[p] != NULL &&
+                players[p]->x == x &&
+                players[p]->y == y)
+            {
                 player_count++;
-            player_index++;
+            }
         }
-        if (i == 0)
+
+        // OPTIONAL: Some people subtract 1 if i==0 (the player is "on" that cell),
+        // so that "voir" doesn't show the viewer themself. Depends on your design.
+        if (i == 0) {
             player_count--;
-        if (player_count > 0)
-            for (int j = 0; j < player_count; j++)
-                temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "joueur ");
+            if (player_count < 0) player_count = 0;
+        }
 
-        // Répéter les ressources en fonction de leur quantité
-        if (cell->resources.nourriture > 0)
-            for (int j = 0; j < cell->resources.nourriture; j++)
-                temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "nourriture ");
-        if (cell->resources.linemate > 0)
-            for (int j = 0; j < cell->resources.linemate; j++)
-                temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "linemate ");
-        if (cell->resources.deraumere > 0)
-            for (int j = 0; j < cell->resources.deraumere; j++)
-                temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "deraumere ");
-        if (cell->resources.sibur > 0)
-            for (int j = 0; j < cell->resources.sibur; j++)
-                temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "sibur ");
-        if (cell->resources.mendiane > 0)
-            for (int j = 0; j < cell->resources.mendiane; j++)
-                temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "mendiane ");
-        if (cell->resources.phiras > 0)
-            for (int j = 0; j < cell->resources.phiras; j++)
-                temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "phiras ");
-        if (cell->resources.thystame > 0)
-            for (int j = 0; j < cell->resources.thystame; j++)
-                temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "thystame ");
-        if (cell->resources.nourriture == 0 && cell->resources.linemate == 0 && cell->resources.deraumere == 0 && cell->resources.sibur == 0 && cell->resources.mendiane == 0 && cell->resources.phiras == 0 && cell->resources.thystame == 0 && player_count <= 0)
-            temp_pos += snprintf(temp + temp_pos, temp_len - temp_pos, "vide ");
+        // Build up 'temp' with "joueur " repeated for each player:
+        for (int count = 0; count < player_count; count++) {
+            // We'll do safe-append into 'temp':
+            int space_left = (int)sizeof(temp) - temp_pos;
+            int written = snprintf(temp + temp_pos, space_left, "%s", "joueur ");
+            if (written < 0 || written >= space_left) {
+                // overflow or error
+                temp_pos = (int)strlen(temp); // jump to end
+                break;
+            }
+            temp_pos += written;
+        }
 
-        // Supprimer l'espace en trop à la fin de temp
-        if (temp_pos > 0 && temp[temp_pos - 1] == ' ')
-            temp[temp_pos - 1] = '\0';
+        // Now each resource. We'll explicitly loop for each resource count:
+        for (int r = 0; r < cell->resources.nourriture; r++) {
+            int space_left = (int)sizeof(temp) - temp_pos;
+            int written = snprintf(temp + temp_pos, space_left, "%s", "nourriture ");
+            if (written < 0 || written >= space_left) {
+                temp_pos = (int)strlen(temp);
+                break;
+            }
+            temp_pos += written;
+        }
+        for (int r = 0; r < cell->resources.linemate; r++) {
+            int space_left = (int)sizeof(temp) - temp_pos;
+            int written = snprintf(temp + temp_pos, space_left, "%s", "linemate ");
+            if (written < 0 || written >= space_left) {
+                temp_pos = (int)strlen(temp);
+                break;
+            }
+            temp_pos += written;
+        }
+        for (int r = 0; r < cell->resources.deraumere; r++) {
+            int space_left = (int)sizeof(temp) - temp_pos;
+            int written = snprintf(temp + temp_pos, space_left, "%s", "deraumere ");
+            if (written < 0 || written >= space_left) {
+                temp_pos = (int)strlen(temp);
+                break;
+            }
+            temp_pos += written;
+        }
+        for (int r = 0; r < cell->resources.sibur; r++) {
+            int space_left = (int)sizeof(temp) - temp_pos;
+            int written = snprintf(temp + temp_pos, space_left, "%s", "sibur ");
+            if (written < 0 || written >= space_left) {
+                temp_pos = (int)strlen(temp);
+                break;
+            }
+            temp_pos += written;
+        }
+        for (int r = 0; r < cell->resources.mendiane; r++) {
+            int space_left = (int)sizeof(temp) - temp_pos;
+            int written = snprintf(temp + temp_pos, space_left, "%s", "mendiane ");
+            if (written < 0 || written >= space_left) {
+                temp_pos = (int)strlen(temp);
+                break;
+            }
+            temp_pos += written;
+        }
+        for (int r = 0; r < cell->resources.phiras; r++) {
+            int space_left = (int)sizeof(temp) - temp_pos;
+            int written = snprintf(temp + temp_pos, space_left, "%s", "phiras ");
+            if (written < 0 || written >= space_left) {
+                temp_pos = (int)strlen(temp);
+                break;
+            }
+            temp_pos += written;
+        }
+        for (int r = 0; r < cell->resources.thystame; r++) {
+            int space_left = (int)sizeof(temp) - temp_pos;
+            int written = snprintf(temp + temp_pos, space_left, "%s", "thystame ");
+            if (written < 0 || written >= space_left) {
+                temp_pos = (int)strlen(temp);
+                break;
+            }
+            temp_pos += written;
+        }
 
-        // Vérifier si le buffer a de la place
-        if (pos + strlen(temp) + 2 >= (size_t)(temp_len * cell_count))
-            break;
+        // If completely empty (no resources, no players), we put "vide "
+        if (player_count <= 0 &&
+            cell->resources.nourriture == 0 &&
+            cell->resources.linemate   == 0 &&
+            cell->resources.deraumere == 0 &&
+            cell->resources.sibur     == 0 &&
+            cell->resources.mendiane  == 0 &&
+            cell->resources.phiras    == 0 &&
+            cell->resources.thystame  == 0)
+        {
+            int space_left = (int)sizeof(temp) - temp_pos;
+            int written = snprintf(temp + temp_pos, space_left, "%s", "vide ");
+            if (written < 0 || written >= space_left) {
+                temp_pos = (int)strlen(temp);
+            } else {
+                temp_pos += written;
+            }
+        }
 
-        // Ajouter les ressources au buffer avec une virgule si nécessaire
-        if (pos > 0)
-            pos += snprintf(buffer + pos, temp_len * cell_count - pos, ", ");
-        pos += snprintf(buffer + pos, temp_len * cell_count - pos, "%s", temp);
+        // Remove trailing space in temp, if any
+        if (temp_pos > 0 && temp[temp_pos - 1] == ' ') {
+            temp[--temp_pos] = '\0';
+        }
 
-        free(temp); // Libérer le buffer temporaire
+        // Now append this cell's string (temp) to the main 'buffer'.
+        // If it's not the first cell, prepend ", "
+        {
+            int space_left = (int)buffer_size - pos;
+            int written;
+
+            if (i > 0) {
+                // e.g. ", joueur sibur"
+                written = snprintf(buffer + pos, space_left, ", %s", temp);
+            } else {
+                // first cell: just put the temp without comma
+                written = snprintf(buffer + pos, space_left, "%s", temp);
+            }
+
+            // Check for overflow or error
+            if (written < 0 || written >= space_left) {
+                // We can't append any further
+                pos = (int)strlen(buffer);
+                break;
+            }
+            pos += written;
+        }
+    }
+
+    // Ensure null termination at the end, in case we stopped early
+    if (pos < (int)buffer_size) {
+        buffer[pos] = '\0';
+    } else {
+        // Force termination at last byte
+        buffer[buffer_size - 1] = '\0';
     }
 }
 
@@ -255,7 +353,7 @@ int get_sound_direction(player_t *sender, player_t *receiver, map_t *map)
                                           : 1;
     int index_y = (dy > 0) ? 2 : (dy < 0) ? 0
                                           : 1;
-    //printf("[%d], [%d][%d] - [%d][%d] - [%d][%d]\n",  receiver->direction, receiver->x, receiver->y, dx, dy, index_x, index_y);
+    // printf("[%d], [%d][%d] - [%d][%d] - [%d][%d]\n",  receiver->direction, receiver->x, receiver->y, dx, dy, index_x, index_y);
     switch (receiver->direction)
     {
     case NORTH:
