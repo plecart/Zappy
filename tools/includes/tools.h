@@ -14,6 +14,7 @@
 #include <sys/time.h>
 #include <math.h>
 #include <ctype.h>
+#include <signal.h>
 
 
 

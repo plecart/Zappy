@@ -121,8 +121,10 @@ void assign_new_player(int graphic_socket, int client_socket, player_t *players[
             print_players(players, max_players);
             
             send_message_player(*players[i], "BIENVENUE\n");
-            log_printf_identity(PRINT_INFORMATION, players[i], "est place en position [%d, %d], direction %s\n", players[i]->x, players[i]->y, get_player_direction(players[i]));
+            char *dir = get_player_direction(players[i]);
+            log_printf_identity(PRINT_INFORMATION, players[i], "est place en position [%d, %d], direction %s\n", players[i]->x, players[i]->y, dir);
             dprintf(client_socket, "%d %d\n", players[i]->x, players[i]->y);
+            free(dir);
             send_graphic_new_player(graphic_socket, players[i], previous_egg_count != *egg_count, egg_id);
             return;
         }
@@ -189,16 +191,15 @@ void free_player(player_t *player)
 {
     if (player == NULL)
         return;
+
     close(player->socket);
-    for (int i = 0; i < player->action_count; i++)
-    {
+
+    for (int i = 0; i < player->action_count; i++) {
         free(player->actions[i]);
         player->actions[i] = NULL;
     }
-    if (player == NULL) {
-        free(player);
-        player = NULL;
-    }
+
+    free(player);
 }
 
 void free_players(player_t *players[])

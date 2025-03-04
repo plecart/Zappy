@@ -5,6 +5,7 @@
         "tools.h": "c",
         "inet.h": "c",
         "unistd.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "signal.h": "c"
     }
 }

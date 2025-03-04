@@ -63,7 +63,9 @@ int action_switch(int graphic_socket, player_t *player, char *action, map_t *map
 int action_move_forward(int graphic_socket, player_t *player, map_t *map)
 {
     move_forward(player, map);
-    log_printf_identity(PRINT_INFORMATION, player, "a avancé en direction de %s, en [%d, %d]\n", get_player_direction(player), player->x, player->y);
+    char *dir = get_player_direction(player);
+    log_printf_identity(PRINT_INFORMATION, player, "a avancé en direction de %s, en [%d, %d]\n", dir, player->x, player->y);
+    free(dir);
     send_message_player(*player, "ok\n");
     send_graphic_player_position(graphic_socket, player);
     return 7;
@@ -72,7 +74,9 @@ int action_move_forward(int graphic_socket, player_t *player, map_t *map)
 int action_turn(int graphic_socket, player_t *player, bool left)
 {
     turn_player(player, left);
-    log_printf_identity(PRINT_INFORMATION, player, "tourne à %s, nouvelle direction: %s\n", left ? "gauche" : "droite", get_player_direction(player));
+    char *dir = get_player_direction(player);
+    log_printf_identity(PRINT_INFORMATION, player, "tourne à %s, nouvelle direction: %s\n", left ? "gauche" : "droite", dir);
+    free(dir);
     send_message_player(*player, "ok\n");
     send_graphic_player_position(graphic_socket, player);
     return 7;
@@ -114,10 +118,11 @@ int action_see(player_t *player, map_t *map, player_t *players[], int max_player
 
     free(buffer);
     buffer = NULL;
-
+    char *dir = get_player_direction(player);
     log_printf_identity(PRINT_INFORMATION, player,
                         "a demandé ce qu'il voyait depuis [%d, %d] en direction du %s\n",
-                        player->x, player->y, get_player_direction(player));
+                        player->x, player->y, dir);
+    free(dir);
     send_message_player(*player, package);
 
     free(package);

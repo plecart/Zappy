@@ -41,13 +41,13 @@ void brain(char RESPONSES_TAB, int response_count, int sock, client_config_t con
     {
         if (7 > inventory(sock, responses, &response_count, NOURRITURE))
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
-        //print_responses(responses, response_count);
+        print_responses(responses, response_count);
         filter_responses(responses, &response_count, config, false);
         int ret = 0;
 
         if ((ret = is_slave_ready(responses, &response_count)) != 0)
         {
-           // printf("Slave READY [%d]\n", ret);
+            printf("Slave READY [%d]\n", ret);
             //print_responses(responses, response_count);
             slave_ready += ret;
         }
