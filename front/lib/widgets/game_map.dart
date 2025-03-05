@@ -8,12 +8,14 @@ class GameMap extends StatelessWidget {
   final double cellSize;
   final void Function(Tile) onTileTap;
   final List<Egg> eggs;
+  final bool isRessourceInt;
 
   const GameMap({
     required this.mapData,
     required this.cellSize,
     required this.onTileTap,
     required this.eggs,
+    required this.isRessourceInt,
     super.key,
   });
 
@@ -54,11 +56,19 @@ class GameMap extends StatelessWidget {
                     spacing: cellSize / 6,
                     children: [
                       for (int i = 0; i < tile.resources.length; i++)
-                        if (tile.resources[i] > 0)
+                        if (tile.resources[i] > 0 && !isRessourceInt)
                           Icon(
                             getResourceIcon(i),
                             color: getResourceColor(i),
                             size: cellSize / 6,
+                          )
+                        else if (tile.resources[i] > 0 && isRessourceInt)
+                          Text(
+                            tile.resources[i].toString(),
+                            style: TextStyle(
+                              color: getResourceColor(i),
+                              fontSize: cellSize / 6,
+                            ),
                           ),
                       if (getEggsNumber(x, y) > 0)
                         Icon(

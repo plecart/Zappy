@@ -39,6 +39,7 @@ class GameScreenState extends State<GameScreen> {
   List<Message> listMessage = [];
   bool hideMessages = false;
   bool isLost = false;
+  bool isRessourcesInt = false;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +62,8 @@ class GameScreenState extends State<GameScreen> {
                     onHideMessages: () =>
                         setState(() => hideMessages = !hideMessages),
                     onPlayTap: () => connectWebSocket(handleServerMessage),
+                    onRessourcesInt: () =>
+                        setState(() => isRessourcesInt = !isRessourcesInt),
                   ),
                   const SizedBox(height: 20),
                   TeamRecap(
@@ -73,6 +76,7 @@ class GameScreenState extends State<GameScreen> {
           ),
           Expanded(
             child: Game(
+              isRessourcesInt: isRessourcesInt,
               mapData: mapData,
               camera: camera,
               gridWidth: gridWidth,

@@ -6,12 +6,14 @@ class ControlButtons extends StatefulWidget {
   final VoidCallback onZoomOut;
   final VoidCallback onHideMessages;
   final VoidCallback onPlayTap;
+  final VoidCallback onRessourcesInt;
 
   const ControlButtons({
     required this.onZoomIn,
     required this.onZoomOut,
     required this.onHideMessages,
     required this.onPlayTap,
+    required this.onRessourcesInt,
     super.key,
   });
 
@@ -44,6 +46,11 @@ class _ControlButtonsState extends State<ControlButtons> {
             child: const Icon(Icons.message, size: 12)),
         const SizedBox(height: 20),
         const BackgroundMusicScreen(),
+        const SizedBox(height: 20),
+        FloatingActionButton(
+            mini: true,
+            onPressed: widget.onRessourcesInt,
+            child: const Icon(Icons.monetization_on, size: 12)),
         const SizedBox(height: 20),
         if (!_isPlaying)
           FloatingActionButton(
