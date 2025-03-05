@@ -1,7 +1,7 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include "../../tools/includes/tools.h"
+#include "../../tools_dir/includes/tools.h"
 
 #define MAX_ACTIONS 10
 

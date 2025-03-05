@@ -1,8 +1,8 @@
 CC			=	gcc -g3
 
-TOOLS__DIR	=	tools/srcs/
-SERVER_DIR	=	server/srcs/
-CLIENT_DIR	=	client/srcs/
+TOOLS__DIR	=	tools_dir/srcs/
+SERVER_DIR	=	server_dir/srcs/
+CLIENT_DIR	=	client_dir/srcs/
 
 
 TOOLS__SRCS =	$(TOOLS__DIR)tools.c
@@ -29,9 +29,9 @@ CLIENT_SRCS	=	$(CLIENT_DIR)main_client.c \
 SERVER_OBJS	=	$(SERVER_SRCS:.c=.o)
 CLIENT_OBJS =	$(CLIENT_SRCS:.c=.o)
 
-SERVER_NAME	=	zappy_server
-CLIENT_NAME	=	zappy_client
-GFX_NAME	=	zappy_gfx
+SERVER_NAME	=	server
+CLIENT_NAME	=	client
+GFX_NAME	=	gfx
 
 RM			=	rm -rf
 CFLAGS		+=  -Wall -Wextra
