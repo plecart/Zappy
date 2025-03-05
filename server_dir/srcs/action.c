@@ -9,7 +9,6 @@ bool execute_player_action(int graphic_socket, player_t *player, map_t *map, pla
     }
     if (player->incantation_trigger == true)
     {
-        printf("INCANTATION TR IGGER\n");
         player->incantation_trigger = false;
         send_graphic_incantation_end(graphic_socket, player, map, true);
         if (level_up_players(graphic_socket, players, player, max_players) == true)
