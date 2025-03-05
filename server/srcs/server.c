@@ -31,6 +31,35 @@ int init_server(int port)
     return server_socket;
 }
 
+int read_line_until_newline(int sockfd, char *buffer, size_t max_size)
+{
+    size_t index = 0;
+
+    while (index < max_size - 1)
+    {
+        ssize_t ret = read(sockfd, &buffer[index], 1);
+
+        if (ret == 0)
+        {
+            return 0;
+        }
+        if (ret < 0)
+        {
+            return -1;
+        }
+
+        if (buffer[index] == '\n')
+        {
+            buffer[index] = '\0';
+            return index;
+        }
+        index++;
+    }
+
+    buffer[index] = '\0';
+    return index;
+}
+
 void handle_client_messages(player_t *players[], int max_players, fd_set *read_fds)
 {
     char buffer[BUFFER_SIZE];
@@ -39,17 +68,40 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
     {
         if (players[i] != NULL && FD_ISSET(players[i]->socket, read_fds))
         {
-            int bytes_read = read(players[i]->socket, buffer, sizeof(buffer) - 1);
-            if (bytes_read < 0)
-            {
-                log_printf(PRINT_INFORMATION, "Client déconnecté (socket %d)\n", players[i]->socket);
-                free_player(players[i]);
-                players[i] = NULL;
-            }
-            else if (bytes_read > 0)
-            {
-                buffer[bytes_read] = '\0';
+            int total = 0;
+            memset(buffer, 0, BUFFER_SIZE);
 
+            while (1)
+            {
+                char small_buffer[BUFFER_SIZE_SMALL];
+                ssize_t bytes_read = read(players[i]->socket, small_buffer, sizeof(small_buffer) - 1);
+                if (bytes_read < 0)
+                {
+                    log_printf(PRINT_INFORMATION, "Client déconnecté (socket %d)\n", players[i]->socket);
+                    free_player(players[i]);
+                    players[i] = NULL;
+                    break;
+                }
+                small_buffer[bytes_read] = '\0';
+                size_t space_left = BUFFER_SIZE - 1 - total;
+                if ((size_t)bytes_read > space_left)
+                {
+                    bytes_read = space_left;
+                }
+                memcpy(buffer + total, small_buffer, bytes_read);
+                total += bytes_read;
+                buffer[total] = '\0';
+                if (strchr(buffer, '\n') != NULL)
+                {
+                    break;
+                }
+                if (total >= BUFFER_SIZE - 1)
+                {
+                    break;
+                }
+            }
+            if (total > 0)
+            {
                 char *command = strtok(buffer, "\n");
                 while (command != NULL)
                 {
@@ -96,14 +148,14 @@ void server_send_message(int socket, const char *message, char *team_name)
 void start_server(server_config_t config)
 {
     int server_socket = init_server(config.port);
-    int max_clients = 8 * config.team_count + 1;
+    int max_clients = 8 * (config.team_count * config.clients_per_team) + 1;
     player_t *players[max_clients];
     memset(players, 0, sizeof(players));
     fd_set read_fds;
     int max_fd, activity;
     map_t *map = create_map(config.width, config.height);
     struct timeval timeout;
-    egg_t *eggs[config.team_count * 8];
+    egg_t *eggs[(config.team_count* config.clients_per_team) * 8];
     memset(eggs, 0, sizeof(eggs));
     int egg_count = 0;
     int graphic_socket = -1;
@@ -179,7 +231,6 @@ void start_server(server_config_t config)
                         {
                             log_printf(PRINT_INFORMATION, "L'équipe %s a gagné\n", players[i]->team_name);
                             send_graphic_game_end(graphic_socket, players[i]->team_name);
-                            print_players(players, max_clients);
                             for (int j = 0; j < max_clients; j++)
                             {
                                 if (players[j] != NULL)

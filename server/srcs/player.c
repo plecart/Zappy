@@ -99,9 +99,6 @@ void assign_new_player(int graphic_socket, int client_socket, player_t *players[
             int previous_egg_count = *egg_count;
             int egg_id = -1;
             *players[i] = init_player(client_socket, eggs, &egg_id, egg_count, team_name, config);
-
-            print_players(players, max_players);
-
             send_message_player(*players[i], "BIENVENUE\n");
             char *dir = get_player_direction(players[i]);
             log_printf_identity(PRINT_INFORMATION, players[i], "est place en position [%d, %d], direction %s\n", players[i]->x, players[i]->y, dir);
@@ -129,14 +126,38 @@ void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], in
     log_printf(PRINT_INFORMATION, "Nouvelle connexion acceptée (socket %d)\n", client_socket);
 
     char buffer[BUFFER_SIZE];
-    int bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
-    if (bytes_read <= 0)
+    int total = 0;
+    memset(buffer, 0, BUFFER_SIZE);
+    while (1)
     {
-        log_printf(PRINT_ERROR, "Erreur de lecture du client (socket %d)\n", client_socket);
-        close(client_socket);
-        return;
+        char small_buffer[BUFFER_SIZE_SMALL];
+        ssize_t bytes_read = read(client_socket, small_buffer, sizeof(small_buffer) - 1);
+        // printf("Correction - Small[%s]\n", small_buffer);
+        if (bytes_read < 0)
+        {
+            log_printf(PRINT_INFORMATION, "Client déconnecté (socket %d)\n", client_socket);
+            break;
+        }
+        small_buffer[bytes_read] = '\0';
+        size_t space_left = BUFFER_SIZE - 1 - total;
+        if ((size_t)bytes_read > space_left)
+        {
+            bytes_read = space_left;
+        }
+        memcpy(buffer + total, small_buffer, bytes_read);
+        total += bytes_read;
+        buffer[total] = '\0';
+        if (strchr(buffer, '\n') != NULL)
+        {
+            break;
+        }
+        if (total >= BUFFER_SIZE - 1)
+        {
+            break;
+        }
     }
-    buffer[bytes_read] = '\0';
+    // printf("CORRECTION - BUFFER FINAL[%s]\n", buffer);
+
     buffer[strcspn(buffer, "\n")] = 0;
     if (strcmp(buffer, "GRAPHIC") == 0)
     {
@@ -159,10 +180,18 @@ void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], in
         return;
     }
 
-    if (count_players_in_team(players, buffer) >= 8)
-    {
-        close_invalid_client(client_socket, "Équipe pleine");
-        return;
+    if (!(*game_started)) {
+        int count = 0;
+        for (int i = 0; i < max_clients; i++) {
+            if (players[i] != NULL)
+                count++;
+        }
+
+        if (count + 1> config->clients_per_team) {
+            close_invalid_client(client_socket,
+                "Équipe pleine");
+            return;
+        }
     }
 
     assign_new_player(*graphic_socket, client_socket, players, eggs, egg_count, max_clients, buffer, config);

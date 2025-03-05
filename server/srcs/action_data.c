@@ -74,7 +74,6 @@ bool can_incantation(player_t *player, map_t *map, player_t *players[], int max_
     }
     if (good_players < required_players)
     {
-        print_players(players, max_players);
         log_printf_identity(PRINT_ERROR, player, "a tenté d'incanter mais il n'y a pas assez de joueurs du même niveau (il n'y en a %d joueurs de niveau %d ou %d, il en fallait %d)\n", good_players, player->level, player->level + 1, required_players);
         return false;
     }
