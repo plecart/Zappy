@@ -109,7 +109,7 @@ bool level_up_players(int graphic_socket, player_t *players[], player_t *player,
         {
             players[i]->level++;
             players[i]->need_level_up = false;
-            send_graphic_player_level(graphic_socket, player);
+            send_graphic_player_level(graphic_socket, players[i]);
             char buffer[BUFFER_SIZE_TINY];
             sprintf(buffer, "level up : %d\n", players[i]->level);
             send_message_player(*players[i], buffer);
