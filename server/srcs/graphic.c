@@ -2,22 +2,18 @@
 
 void send_initial_graphic_data(int graphic_socket, server_config_t *config, map_t *map, player_t *players[], int max_players, egg_t *eggs[], int egg_count)
 {
-    if (graphic_socket == -1 || map == NULL || players == NULL) {
+    if (graphic_socket == -1 || map == NULL || players == NULL)
+    {
         return;
     }
 
     char buffer[BUFFER_SIZE];
-
     send(graphic_socket, "BIENVENUE\n", 10, 0);
-    // Taille de la carte
     snprintf(buffer, sizeof(buffer), "msz %d %d\n", config->width, config->height);
     send(graphic_socket, buffer, strlen(buffer), 0);
-
-    // Unité de temps
     snprintf(buffer, sizeof(buffer), "sgt %d\n", config->time_unit);
     send(graphic_socket, buffer, strlen(buffer), 0);
 
-    // Contenu de la carte
     for (int y = 0; y < config->height; y++)
     {
         for (int x = 0; x < config->width; x++)
@@ -26,14 +22,12 @@ void send_initial_graphic_data(int graphic_socket, server_config_t *config, map_
         }
     }
 
-    // Noms des équipes
     for (int i = 0; i < config->team_count; i++)
     {
         snprintf(buffer, sizeof(buffer), "tna %s\n", config->teams[i]);
         send(graphic_socket, buffer, strlen(buffer), 0);
     }
 
-    // Joueurs connectés
     for (int i = 0; i < max_players; i++)
     {
         if (players[i] != NULL)
@@ -44,7 +38,6 @@ void send_initial_graphic_data(int graphic_socket, server_config_t *config, map_
         }
     }
 
-    // Œufs présents
     for (int i = 0; i < egg_count; i++)
     {
         snprintf(buffer, sizeof(buffer), "enw #%d #%d %d %d\n",
@@ -87,14 +80,14 @@ void send_graphic_new_player(int graphic_socket, player_t *player, bool from_egg
         snprintf(buffer, sizeof(buffer), "ebo #%d\n", egg_id);
         send(graphic_socket, buffer, strlen(buffer), 0);
     }
-    // 📌 Envoi de la commande pnw (Connexion d’un joueur)
+
     snprintf(buffer, sizeof(buffer), "pnw #%d %d %d %d %d %s\n",
-             player->socket,     // ID unique du joueur (socket)
-             player->x,          // Position X
-             player->y,          // Position Y
-             player->direction,  // Orientation (1 = Nord, 2 = Est, 3 = Sud, 4 = Ouest)
-             player->level,      // Niveau du joueur
-             player->team_name); // Nom de l’équipe
+             player->socket,
+             player->x,
+             player->y,
+             player->direction,
+             player->level,
+             player->team_name);
 
     send(graphic_socket, buffer, strlen(buffer), 0);
 }
@@ -103,25 +96,24 @@ void send_graphic_player_position(int graphic_socket, player_t *player)
 {
     if (graphic_socket == -1 || player == NULL)
     {
-        return; // Aucun client graphique ou joueur invalide
+        return;
     }
 
     char buffer[BUFFER_SIZE];
-
     snprintf(buffer, sizeof(buffer), "ppo #%d %d %d %d\n",
-             player->socket,     // ID du joueur
-             player->x,          // Nouvelle position X
-             player->y,          // Nouvelle position Y
-             player->direction); // Orientation (1 = Nord, 2 = Est, 3 = Sud, 4 = Ouest)
-
+             player->socket,
+             player->x,
+             player->y,
+             player->direction);
     send(graphic_socket, buffer, strlen(buffer), 0);
 }
 
-void send_graphic_player_inventory(int graphic_socket, player_t *player){
+void send_graphic_player_inventory(int graphic_socket, player_t *player)
+{
     char buffer[BUFFER_SIZE];
     snprintf(buffer, sizeof(buffer), "pin #%d %d %d %d %d %d %d %d %d %d\n",
-             player->socket,       // ID du joueur
-             player->x, player->y, // Position
+             player->socket,
+             player->x, player->y,
              player->inventory.nourriture,
              player->inventory.linemate,
              player->inventory.deraumere,
@@ -137,9 +129,8 @@ void send_graphic_player_resources(int graphic_socket, player_t *player, map_t *
 {
     if (graphic_socket == -1 || player == NULL)
     {
-        return; // Aucun client graphique ou joueur invalide
+        return;
     }
-
     char buffer[BUFFER_SIZE];
     snprintf(buffer, sizeof(buffer), "%s #%d %d\n", take ? "pgt" : "pdr", player->socket, resource_index);
     send(graphic_socket, buffer, strlen(buffer), 0);
@@ -227,7 +218,8 @@ void send_graphic_player_level(int graphic_socket, player_t *player)
 
 void send_graphic_fork(int graphic_socket, player_t *player)
 {
-    if (graphic_socket == -1 || player == NULL) {
+    if (graphic_socket == -1 || player == NULL)
+    {
         return;
     }
 
@@ -238,7 +230,8 @@ void send_graphic_fork(int graphic_socket, player_t *player)
 
 void send_graphic_egg_created(int graphic_socket, int egg_id, egg_t *egg)
 {
-    if (graphic_socket == -1 || egg == NULL) {
+    if (graphic_socket == -1 || egg == NULL)
+    {
         return;
     }
 
@@ -249,7 +242,8 @@ void send_graphic_egg_created(int graphic_socket, int egg_id, egg_t *egg)
 
 void send_graphic_egg_hatched(int graphic_socket, int egg_id)
 {
-    if (graphic_socket == -1) {
+    if (graphic_socket == -1)
+    {
         return;
     }
 
@@ -260,7 +254,8 @@ void send_graphic_egg_hatched(int graphic_socket, int egg_id)
 
 void send_graphic_player_death(int graphic_socket, player_t *player)
 {
-    if (graphic_socket == -1 || player == NULL) {
+    if (graphic_socket == -1 || player == NULL)
+    {
         return;
     }
 
@@ -271,7 +266,8 @@ void send_graphic_player_death(int graphic_socket, player_t *player)
 
 void send_graphic_game_end(int graphic_socket, const char *winning_team)
 {
-    if (graphic_socket == -1 || winning_team == NULL) {
+    if (graphic_socket == -1 || winning_team == NULL)
+    {
         return;
     }
 
@@ -279,6 +275,3 @@ void send_graphic_game_end(int graphic_socket, const char *winning_team)
     snprintf(buffer, sizeof(buffer), "seg %s\n", winning_team);
     send(graphic_socket, buffer, strlen(buffer), 0);
 }
-
-
-

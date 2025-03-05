@@ -2,25 +2,21 @@
 
 void add_egg(egg_t *eggs[], int *egg_count, player_t *player)
 {
-
-    egg_t *new_egg = malloc(sizeof(egg_t)); // ✅ Allouer la mémoire correctement
+    egg_t *new_egg = malloc(sizeof(egg_t));
     if (!new_egg)
     {
         log_printf(PRINT_ERROR, "Échec de l'allocation mémoire pour un œuf\n");
-        return ;
+        return;
     }
-
     static int egg_id = 0;
-    
     strcpy(new_egg->team_name, player->team_name);
     new_egg->mother_socket = player->socket;
     new_egg->x = player->x;
     new_egg->y = player->y;
-    new_egg->time_before_spawn = 42;  // remettre 42
-    new_egg->time_before_hatch = 600; // remettre 600
+    new_egg->time_before_spawn = 42;
+    new_egg->time_before_hatch = 600;
     new_egg->id = egg_id++;
-    
-    eggs[*egg_count] = new_egg; // ✅ Copy the new egg
+    eggs[*egg_count] = new_egg;
     (*egg_count)++;
 }
 
@@ -31,16 +27,11 @@ void remove_egg(egg_t *eggs[], int *egg_count, const char *team_name, int x, int
         if (eggs[i] != NULL && strcmp(eggs[i]->team_name, team_name) == 0 &&
             eggs[i]->x == x && eggs[i]->y == y && eggs[i]->time_before_hatch == 0)
         {
-            // ✅ Libération de la mémoire de l'œuf supprimé
             free(eggs[i]);
-
-            // ✅ Décalage des éléments restants pour combler le trou
             for (int j = i; j < *egg_count - 1; j++)
             {
                 eggs[j] = eggs[j + 1];
             }
-
-            // ✅ Mise à NULL du dernier élément pour éviter une référence invalide
             eggs[*egg_count - 1] = NULL;
             (*egg_count)--;
 
@@ -54,9 +45,8 @@ void add_egg_cycle(int graphic_socket, egg_t *eggs[], int egg_count)
 {
     for (int i = 0; i < egg_count; i++)
     {
-        if (eggs[i] == NULL) // ✅ Vérification ajoutée
+        if (eggs[i] == NULL)
             continue;
-        // printf("egg %d\n", i);
         if (eggs[i]->time_before_spawn > 0)
         {
             eggs[i]->time_before_spawn--;
@@ -83,7 +73,8 @@ void add_egg_cycle(int graphic_socket, egg_t *eggs[], int egg_count)
 
 void free_eggs(egg_t *eggs[], int egg_count)
 {
-    for (int i = 0; i < egg_count; i++) {
+    for (int i = 0; i < egg_count; i++)
+    {
         free(eggs[i]);
         eggs[i] = NULL;
     }

@@ -31,29 +31,22 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         log_printf(PRINT_ERROR, "Erreur lors de la récupération de la mission\n");
         return;
     }
-    
-
 
     int quantity = 0;
 
     log_printf(PRINT_INFORMATION, "[Slave][1] (%s) - se rempli de nourriture et cherche sa pierre\n", mission);
     while (quantity < quantity_needed)
     {
-        //printf("slave - BOUCLE CHERCHER\n");
         while (25 > inventory(sock, responses, &response_count, NOURRITURE))
             scan_for_resource(sock, responses, &response_count, NOURRITURE);
-
-        //printf("slave - quantity = %d (%s) < %d\n", quantity, mission, quantity_needed);
         scan_for_resource(sock, responses, &response_count, mission);
         quantity = inventory(sock, responses, &response_count, mission);
     }
 
     char buffer[BUFFER_SIZE];
     log_printf(PRINT_INFORMATION, "[Slave][2] (%s) - signal qu'il a fini\n", mission);
-
     sprintf(buffer, "broadcast %s done %s\n", trim_team_name, mission);
     execute_action(sock, buffer, responses, &response_count, SERVER_RESPONSE_OK_KO, true);
-
     int message_origin = -1;
     log_printf(PRINT_INFORMATION, "[Slave][3] (%s) - suite le signal du \"master\"\n", mission);
     while (message_origin != 0)
@@ -63,24 +56,14 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         {
             while (response_count > 0)
             {
-                //printf("{%d}\n", response_count);
                 delete_response(responses, &response_count, 0);
             }
-            // printf(".slave - %s\n", mission);
             response_count = receive_server_response(sock, responses, response_count);
-            // printf("AVANT FILTRE ---\n");
-            // print_responses(responses, response_count);
             filter_responses(responses, &response_count, config, true);
             filter_slaves_extra_responses(responses, &response_count);
-            // printf("APRES FILTRE ---\n");
-            //print_responses(responses, response_count);
-            // printf("MESSAGE DU SERV : %s\n", responses[response_index]);
             response_index = get_response_index(responses, SERVER_RESPONSE_BEACON, response_count);
-            // printf("RESPONS COUNT = %d | response_index = %d\n", response_count, response_index);
         }
-
         message_origin = get_message_direction(responses[response_index]);
-        //printf("slave - ORIGIN : %d - %s [%s]\n", message_origin, responses[response_index], mission);
         if (message_origin != 0)
             one_step_to_master(message_origin, sock, responses, &response_count);
     }
@@ -91,7 +74,6 @@ void slave(char RESPONSES_TAB, int response_count, int sock, client_config_t con
         sprintf(buffer, "pose %s\n", mission);
         execute_action(sock, buffer, responses, &response_count, SERVER_RESPONSE_OK_KO, true);
         printf("%s poser[%d]\n", mission, quantity_needed);
-        //print_responses(responses, response_count);
         quantity_needed--;
     }
 

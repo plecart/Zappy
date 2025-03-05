@@ -75,36 +75,36 @@ typedef enum
     WEST
 } Direction;
 
-typedef struct  player_s
+typedef struct player_s
 {
-    int         socket;
-    char        team_name[BUFFER_SIZE_MEDIUM];
-    Direction   direction;
-    int         x;
-    int         y;
-    char        *actions[MAX_ACTIONS];
-    int         action_count;
-    int         current_execution_time;
+    int socket;
+    char team_name[BUFFER_SIZE_MEDIUM];
+    Direction direction;
+    int x;
+    int y;
+    char *actions[MAX_ACTIONS];
+    int action_count;
+    int current_execution_time;
     resources_t inventory;
-    bool        need_level_up;
-    bool        incantation_trigger;
-    int         level;
-    int         life_cycle;
-}               player_t;
+    bool need_level_up;
+    bool incantation_trigger;
+    int level;
+    int life_cycle;
+} player_t;
 
-void            print_server_usage(char *prog_name);
+void print_server_usage(char *prog_name);
 server_config_t parse_server_arguments(int argc, char *argv[]);
-void            print_server_config(server_config_t config);
+void print_server_config(server_config_t config);
 
-void            start_server(server_config_t config);
-int             init_server(int port);
-void            accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], int *egg_count, int max_clients, server_config_t *config, map_t *map, int *graphic_socket, bool *game_started);
-void            handle_client_messages(player_t *players[], int max_players, fd_set *read_fds);
+void start_server(server_config_t config);
+int init_server(int port);
+void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], int *egg_count, int max_clients, server_config_t *config, map_t *map, int *graphic_socket, bool *game_started);
+void handle_client_messages(player_t *players[], int max_players, fd_set *read_fds);
 
 void send_message_egg(egg_t egg, const char *message);
 void send_message_player(player_t player, const char *message);
 void server_send_message(int socket, const char *message, char *team_name);
-void free_all(player_t *players[], map_t *map, server_config_t *config,  int server_socket);
+void free_all(player_t *players[], map_t *map, server_config_t *config, int server_socket);
 
 map_t *create_map(int width, int height);
 void populate_map(map_t *map);

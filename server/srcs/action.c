@@ -87,27 +87,16 @@ int action_see(player_t *player, map_t *map, player_t *players[], int max_player
     int visible_cell_count = get_visible_cell_count(player->level);
     int coordinates[visible_cell_count][2];
 
-    // Fill the coordinate array
     get_visible_cells_coordinates(player, map, coordinates);
 
-    // The old approach tried to guess space usage with (elements_max_len + 1) * visible_cell_count + 1
-    // We'll keep that but must also pass it *correctly* into get_elements_from_coordinates.
     int elements_max_len = get_elements_max_len(max_players);
     int buffer_len = (elements_max_len + 1) * visible_cell_count + 1;
 
     char *buffer = malloc(buffer_len * sizeof(char));
     if (!buffer)
-    {
-        // handle error...
         return 0;
-    }
+    get_elements_from_coordinates(map, coordinates, visible_cell_count, buffer, (size_t)buffer_len, players, max_players);
 
-    // Pass buffer_len to the updated function
-    get_elements_from_coordinates(map, coordinates, visible_cell_count,
-                                  buffer, (size_t)buffer_len,
-                                  players, max_players);
-
-    // Now wrap in braces
     char *package = malloc(buffer_len + 4);
     if (!package)
     {
@@ -115,16 +104,12 @@ int action_see(player_t *player, map_t *map, player_t *players[], int max_player
         return 0;
     }
     snprintf(package, buffer_len + 4, "{%s}\n", buffer);
-
     free(buffer);
     buffer = NULL;
     char *dir = get_player_direction(player);
-    log_printf_identity(PRINT_INFORMATION, player,
-                        "a demandé ce qu'il voyait depuis [%d, %d] en direction du %s\n",
-                        player->x, player->y, dir);
+    log_printf_identity(PRINT_INFORMATION, player, "a demandé ce qu'il voyait depuis [%d, %d] en direction du %s\n", player->x, player->y, dir);
     free(dir);
     send_message_player(*player, package);
-
     free(package);
     package = NULL;
     return 7;
@@ -150,22 +135,9 @@ int action_take(int graphic_socket, player_t *player, map_t *map, const char *ac
         send_message_player(*player, "ko\n");
         return 0;
     }
-
-    printf("RESSOURCE INDEX: %d\n", resource_index);
     int count = ((int *)&map->cells[player->y][player->x].resources)[resource_index];
-
-    printf("RESSOURCES ON THE GROUNDS[%d][%d][%d][%d][%d][%d][%d]\n",
-           map->cells[player->y][player->x].resources.nourriture,
-           map->cells[player->y][player->x].resources.linemate,
-           map->cells[player->y][player->x].resources.deraumere,
-           map->cells[player->y][player->x].resources.sibur,
-           map->cells[player->y][player->x].resources.mendiane,
-           map->cells[player->y][player->x].resources.phiras,
-           map->cells[player->y][player->x].resources.thystame);
-
     if (count <= 0)
     {
-
         log_printf_identity(PRINT_ERROR, player, "a demandé à prendre l'objet \"%s\", il n'y en a pas en [%d, %d]\n", object, player->x, player->y);
         send_message_player(*player, "ko\n");
         return 0;
@@ -265,15 +237,9 @@ int action_incantation(int graphic_socket, player_t *player, map_t *map, player_
 
 int action_lay_egg(int graphic_socket, player_t *player, egg_t *eggs[], int *egg_count)
 {
-
     add_egg(eggs, egg_count, player);
-
-    // ✅ Debugging : Afficher l'état de l'œuf ajouté
-    // printf("DEBUG: Œuf ajouté - Team: %s, Pos: (%d, %d), Spawn: %d, Hatch: %d, egg_count: %d\n",
-    //        new_egg->team_name, new_egg->x, new_egg->y, new_egg->time_before_spawn, new_egg->time_before_hatch, *egg_count);
-
     log_printf_identity(PRINT_INFORMATION, player, "commence à pondre un œuf en [%d, %d]\n", player->x, player->y);
     send_message_player(*player, "ok\n");
     send_graphic_fork(graphic_socket, player);
-    return 42; // a remettre
+    return 42;
 }

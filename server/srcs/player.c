@@ -47,32 +47,19 @@ player_t init_player(int client_socket, egg_t *eggs[], int *egg_id, int *egg_cou
     player_t player;
     bool egg_found = false;
 
-    // printf("DEBUG: Initialisation du joueur pour l'équipe %s\n", team_name);
-    // printf("DEBUG: Nombre total d'œufs disponibles: %d\n", *egg_count);
-
     for (int i = 0; i < *egg_count; i++)
     {
         if (eggs[i] != NULL)
         {
-            // printf("DEBUG: Vérification de l'œuf[%d] - Team: %s, Pos: (%d, %d), Hatch: %d\n",
-            //        i, eggs[i]->team_name, eggs[i]->x, eggs[i]->y, eggs[i]->time_before_hatch);
-
             if (strcmp(eggs[i]->team_name, team_name) == 0 && eggs[i]->time_before_hatch == 0)
             {
-                // printf("DEBUG: Oeuf trouvé ! Assignation des coordonnées du joueur à (%d, %d)\n",
-                //        eggs[i]->x, eggs[i]->y);
                 egg_found = true;
                 *egg_id = eggs[i]->id;
                 player.x = eggs[i]->x;
                 player.y = eggs[i]->y;
-
                 remove_egg(eggs, egg_count, team_name, player.x, player.y);
-                break; // Sortir après avoir trouvé un œuf valide
+                break;
             }
-        }
-        else
-        {
-            // printf("DEBUG: eggs[%d] est NULL\n", i);
         }
     }
 
@@ -80,7 +67,6 @@ player_t init_player(int client_socket, egg_t *eggs[], int *egg_id, int *egg_cou
     {
         player.x = rand() % config->width;
         player.y = rand() % config->height;
-        // printf("DEBUG: Aucun œuf trouvé. Attribution d'une position aléatoire (%d, %d)\n", player.x, player.y);
     }
 
     player.socket = client_socket;
@@ -100,10 +86,6 @@ player_t init_player(int client_socket, egg_t *eggs[], int *egg_id, int *egg_cou
     player.inventory.mendiane = 0;
     player.inventory.phiras = 0;
     player.inventory.thystame = 0;
-
-    // printf("DEBUG: Joueur initialisé - Team: %s, Pos: (%d, %d), Socket: %d\n",
-    //    player.team_name, player.x, player.y, player.socket);
-
     return player;
 }
 
@@ -119,7 +101,7 @@ void assign_new_player(int graphic_socket, int client_socket, player_t *players[
             *players[i] = init_player(client_socket, eggs, &egg_id, egg_count, team_name, config);
 
             print_players(players, max_players);
-            
+
             send_message_player(*players[i], "BIENVENUE\n");
             char *dir = get_player_direction(players[i]);
             log_printf_identity(PRINT_INFORMATION, players[i], "est place en position [%d, %d], direction %s\n", players[i]->x, players[i]->y, dir);
@@ -156,7 +138,6 @@ void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], in
     }
     buffer[bytes_read] = '\0';
     buffer[strcspn(buffer, "\n")] = 0;
-    // Vérifier si c'est le client graphique
     if (strcmp(buffer, "GRAPHIC") == 0)
     {
         if (*graphic_socket != -1)
@@ -166,18 +147,18 @@ void accept_new_client(int server_socket, player_t *players[], egg_t *eggs[], in
             return;
         }
         *graphic_socket = client_socket;
-        *game_started = true; // La partie peut commencer
+        *game_started = true;
         log_printf(PRINT_INFORMATION, "Client graphique connecté (socket %d)\n", client_socket);
         send_initial_graphic_data(*graphic_socket, config, map, players, max_clients, eggs, *egg_count);
         return;
     }
-    // Vérifier si l'équipe est valide
+
     if (!validate_team(buffer, config))
     {
         close_invalid_client(client_socket, "Équipe invalide");
         return;
     }
-    // Vérifier si l'équipe a encore de la place
+
     if (count_players_in_team(players, buffer) >= 8)
     {
         close_invalid_client(client_socket, "Équipe pleine");
@@ -194,7 +175,8 @@ void free_player(player_t *player)
 
     close(player->socket);
 
-    for (int i = 0; i < player->action_count; i++) {
+    for (int i = 0; i < player->action_count; i++)
+    {
         free(player->actions[i]);
         player->actions[i] = NULL;
     }

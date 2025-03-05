@@ -1,9 +1,5 @@
 #include "../includes/server.h"
 
-// Initialise un serveur TCP et le met en écoute sur un port donné.
-// Cette fonction crée un socket, configure son adresse, lie ce socket à une
-// adresse spécifique, et le met en écoute afin d'accepter des connexions clients.
-
 int init_server(int port)
 {
     int server_socket;
@@ -35,12 +31,6 @@ int init_server(int port)
     return server_socket;
 }
 
-// Gère les messages des clients connectés et traite les déconnexions.
-// Cette fonction parcourt la liste des clients actifs et vérifie si un message a été reçu
-// à l'aide de `FD_ISSET`. Si un client a envoyé un message, celui-ci est lu, affiché, puis
-// une réponse simple ("OK\n") est envoyée. Si un client se déconnecte, son socket est fermé
-// et retiré de la liste des clients actifs.
-
 void handle_client_messages(player_t *players[], int max_players, fd_set *read_fds)
 {
     char buffer[BUFFER_SIZE];
@@ -52,7 +42,6 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
             int bytes_read = read(players[i]->socket, buffer, sizeof(buffer) - 1);
             if (bytes_read < 0)
             {
-                //printf("[%d] bytes_read = %d\n", players[i]->socket, bytes_read);
                 log_printf(PRINT_INFORMATION, "Client déconnecté (socket %d)\n", players[i]->socket);
                 free_player(players[i]);
                 players[i] = NULL;
@@ -74,7 +63,7 @@ void handle_client_messages(player_t *players[], int max_players, fd_set *read_f
 
 void send_message_player(player_t player, const char *message)
 {
-        server_send_message(player.socket, message, player.team_name);
+    server_send_message(player.socket, message, player.team_name);
 }
 
 void send_message_egg(egg_t egg, const char *message)
@@ -87,31 +76,22 @@ void server_send_message(int socket, const char *message, char *team_name)
     if (write(socket, message, strlen(message)) < 0)
     {
         log_printf(PRINT_ERROR, "Erreur lors de l'envoi du message\n");
-        return ;
+        return;
     }
     size_t length = strlen(message);
-    if (length <= 200) {
-        // Message court, on l'affiche en entier
+    if (length <= 200)
+    {
         log_printf(PRINT_SEND, "[serveur], a [%d][%s]: %s", socket, team_name, message);
-    } else {
-        // Message trop long : on tronque à 200 caractères
+    }
+    else
+    {
         char truncated[MAX_PRINT_CHAR + 10];
-        // Copie des 200 premiers caractères
         strncpy(truncated, message, MAX_PRINT_CHAR);
-        // On ferme la chaîne
         truncated[MAX_PRINT_CHAR] = '\0';
-        // On ajoute la suite " [...]\n"
-        // (7 octets : un espace, 5 points et le \n final)
         strcat(truncated, " [...]\n\0");
-
-        // On log seulement la version tronquée
         log_printf(PRINT_SEND, "[serveur], a [%d][%s]: %s", socket, team_name, truncated);
     }
 }
-
-// Démarre et gère le serveur en acceptant et en traitant les connexions clients.
-// Cette fonction initialise un serveur, gère les connexions entrantes et traite les
-// messages des clients en utilisant `select` pour surveiller l'activité sur les sockets.
 
 void start_server(server_config_t config)
 {
@@ -126,9 +106,8 @@ void start_server(server_config_t config)
     egg_t *eggs[config.team_count * 8];
     memset(eggs, 0, sizeof(eggs));
     int egg_count = 0;
-    int graphic_socket = -1; // Stockage du socket graphique
+    int graphic_socket = -1;
     bool game_started = false;
-
     populate_map(map);
 
     bool game_over = false;
@@ -175,11 +154,9 @@ void start_server(server_config_t config)
         handle_client_messages(players, max_clients - 1, &read_fds);
 
         if (game_started)
-        { // La partie ne commence pas tant que le client graphique n'est pas là
-           // printf("TOURN\n");
-           int i = 0;
-        
-            while( i < max_clients && game_over == false)
+        {
+            int i = 0;
+            while (i < max_clients && game_over == false)
             {
                 if (players[i] != NULL)
                 {
@@ -203,7 +180,8 @@ void start_server(server_config_t config)
                             log_printf(PRINT_INFORMATION, "L'équipe %s a gagné\n", players[i]->team_name);
                             send_graphic_game_end(graphic_socket, players[i]->team_name);
                             print_players(players, max_clients);
-                            for (int j = 0; j < max_clients; j++) {
+                            for (int j = 0; j < max_clients; j++)
+                            {
                                 if (players[j] != NULL)
                                     send_message_player(*players[j], "fini\n");
                             }
@@ -218,7 +196,8 @@ void start_server(server_config_t config)
     free_all(players, map, &config, server_socket);
 }
 
-void free_all(player_t *players[], map_t *map, server_config_t *config,  int server_socket){
+void free_all(player_t *players[], map_t *map, server_config_t *config, int server_socket)
+{
     free_players(players);
     free_map(map);
     free(config->teams);

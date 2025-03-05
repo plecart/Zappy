@@ -1,8 +1,9 @@
 #include "../includes/tools.h"
 
-const char *print_type_str[] = {"❌","🔍","📤","📩"};  
+const char *print_type_str[] = {"❌", "🔍", "📤", "📩"};
 
-void log_printf(print_type type, const char *format, ...) {
+void log_printf(print_type type, const char *format, ...)
+{
 
     time_t rawtime;
     struct tm *timeinfo;
@@ -18,11 +19,15 @@ void log_printf(print_type type, const char *format, ...) {
     va_end(args);
 }
 
-void send_message(int sock, const char *message) {
-    if (write(sock, message, strlen(message)) < 0) {
+void send_message(int sock, const char *message)
+{
+    if (write(sock, message, strlen(message)) < 0)
+    {
         log_printf(PRINT_ERROR, "Erreur lors de l'envoi du message\n");
-    } else {
-        if (strstr(message, "inventaire")== NULL)
+    }
+    else
+    {
+        if (strstr(message, "inventaire") == NULL)
             log_printf(PRINT_SEND, "[%d] Message envoyé: %s", sock, message);
     }
 }

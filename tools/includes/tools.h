@@ -16,10 +16,8 @@
 #include <ctype.h>
 #include <signal.h>
 
-
-
 #define BUFFER_SIZE_TINY 64
-#define BUFFER_SIZE_SMALL 256 
+#define BUFFER_SIZE_SMALL 256
 #define BUFFER_SIZE_MEDIUM 512
 #define BUFFER_SIZE 1024
 #define BUFFER_SIZE_LARGE 2048
@@ -33,14 +31,15 @@
 #define THYSTAME "thystame"
 #define JOUEUR "joueur"
 
-typedef enum    print_type {
+typedef enum print_type
+{
     PRINT_ERROR,
     PRINT_INFORMATION,
     PRINT_SEND,
     PRINT_RECEIVE
-}               print_type;
+} print_type;
 
-void            log_printf(print_type type, const char *format, ...);
-void            send_message(int sock, const char *message);
+void log_printf(print_type type, const char *format, ...);
+void send_message(int sock, const char *message);
 
-#endif 
+#endif
