@@ -24,6 +24,7 @@ class Game extends StatefulWidget {
     required this.winner,
     required this.adjustedCellSize,
     required this.isLost,
+    required this.isRessourcesInt,
     super.key,
   });
 
@@ -38,6 +39,7 @@ class Game extends StatefulWidget {
   final Team? winner;
   final double adjustedCellSize;
   final bool isLost;
+  final bool isRessourcesInt;
 
   @override
   State<Game> createState() => _GameState();
@@ -68,8 +70,8 @@ class _GameState extends State<Game> {
             screenHeight / 2 +
             _panUpdateDy;
 
-    return GestureDetector(
-      onPanUpdate: (details) {
+    return Listener(
+      onPointerMove: (details) {
         setState(() {
           _panUpdateDx += details.delta.dx;
           _panUpdateDy += details.delta.dy;
@@ -89,6 +91,7 @@ class _GameState extends State<Game> {
                     cellSize: widget.adjustedCellSize,
                     onTileTap: widget.onTileTap,
                     eggs: widget.eggs,
+                    isRessourceInt: widget.isRessourcesInt,
                   ),
                   for (GhostPlayer ghostPlayer in widget.ghostPlayers)
                     GhostPlayerWidget(

@@ -1,7 +1,7 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include "../../tools/includes/tools.h"
+#include "../../tools_dir/includes/tools.h"
 
 #define MAX_RESPONSES_COMMANDS 246
 #define RESPONSES_TAB *responses[MAX_RESPONSES_COMMANDS]
