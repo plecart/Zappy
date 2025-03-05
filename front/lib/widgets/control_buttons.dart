@@ -53,7 +53,7 @@ class _ControlButtonsState extends State<ControlButtons> {
                 });
                 widget.onPlayTap();
               },
-              child: const Icon(Icons.pause, size: 30))
+              child: const Icon(Icons.play_arrow, size: 30))
       ],
     );
   }
