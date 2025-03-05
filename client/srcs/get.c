@@ -89,7 +89,7 @@ int get_mission(const char *str, const char *team_name, char *mission)
     return value;
 }
 
-int get_view(char responses[BUFFER_SIZE_SMALL], char cells[8 * 8][BUFFER_SIZE])
+int get_view(char responses[BUFFER_SIZE_SMALL], char cells[8 * 8 + 3][BUFFER_SIZE])
 {
     char *token = strtok(responses, ",");
     int j = 0;
