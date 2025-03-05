@@ -136,7 +136,7 @@ int execute_action(int sock, char *action, char RESPONSES_TAB, int *response_cou
 int look(int sock, char RESPONSES_TAB, int *response_count, char *resource_name, int *player_level)
 {
     int response_index = execute_action(sock, "voir\n", responses, response_count, SERVER_RESPONSE_OBJECT, false);
-    char cells[8 * 8][BUFFER_SIZE];
+    char cells[8 * 8 + 3][BUFFER_SIZE];
     int cells_number = get_view(responses[response_index], cells);
     delete_response(responses, response_count, response_index);
     *player_level = (int)(sqrt(cells_number) - 1);

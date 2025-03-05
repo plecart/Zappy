@@ -3,7 +3,7 @@
 
 #include "../../tools/includes/tools.h"
 
-#define MAX_RESPONSES_COMMANDS 128
+#define MAX_RESPONSES_COMMANDS 246
 #define RESPONSES_TAB *responses[MAX_RESPONSES_COMMANDS]
 
 extern const char *const resource_names[];
